@@ -13,8 +13,8 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
+  - test1
+  - test2
   - 
   - 
   - 
@@ -40,4 +40,13 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Ground
+    uniqueID: 3615937929
+    locked: 0
+  - name: Corals
+    uniqueID: 2480388883
+    locked: 0
+  - name: HUD
+    uniqueID: 3211224705
     locked: 0
