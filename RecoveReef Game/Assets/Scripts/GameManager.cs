@@ -13,8 +13,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CameraFollow cameraFollow;
     [SerializeField] private Tilemap coralTileMap;
     [SerializeField] private Tilemap groundTileMap;
+    [SerializeField] private Tilemap algaeTileMap;
     [SerializeField] private TileBase[] coralTileBases;
     [SerializeField] private TileBase[] groundTileBases;
+    [SerializeField] private TileBase[] algaeTileBases;
     [SerializeField] private Text fishDisplay;
     #pragma warning restore 0649
     private float zoom = 10f;
@@ -24,7 +26,8 @@ public class GameManager : MonoBehaviour
     private bool edgeScrollingEnabled = false;
     private Dictionary<Vector3Int,CoralCellData> coralCells;
     private Dictionary<Vector3Int,float> groundCells;
-    private Dictionary<TileBase, float> probabilitySurvivalMax;
+    private Dictionary<Vector3Int,CoralCellData> algaeCells; // eventually convert to algae cell data or unified structure
+    private Dictionary<TileBase, float> probCoralSurvivabilityMax;
     private Dictionary<TileBase,int> coralFishValue;
     private int testnum = 0;
     private int fishOutput = 0;
@@ -50,10 +53,10 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < coralTileBases.Length; i++) {
             coralFishValue.Add(coralTileBases[i], UnityEngine.Random.Range(5,15));
         }
-        probabilitySurvivalMax = new Dictionary<TileBase, float>();
-        probabilitySurvivalMax.Add(groundTileBases[0], 100);
-        probabilitySurvivalMax.Add(groundTileBases[1], 85);
-        probabilitySurvivalMax.Add(groundTileBases[2], 65);
+        probCoralSurvivabilityMax = new Dictionary<TileBase, float>();
+        probCoralSurvivabilityMax.Add(groundTileBases[0], 100);
+        probCoralSurvivabilityMax.Add(groundTileBases[1], 85);
+        probCoralSurvivabilityMax.Add(groundTileBases[2], 65);
 
         // Setting the tiles in the tilemap to the coralCells dictionary
         coralCells = new Dictionary<Vector3Int,CoralCellData>();
@@ -82,7 +85,7 @@ public class GameManager : MonoBehaviour
         foreach (Vector3Int pos in groundTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
             if (!groundTileMap.HasTile(localPlace)) continue;
-            groundCells.Add(localPlace, probabilitySurvivalMax[groundTileMap.GetTile(localPlace)]);
+            groundCells.Add(localPlace, probCoralSurvivabilityMax[groundTileMap.GetTile(localPlace)]);
         }
     }
 
@@ -118,6 +121,7 @@ public class GameManager : MonoBehaviour
 
         bool rb = Input.GetMouseButtonDown(1);
         if (rb) {
+            // should be unable to replace a tile
             print("right mouse button has been pressed");
             Vector3Int position = getMouseGridPosition();
             print("position: " + position);
@@ -173,6 +177,18 @@ public class GameManager : MonoBehaviour
                         + "\nSmall Fish: " + smallFishTotal
                         + "\nBig Fish: " + bigFishTotal
                         + "\nHerbivorous Fish: " + herbivorousFishTotal;
+    }
+
+    private void updateAllAlgae() {
+        // handles propagation
+        // refer to updateCoralSurvivability for structure
+        // basically get list of keys, then propagate
+        //           <x+1,y>
+        // <x+1,y-1>         <x+1,y+1>
+        //            <x,y>
+        //  <x,y-1>           <x,y+1>
+        //           <x-1,y>
+        // each algae has a random propagation chance; generate a random num to roll chance
     }
 
     private void updateFishOutput() {
