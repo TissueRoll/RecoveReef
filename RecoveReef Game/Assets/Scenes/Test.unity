@@ -9093,6 +9093,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
         type: 3}
+      propertyPath: algaeTileBases.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
       propertyPath: cameraFollow
       value: 
       objectReference: {fileID: 519420033}
@@ -9248,6 +9253,23 @@ PrefabInstance:
       propertyPath: fishDisplay
       value: 
       objectReference: {fileID: 1292799972}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
+      propertyPath: algaeTileMap
+      value: 
+      objectReference: {fileID: 1080535664}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
+      propertyPath: algaeTileBases.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: aa8b6c8b66b7f2340b130c9fb377ab1d,
+        type: 2}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
+      propertyPath: algaeTileBases.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: f7aae7b64e240b848811a0dd1e59d739,
+        type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a42c425e58ec2bc4b9b466b78437a1df, type: 3}
 --- !u!1 &1080535661

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class CoralCellData
+public class AlgaeCellData
 {
     public Vector3Int LocalPlace {get; set;}
     public Vector3 WorldLocation {get; set;}
@@ -16,7 +16,6 @@ public class CoralCellData
     public int smallFishProduction {get; set;}
     public int bigFishProduction {get; set;}
     public int herbivorousFishProduction {get; set;}
-    public int group {get; set;}
 
     public string printData() {
         string output = "";
@@ -30,7 +29,6 @@ public class CoralCellData
         output += ("smallFishProduction: " + smallFishProduction + "\n");
         output += ("bigFishProduction: " + bigFishProduction + "\n");
         output += ("herbivorousFishProduction: " + herbivorousFishProduction + "\n");
-        output += ("group: " + group + "\n");
         return output;
     }
 
@@ -44,5 +42,4 @@ public class CoralCellData
         if (randNum <= computedSurvivability) return true;
         else return false;
     }
-
 }
