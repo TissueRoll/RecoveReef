@@ -138,7 +138,6 @@ public class GameManager : MonoBehaviour
         InvokeRepeating("doStuff", 1.0f, updateDelay);
     }
 
-    // Update is called once per frame
     void Update()
     {
         // testing for hex tile coords
@@ -204,8 +203,8 @@ public class GameManager : MonoBehaviour
     private void doStuff() {
         survivabilityFrameCounter = (++survivabilityFrameCounter % 7 == 0 ? 0 : survivabilityFrameCounter);
         if (survivabilityFrameCounter == 0) 
-            updateCoralSurvivability();
-        else if (survivabilityFrameCounter == 3)
+            updateAllCoral();
+        else if (survivabilityFrameCounter == 3 || survivabilityFrameCounter == 6)
             updateAllAlgae();
         
         updateFishOutput();
@@ -216,29 +215,32 @@ public class GameManager : MonoBehaviour
     }
 
     private void updateAllAlgae() {
-        // handles propagation
-        // refer to updateCoralSurvivability for structure
-        // basically get list of keys, then propagate
-        // https://www.redblobgames.com/grids/hexagons/
-        // note: unity is using inverted odd-q; switch x and y then baliktad
-        // each algae has a random propagation chance; generate a random num to roll chance
+        updateAlgaeSurvivability();
+        updateAlgaePropagation();
+    }
 
-        // survival
+    private void updateAlgaeSurvivability() {
         List<Vector3Int> keys = new List<Vector3Int>(algaeCells.Keys);
         foreach (Vector3Int key in keys) {
             float randNum = UnityEngine.Random.Range(0.0f, 100.0f);
             if (algaeCells[key].maturity <= 100.0f) {
-                algaeCells[key].addMaturity(10);
+                algaeCells[key].addMaturity(1);
                 if (!algaeCells[key].willSurvive(randNum, groundCells[key])) {
                     algaeTileMap.SetTile(key, null);
                     algaeCells.Remove(key);
                 }
             }
-            
         }
+    }
 
-        // propagation
-        keys = new List<Vector3Int>(algaeCells.Keys);
+    private void updateAlgaePropagation() {
+        // handles propagation
+        // basically get list of keys, then propagate
+        // https://www.redblobgames.com/grids/hexagons/
+        // note: unity is using inverted odd-q; switch x and y then baliktad
+        // each algae has a random propagation chance; generate a random num to roll chance
+
+        List<Vector3Int> keys = new List<Vector3Int>(algaeCells.Keys);
         foreach (Vector3Int key in keys) {
             float randNum = UnityEngine.Random.Range(0.0f, 100.0f);
             float basePropagationChance = UnityEngine.Random.Range(50.0f, 60.0f);
@@ -247,6 +249,20 @@ public class GameManager : MonoBehaviour
                     if (UnityEngine.Random.Range(0.0f,100.0f) <= basePropagationChance + UnityEngine.Random.Range(0.0f, 5.0f)) {
                         Vector3Int localPlace = key+hexNeighbors[key.y&1,i];
                         if (algaeTileMap.HasTile(localPlace) || algaeCells.ContainsKey(localPlace)) continue;
+                        if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace)) {
+                            randNum -= coralCells[localPlace].maturity*0.15f;
+                            CoralCellData temp;
+                            float avgMaturity = 0;
+                            float numCorals = 1;
+                            for (int j = 0; j < 6; j++)
+                                if (coralCells.TryGetValue(localPlace+hexNeighbors[localPlace.y&1, j], out temp)) {
+                                    randNum -= coralCells[localPlace+hexNeighbors[localPlace.y&1, j]].maturity*0.05f;
+                                    avgMaturity += coralCells[localPlace+hexNeighbors[localPlace.y&1, j]].maturity;
+                                    numCorals++;
+                                }
+                            if (randNum < avgMaturity/numCorals) continue;
+                        }
+                        
                         AlgaeCellData cell = new AlgaeCellData {
                             LocalPlace = localPlace,
                             WorldLocation = algaeTileMap.CellToWorld(localPlace),
@@ -257,12 +273,19 @@ public class GameManager : MonoBehaviour
                             herbivorousFishProduction = UnityEngine.Random.Range(10,20)
                         };
                         herbivorousFishTotal += cell.herbivorousFishProduction;
+                        if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace)) {
+                            coralTileMap.SetTile(localPlace, null);
+                            herbivorousFishTotalInterest -= coralCells[localPlace].herbivorousFishInterest;
+                            carnivorousFishTotalInterest -= coralCells[localPlace].carnivorousFishInterest;
+                            coralCells.Remove(localPlace);
+                        }
                         algaeCells.Add(cell.LocalPlace,cell);
                         algaeTileMap.SetTile(cell.LocalPlace, cell.TileBase);
                     }
                 }
             }
         }
+
     }
 
     private void updateFishOutput() {
@@ -277,6 +300,11 @@ public class GameManager : MonoBehaviour
 
         fishIncome = (int)Math.Round(carnivorousFishTotal*0.3f + herbivorousFishTotal*0.2f);
         fishOutput += fishIncome;
+    }
+
+    private void updateAllCoral() {
+        updateCoralSurvivability();
+        updateCoralPropagation();
     }
 
     private void updateCoralSurvivability() {
@@ -297,7 +325,36 @@ public class GameManager : MonoBehaviour
                     coralCells.Remove(key);
                 }
             }
-            
+        }
+    }
+
+    private void updateCoralPropagation() {
+        List<Vector3Int> keys = new List<Vector3Int>(coralCells.Keys);
+        foreach (Vector3Int key in keys) {
+            float randNum = UnityEngine.Random.Range(0.0f, 100.0f);
+            float basePropagationChance = UnityEngine.Random.Range(50.0f, 60.0f);
+            if (coralCells[key].maturity > 100.0f) { // propagate only if "mature"
+                for (int i = 0; i < 6; i++) {
+                    if (UnityEngine.Random.Range(0.0f,100.0f) <= basePropagationChance + UnityEngine.Random.Range(0.0f, 5.0f)) {
+                        Vector3Int localPlace = key+hexNeighbors[key.y&1,i];
+                        if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace) || algaeTileMap.HasTile(localPlace)) continue;
+                        CoralCellData cell = new CoralCellData {
+                            LocalPlace = localPlace,
+                            WorldLocation = coralTileMap.CellToWorld(localPlace),
+                            TileBase = coralCells[key].TileBase,
+                            TilemapMember = coralTileMap,
+                            name = localPlace.x + "," + localPlace.y,
+                            maturity = 0.0f,
+                            carnivorousFishInterest = UnityEngine.Random.Range(0.0007f, 0.0035f),
+                            herbivorousFishInterest = UnityEngine.Random.Range(0.001f,0.005f)
+                        };
+                        carnivorousFishTotalInterest += cell.carnivorousFishInterest;
+                        herbivorousFishTotalInterest += cell.herbivorousFishInterest;
+                        coralCells.Add(cell.LocalPlace,cell);
+                        coralTileMap.SetTile(cell.LocalPlace, cell.TileBase);
+                    }
+                }
+            }
         }
     }
 
