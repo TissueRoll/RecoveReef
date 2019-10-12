@@ -34,10 +34,10 @@ public class CoralCellData
         maturity += maturitySpeed;
     }
 
-    public bool willSurvive (float randNum, float groundViability) {
-        float computedSurvivability = Mathf.Min((groundViability - 50.0f)/100.0f*maturity + 50.0f, groundViability);
+    public bool willSurvive (float randNum, float groundViability, float miscFactors) {
+        float computedSurvivability = Mathf.Min((groundViability - 75.0f)/100.0f*maturity + 75.0f, groundViability);
         
-        if (randNum <= computedSurvivability) return true;
+        if (randNum <= computedSurvivability+miscFactors) return true;
         else return false;
     }
 

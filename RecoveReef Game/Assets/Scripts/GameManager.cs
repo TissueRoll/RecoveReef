@@ -201,11 +201,12 @@ public class GameManager : MonoBehaviour
     }
 
     private void doStuff() {
-        survivabilityFrameCounter = (++survivabilityFrameCounter % 5 == 0 ? 0 : survivabilityFrameCounter);
-        if (survivabilityFrameCounter == 0) {
+        survivabilityFrameCounter = (++survivabilityFrameCounter % 7 == 0 ? 0 : survivabilityFrameCounter);
+        if (survivabilityFrameCounter == 0) 
             updateCoralSurvivability();
+        else if (survivabilityFrameCounter == 3)
             updateAllAlgae();
-        }
+        
         updateFishOutput();
         fishDisplay.text = "Fish Output: " + fishOutput
                         + "\nCarnivorous Fish: " + carnivorousFishTotal
@@ -272,14 +273,18 @@ public class GameManager : MonoBehaviour
         fishOutput += toBeAdded;
     }
 
+    // #F001: coral survivability influenced by adjacent corals
     private void updateCoralSurvivability() {
         List<Vector3Int> keys = new List<Vector3Int>(coralCells.Keys);
         foreach (Vector3Int key in keys) {
             float randNum = UnityEngine.Random.Range(0.0f, 100.0f);
-            // print(randNum + " " + key);
             if (coralCells[key].maturity <= 100) {
-                coralCells[key].addMaturity(10);
-                if (!coralCells[key].willSurvive(randNum, groundCells[key])) {
+                float miscFactors = 0.0f;
+                for (int i = 0; i < 6; i++)
+                    if (coralCells.ContainsKey(key+hexNeighbors[key.y&1, i]))
+                        miscFactors += 0.3f;
+                coralCells[key].addMaturity(1.0f);
+                if (!coralCells[key].willSurvive(randNum, groundCells[key], miscFactors)) {
                     coralTileMap.SetTile(key, null);
                     coralCells.Remove(key);
                 }
