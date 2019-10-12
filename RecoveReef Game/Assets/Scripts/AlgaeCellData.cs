@@ -13,8 +13,6 @@ public class AlgaeCellData
 
     public float maturity {get; set;}
     public int fishProduction {get; set;}
-    public int smallFishProduction {get; set;}
-    public int bigFishProduction {get; set;}
     public int herbivorousFishProduction {get; set;}
 
     public string printData() {
@@ -26,8 +24,6 @@ public class AlgaeCellData
         output += ("name: " + name + "\n");
         output += ("maturity: " + maturity + "\n");
         output += ("fishProduction: " + fishProduction + "\n");
-        output += ("smallFishProduction: " + smallFishProduction + "\n");
-        output += ("bigFishProduction: " + bigFishProduction + "\n");
         output += ("herbivorousFishProduction: " + herbivorousFishProduction + "\n");
         return output;
     }

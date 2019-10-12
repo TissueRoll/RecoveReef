@@ -13,10 +13,8 @@ public class CoralCellData
 
     public float maturity {get; set;}
     public int fishProduction {get; set;}
-    public int smallFishProduction {get; set;}
-    public int bigFishProduction {get; set;}
+    public int carnivorousFishProduction {get; set;}
     public int herbivorousFishProduction {get; set;}
-    public int group {get; set;}
 
     public string printData() {
         string output = "";
@@ -27,10 +25,8 @@ public class CoralCellData
         output += ("name: " + name + "\n");
         output += ("maturity: " + maturity + "\n");
         output += ("fishProduction: " + fishProduction + "\n");
-        output += ("smallFishProduction: " + smallFishProduction + "\n");
-        output += ("bigFishProduction: " + bigFishProduction + "\n");
+        output += ("carnivorousFishProduction: " + carnivorousFishProduction + "\n");
         output += ("herbivorousFishProduction: " + herbivorousFishProduction + "\n");
-        output += ("group: " + group + "\n");
         return output;
     }
 

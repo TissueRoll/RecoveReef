@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Text fishDisplay;
     #pragma warning restore 0649
     private float zoom = 10f;
-    private float updateDelay = 5f;
+    private float updateDelay = 0.5f;
     private int survivabilityFrameCounter = 0;
     private Vector3 cameraFollowPosition;
     private bool edgeScrollingEnabled = false;
@@ -33,8 +33,7 @@ public class GameManager : MonoBehaviour
     private int testnum = 0;
     private int fishOutput = 0;
     private int fishIncome = 0;
-    private int smallFishTotal = 0;
-    private int bigFishTotal = 0;
+    private int carnivorousFishTotal = 0;
     private int herbivorousFishTotal = 0;
     private Vector3Int[,] hexNeighbors = new Vector3Int[,] {
         {new Vector3Int(1,0,0), new Vector3Int(0,-1,0), new Vector3Int(-1,-1,0), new Vector3Int(-1,0,0), new Vector3Int(-1,1,0), new Vector3Int(0,1,0)}, 
@@ -56,24 +55,30 @@ public class GameManager : MonoBehaviour
     }
 
     private void initializeTiles() {
+        // instantiation
         coralFishValue = new Dictionary<TileBase, int>();
+        coralGroups = new Dictionary<int, Dictionary<Vector3Int, CoralCellData>>();
+        coralCells = new Dictionary<Vector3Int,CoralCellData>();
+        groundCells = new Dictionary<Vector3Int, float>();
+        algaeCells = new Dictionary<Vector3Int, AlgaeCellData>();
+
+        // setting values
         for (int i = 0; i < coralTileBases.Length; i++) {
             coralFishValue.Add(coralTileBases[i], UnityEngine.Random.Range(5,15));
         }
         probCoralSurvivabilityMax = new Dictionary<TileBase, float>();
         probCoralSurvivabilityMax.Add(groundTileBases[0], 100);
-        probCoralSurvivabilityMax.Add(groundTileBases[1], 85);
-        probCoralSurvivabilityMax.Add(groundTileBases[2], 65);
+        probCoralSurvivabilityMax.Add(groundTileBases[1], 97);
+        probCoralSurvivabilityMax.Add(groundTileBases[2], 90);
 
         probAlgaeSurvivabilityMax = new Dictionary<TileBase, float>();
         probAlgaeSurvivabilityMax.Add(algaeTileBases[0], 90);
         probAlgaeSurvivabilityMax.Add(algaeTileBases[1], 90);
 
-        coralGroups = new Dictionary<int, Dictionary<Vector3Int, CoralCellData>>();
+        // initialization
         coralGroups.Add(0,new Dictionary<Vector3Int, CoralCellData>());
 
         // Setting the tiles in the tilemap to the coralCells dictionary
-        coralCells = new Dictionary<Vector3Int,CoralCellData>();
         foreach(Vector3Int pos in coralTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
             if (!coralTileMap.HasTile(localPlace)) continue;
@@ -85,26 +90,23 @@ public class GameManager : MonoBehaviour
                 name = localPlace.x + "," + localPlace.y,
                 maturity = 101.0f,
                 fishProduction = coralFishValue[coralTileMap.GetTile(localPlace)],
-                smallFishProduction = UnityEngine.Random.Range(10,50),
-                bigFishProduction = UnityEngine.Random.Range(5,15),
-                herbivorousFishProduction = UnityEngine.Random.Range(10,20),
-                group = 0
+                carnivorousFishProduction = 0,
+                herbivorousFishProduction = UnityEngine.Random.Range(10,20)
             };
-            smallFishTotal += cell.smallFishProduction;
-            bigFishTotal += cell.bigFishProduction;
+            carnivorousFishTotal += cell.carnivorousFishProduction;
             herbivorousFishTotal += cell.herbivorousFishProduction;
             coralCells.Add(cell.LocalPlace, cell);
             coralGroups[0].Add(cell.LocalPlace, cell);
         }
 
-        groundCells = new Dictionary<Vector3Int, float>();
+        
         foreach (Vector3Int pos in groundTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
             if (!groundTileMap.HasTile(localPlace)) continue;
             groundCells.Add(localPlace, probCoralSurvivabilityMax[groundTileMap.GetTile(localPlace)]);
         }
 
-        algaeCells = new Dictionary<Vector3Int, AlgaeCellData>();
+        
         foreach (Vector3Int pos in algaeTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
             if (!algaeTileMap.HasTile(localPlace)) continue;
@@ -116,28 +118,22 @@ public class GameManager : MonoBehaviour
                 name = localPlace.x + "," + localPlace.y,
                 maturity = 101.0f,
                 fishProduction = 0,
-                smallFishProduction = UnityEngine.Random.Range(10,50),
-                bigFishProduction = UnityEngine.Random.Range(5,15),
                 herbivorousFishProduction = UnityEngine.Random.Range(10,20)
             };
             algaeCells.Add(cell.LocalPlace,cell);
         }
-
-        // foreach (KeyValuePair<Vector3Int,AlgaeCellData> entry in algaeCells) {
-        //     print("position: " + entry.Key + "\n" + entry.Value.printData());
-        // }
     }
 
     private void initializeGame() {
         fishDisplay = GameObject.Find("FishDisplay").GetComponent<Text>();
-        fishDisplay.text = "Fish Output: 0\nSmall Fish: 0\nBig Fish: 0\nHerbivorous Fish: 0\nFish Income: 0";
+        fishDisplay.text = "Fish Output: 0\nCarnivorous Fish: 0\nHerbivorous Fish: 0\nFish Income: 0";
     }
 
     private void Start() {
         // sets the cameraFollowPosition to the default 
         cameraFollowPosition = cameraFollow.transform.position;
         cameraFollow.Setup(() => cameraFollowPosition, () => zoom);
-        InvokeRepeating("doStuff", 2.0f, 2.0f);
+        InvokeRepeating("doStuff", 1.0f, updateDelay);
     }
 
     // Update is called once per frame
@@ -150,11 +146,7 @@ public class GameManager : MonoBehaviour
             print("left mouse button has been pressed");
             Vector3Int position = getMouseGridPosition();
             print(":: " + position);
-            if (coralCells.ContainsKey(position))
-                print("::--> group: " + coralCells[position].group);
             // if (coralCells.ContainsKey(position)) {
-            //     smallFishTotal -= coralCells[position].smallFishProduction;
-            //     bigFishTotal -= coralCells[position].bigFishProduction;
             //     herbivorousFishTotal -= coralCells[position].herbivorousFishProduction;
             //     coralTileMap.SetTile(position, null);
             //     coralCells.Remove(position);
@@ -170,12 +162,6 @@ public class GameManager : MonoBehaviour
             if (coralTileMap.HasTile(position)) {
                 print("coral already existing; cannot place tile");
                 print(coralCells[position].printData());
-                // coralCells[position].TileBase = coralTileBases[testnum];
-                // coralCells[position].maturity = 0;
-                // coralCells[position].fishProduction = coralFishValue[coralTileBases[testnum]];
-                // coralCells[position].smallFishProduction = UnityEngine.Random.Range(10,50);
-                // coralCells[position].bigFishProduction = UnityEngine.Random.Range(5,15);
-                // coralCells[position].herbivorousFishProduction = UnityEngine.Random.Range(10,20);
             } else if (algaeTileMap.HasTile(position)) {
                 print("algae already existing; cannot place tile");
                 print(algaeCells[position].printData());
@@ -188,14 +174,11 @@ public class GameManager : MonoBehaviour
                     name = position.x + "," + position.y,
                     maturity = 0,
                     fishProduction = coralFishValue[coralTileBases[testnum]],
-                    smallFishProduction = UnityEngine.Random.Range(10,50),
-                    bigFishProduction = UnityEngine.Random.Range(5,15),
-                    herbivorousFishProduction = UnityEngine.Random.Range(10,20),
-                    group = 0
+                    carnivorousFishProduction = 0,
+                    herbivorousFishProduction = UnityEngine.Random.Range(10,20)
                 };
                 coralCells.Add(position, cell);
-                smallFishTotal += coralCells[position].smallFishProduction;
-                bigFishTotal += coralCells[position].bigFishProduction;
+                carnivorousFishTotal += coralCells[position].carnivorousFishProduction;
                 herbivorousFishTotal += coralCells[position].herbivorousFishProduction;
                 coralTileMap.SetTile(position, coralTileBases[testnum]);
             }
@@ -222,12 +205,10 @@ public class GameManager : MonoBehaviour
         if (survivabilityFrameCounter == 0) {
             updateCoralSurvivability();
             updateAllAlgae();
-            updateCoralGrouping();
         }
         updateFishOutput();
         fishDisplay.text = "Fish Output: " + fishOutput
-                        + "\nSmall Fish: " + smallFishTotal
-                        + "\nBig Fish: " + bigFishTotal
+                        + "\nCarnivorous Fish: " + carnivorousFishTotal
                         + "\nHerbivorous Fish: " + herbivorousFishTotal
                         + "\nFish Income: " + fishIncome;
     }
@@ -244,11 +225,9 @@ public class GameManager : MonoBehaviour
         List<Vector3Int> keys = new List<Vector3Int>(algaeCells.Keys);
         foreach (Vector3Int key in keys) {
             float randNum = UnityEngine.Random.Range(0.0f, 100.0f);
-            // print(randNum + " " + key);
             if (algaeCells[key].maturity <= 100.0f) {
                 algaeCells[key].addMaturity(10);
                 if (!algaeCells[key].willSurvive(randNum, groundCells[key])) {
-                    // float temp = Mathf.Min((groundCells[key]-50.0f)/100.0f*algaeCells[key].maturity + 50.0f, groundCells[key]);
                     algaeTileMap.SetTile(key, null);
                     algaeCells.Remove(key);
                 }
@@ -274,8 +253,6 @@ public class GameManager : MonoBehaviour
                             name = localPlace.x + "," + localPlace.y,
                             maturity = 0.0f,
                             fishProduction = 0,
-                            smallFishProduction = UnityEngine.Random.Range(10,50),
-                            bigFishProduction = UnityEngine.Random.Range(5,15),
                             herbivorousFishProduction = UnityEngine.Random.Range(10,20)
                         };
                         algaeCells.Add(cell.LocalPlace,cell);
@@ -309,55 +286,6 @@ public class GameManager : MonoBehaviour
             }
             
         }
-    }
-
-    private void updateCoralGrouping() {
-        foreach(KeyValuePair<Vector3Int,CoralCellData> entry in coralCells) {
-            Vector3Int pos = entry.Key;
-            CoralCellData posData = entry.Value;
-            float randNum = UnityEngine.Random.Range(0.0f, 100.0f);
-            float baseFusionChance = UnityEngine.Random.Range(25.0f, 50.0f);
-            if (posData.maturity > 100.0f) {
-                for (int i = 0; i < 6; i++) {
-                    if (!coralCells.ContainsKey(pos+hexNeighbors[pos.y&1,i])) continue;
-                    CoralCellData other = coralCells[pos+hexNeighbors[pos.y&1,i]];
-                    if (other.maturity > 100.0f && randNum <= baseFusionChance) {
-                        // add them to a data struct
-                        if (posData.group == 0 && other.group == 0) {
-                            int availableGroup = checkAvailableGroup();
-                            coralGroups.Add(availableGroup, new Dictionary<Vector3Int, CoralCellData>());
-                            entry.Value.group = availableGroup;
-                            coralCells[pos+hexNeighbors[pos.y&1,i]].group = availableGroup;
-                            coralGroups[availableGroup].Add(entry.Value.LocalPlace, entry.Value);
-                            coralGroups[availableGroup].Add(other.LocalPlace, coralCells[pos+hexNeighbors[pos.y&1,i]]);
-                            coralGroups[0].Remove(entry.Key);
-                            coralGroups[0].Remove(other.LocalPlace);
-                        } else if (posData.group == 0 && other.group != 0) {
-                            entry.Value.group = other.group;
-                            coralGroups[other.group].Add(entry.Key, entry.Value);
-                            coralGroups[0].Remove(entry.Key);
-                        } else if (posData.group != 0 && other.group == 0) {
-                            coralCells[pos+hexNeighbors[pos.y&1,i]].group = posData.group;
-                            coralGroups[posData.group].Add(other.LocalPlace, coralCells[pos+hexNeighbors[pos.y&1,i]]);
-                            coralGroups[0].Remove(other.LocalPlace);
-                        } else {
-                            // do nothing
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private int checkAvailableGroup() {
-        int available = 0;
-        for (int i = 1; i < 3601; i++) {
-            if (!coralGroups.ContainsKey(i)) {
-                available = i;
-                break;
-            }
-        }
-        return available;
     }
 
     private Vector3Int getMouseGridPosition() {
