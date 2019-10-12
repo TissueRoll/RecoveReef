@@ -273,16 +273,16 @@ public class GameManager : MonoBehaviour
         fishOutput += toBeAdded;
     }
 
-    // #F001: coral survivability influenced by adjacent corals
     private void updateCoralSurvivability() {
         List<Vector3Int> keys = new List<Vector3Int>(coralCells.Keys);
         foreach (Vector3Int key in keys) {
             float randNum = UnityEngine.Random.Range(0.0f, 100.0f);
             if (coralCells[key].maturity <= 100) {
+                // check adj corals
                 float miscFactors = 0.0f;
                 for (int i = 0; i < 6; i++)
                     if (coralCells.ContainsKey(key+hexNeighbors[key.y&1, i]))
-                        miscFactors += 0.3f;
+                        miscFactors += 0.01f*coralCells[key+hexNeighbors[key.y&1, i]].maturity;
                 coralCells[key].addMaturity(1.0f);
                 if (!coralCells[key].willSurvive(randNum, groundCells[key], miscFactors)) {
                     coralTileMap.SetTile(key, null);
