@@ -33,7 +33,9 @@ public class GameManager : MonoBehaviour
     private int testnum = 0;
     private int fishOutput = 0;
     private int fishIncome = 0;
+    private float carnivorousFishTotalInterest = 0;
     private int carnivorousFishTotal = 0;
+    private float herbivorousFishTotalInterest = 0;
     private int herbivorousFishTotal = 0;
     private Vector3Int[,] hexNeighbors = new Vector3Int[,] {
         {new Vector3Int(1,0,0), new Vector3Int(0,-1,0), new Vector3Int(-1,-1,0), new Vector3Int(-1,0,0), new Vector3Int(-1,1,0), new Vector3Int(0,1,0)}, 
@@ -90,11 +92,11 @@ public class GameManager : MonoBehaviour
                 name = localPlace.x + "," + localPlace.y,
                 maturity = 101.0f,
                 fishProduction = coralFishValue[coralTileMap.GetTile(localPlace)],
-                carnivorousFishProduction = 0,
-                herbivorousFishProduction = UnityEngine.Random.Range(10,20)
+                carnivorousFishInterest = UnityEngine.Random.Range(0.0007f,0.0035f),
+                herbivorousFishInterest = UnityEngine.Random.Range(0.001f,0.005f)
             };
-            carnivorousFishTotal += cell.carnivorousFishProduction;
-            herbivorousFishTotal += cell.herbivorousFishProduction;
+            carnivorousFishTotalInterest += cell.carnivorousFishInterest;
+            herbivorousFishTotalInterest += cell.herbivorousFishInterest;
             coralCells.Add(cell.LocalPlace, cell);
             coralGroups[0].Add(cell.LocalPlace, cell);
         }
@@ -117,9 +119,9 @@ public class GameManager : MonoBehaviour
                 TilemapMember = algaeTileMap,
                 name = localPlace.x + "," + localPlace.y,
                 maturity = 101.0f,
-                fishProduction = 0,
                 herbivorousFishProduction = UnityEngine.Random.Range(10,20)
             };
+            herbivorousFishTotal += cell.herbivorousFishProduction;
             algaeCells.Add(cell.LocalPlace,cell);
         }
     }
@@ -139,7 +141,6 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
         // testing for hex tile coords
         bool lb = Input.GetMouseButtonDown(0);
         if (lb) {
@@ -174,12 +175,12 @@ public class GameManager : MonoBehaviour
                     name = position.x + "," + position.y,
                     maturity = 0,
                     fishProduction = coralFishValue[coralTileBases[testnum]],
-                    carnivorousFishProduction = 0,
-                    herbivorousFishProduction = UnityEngine.Random.Range(10,20)
+                    carnivorousFishInterest = UnityEngine.Random.Range(0.0007f,0.0035f),
+                    herbivorousFishInterest = UnityEngine.Random.Range(0.001f,0.005f)
                 };
                 coralCells.Add(position, cell);
-                carnivorousFishTotal += coralCells[position].carnivorousFishProduction;
-                herbivorousFishTotal += coralCells[position].herbivorousFishProduction;
+                carnivorousFishTotalInterest += coralCells[position].carnivorousFishInterest;
+                herbivorousFishTotalInterest += coralCells[position].herbivorousFishInterest;
                 coralTileMap.SetTile(position, coralTileBases[testnum]);
             }
             
@@ -253,9 +254,9 @@ public class GameManager : MonoBehaviour
                             TilemapMember = algaeTileMap,
                             name = localPlace.x + "," + localPlace.y,
                             maturity = 0.0f,
-                            fishProduction = 0,
                             herbivorousFishProduction = UnityEngine.Random.Range(10,20)
                         };
+                        herbivorousFishTotal += cell.herbivorousFishProduction;
                         algaeCells.Add(cell.LocalPlace,cell);
                         algaeTileMap.SetTile(cell.LocalPlace, cell.TileBase);
                     }
@@ -265,12 +266,17 @@ public class GameManager : MonoBehaviour
     }
 
     private void updateFishOutput() {
-        int toBeAdded = 0;
-        foreach(KeyValuePair<Vector3Int, CoralCellData> entry in coralCells) {
-            toBeAdded += entry.Value.fishProduction;
-        }
-        fishIncome = toBeAdded;
-        fishOutput += toBeAdded;
+        int tempHFT = herbivorousFishTotal;
+        int tempCFT = carnivorousFishTotal;
+        herbivorousFishTotal += (int)Math.Round(tempHFT*herbivorousFishTotalInterest - tempCFT);
+        carnivorousFishTotal += (int)Math.Round((tempHFT-tempCFT)*carnivorousFishTotalInterest + (tempHFT-tempCFT)*0.03f);
+
+        // anti civ gandhi
+        herbivorousFishTotal = Math.Max(herbivorousFishTotal, 0);
+        carnivorousFishTotal = Math.Max(carnivorousFishTotal, 0);
+
+        fishIncome = (int)Math.Round(carnivorousFishTotal*0.3f + herbivorousFishTotal*0.2f);
+        fishOutput += fishIncome;
     }
 
     private void updateCoralSurvivability() {
@@ -286,6 +292,8 @@ public class GameManager : MonoBehaviour
                 coralCells[key].addMaturity(1.0f);
                 if (!coralCells[key].willSurvive(randNum, groundCells[key], miscFactors)) {
                     coralTileMap.SetTile(key, null);
+                    herbivorousFishTotalInterest -= coralCells[key].herbivorousFishInterest;
+                    carnivorousFishTotalInterest -= coralCells[key].carnivorousFishInterest;
                     coralCells.Remove(key);
                 }
             }

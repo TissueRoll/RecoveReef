@@ -12,7 +12,6 @@ public class AlgaeCellData
     public string name {get; set;}
 
     public float maturity {get; set;}
-    public int fishProduction {get; set;}
     public int herbivorousFishProduction {get; set;}
 
     public string printData() {
@@ -23,7 +22,6 @@ public class AlgaeCellData
         output += ("TilemapMember: " + TilemapMember + "\n");
         output += ("name: " + name + "\n");
         output += ("maturity: " + maturity + "\n");
-        output += ("fishProduction: " + fishProduction + "\n");
         output += ("herbivorousFishProduction: " + herbivorousFishProduction + "\n");
         return output;
     }
