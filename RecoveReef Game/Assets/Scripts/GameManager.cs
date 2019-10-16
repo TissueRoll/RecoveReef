@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TileBase[] groundTileBases;
     [SerializeField] private TileBase[] algaeTileBases;
     [SerializeField] private Text fishDisplay;
+    [SerializeField] private Text testTimerText;
     #pragma warning restore 0649
     private float zoom = 10f;
     private float updateDelay = 0.5f;
@@ -43,6 +44,8 @@ public class GameManager : MonoBehaviour
     };
     private Dictionary<int,Dictionary<Vector3Int,CoralCellData>> coralGroups;
 
+    private CountdownTimer tempTimer;
+
     void Awake()
     {
         if (instance == null) {
@@ -53,6 +56,7 @@ public class GameManager : MonoBehaviour
         print("initializing tiles...");
         initializeTiles();
         print("initialization done");
+        tempTimer = new CountdownTimer(1800f);
         initializeGame();
     }
 
@@ -129,6 +133,7 @@ public class GameManager : MonoBehaviour
     private void initializeGame() {
         fishDisplay = GameObject.Find("FishDisplay").GetComponent<Text>();
         fishDisplay.text = "Fish Output: 0\nCarnivorous Fish: 0\nHerbivorous Fish: 0\nFish Income: 0";
+        testTimerText.text = convertTimetoMS(tempTimer.currentTime);
     }
 
     private void Start() {
@@ -197,7 +202,14 @@ public class GameManager : MonoBehaviour
         moveCameraWASD(20f);
         if (edgeScrollingEnabled) moveCameraMouseEdge(20f,10f);
         zoomKeys(1f);
-        
+        tempTimer.updateTime();
+        testTimerText.text = convertTimetoMS(tempTimer.currentTime);
+    }
+
+    private string convertTimetoMS(float rawTime) {
+        string minutes = Mathf.Floor(rawTime/60).ToString("00");
+        string seconds = Mathf.RoundToInt(rawTime%60).ToString("00");
+        return string.Format("{0}:{1}", minutes, seconds);
     }
 
     private void doStuff() {
