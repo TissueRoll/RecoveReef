@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
 
     #pragma warning disable 0649
     [SerializeField] private CameraFollow cameraFollow;
+    [SerializeField] private Camera nurseryCamera;
     [SerializeField] private Tilemap coralTileMap;
     [SerializeField] private Tilemap groundTileMap;
     [SerializeField] private Tilemap algaeTileMap;
@@ -24,7 +25,9 @@ public class GameManager : MonoBehaviour
     private float updateDelay = 0.5f;
     private int survivabilityFrameCounter = 0;
     private Vector3 cameraFollowPosition;
+    private Vector3 savedCameraPosition;
     private bool edgeScrollingEnabled = false;
+    private bool showNursery = false;
     private Dictionary<Vector3Int,CoralCellData> coralCells;
     private Dictionary<Vector3Int,float> groundCells;
     private Dictionary<Vector3Int,AlgaeCellData> algaeCells; // eventually convert to algae cell data or unified structure
@@ -140,6 +143,9 @@ public class GameManager : MonoBehaviour
         // sets the cameraFollowPosition to the default 
         cameraFollowPosition = cameraFollow.transform.position;
         cameraFollow.Setup(() => cameraFollowPosition, () => zoom);
+        cameraFollow.enabled = true;
+        // nurseryCamera.Setup(() => new Vector3(500,500,-10), () => zoom);
+        nurseryCamera.enabled = false;
         InvokeRepeating("doStuff", 1.0f, updateDelay);
     }
 
@@ -199,9 +205,28 @@ public class GameManager : MonoBehaviour
             print("edgeScrolling = " + edgeScrollingEnabled);
         }
         
-        moveCameraWASD(20f);
-        if (edgeScrollingEnabled) moveCameraMouseEdge(20f,10f);
-        zoomKeys(1f);
+        // transporting to some far off place for the nursery
+        if (Input.GetKeyDown(KeyCode.DownArrow)) {
+            showNursery = !showNursery;
+            if (showNursery) {
+                savedCameraPosition = cameraFollow.transform.position;
+                cameraFollow.enabled = false;
+                nurseryCamera.enabled = true;
+            } else {
+                cameraFollow.enabled = true;
+                nurseryCamera.enabled = false;
+                cameraFollowPosition = savedCameraPosition;
+                cameraFollow.Setup(() => cameraFollowPosition, () => zoom);
+            }
+            
+        }
+
+        if (!showNursery) {
+            moveCameraWASD(20f);
+            if (edgeScrollingEnabled) moveCameraMouseEdge(20f,10f);
+            zoomKeys(1f);
+        }
+        
         tempTimer.updateTime();
         testTimerText.text = convertTimetoMS(tempTimer.currentTime);
     }
