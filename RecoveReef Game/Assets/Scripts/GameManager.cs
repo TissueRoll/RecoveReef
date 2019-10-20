@@ -210,7 +210,7 @@ public class GameManager : MonoBehaviour
             print("left mouse button has been pressed");
             Vector3Int position = getMouseGridPosition();
             print(":: " + position);
-            print(":: "+substrataOverlayTileMap.GetTile(position).name); 
+            print(":: " + substrataOverlayTileMap.GetTile(position).name); 
         }
 
         bool rb = Input.GetMouseButtonDown(1);
