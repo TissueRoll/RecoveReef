@@ -12,9 +12,24 @@ public class CoralCellData
     public string name {get; set;}
 
     public float maturity {get; set;}
-    public int fishProduction {get; set;}
     public float carnivorousFishInterest {get; set;}
     public float herbivorousFishInterest {get; set;}
+
+    public CoralCellData () {
+        // this shouldnt be called; setting name to ERROR by default
+        name = "ERROR";
+    }
+
+    public CoralCellData (Vector3Int _position, Tilemap _tilemap, TileBase _tilebase, float _maturity, float _cFI, float _hFI) {
+        LocalPlace = _position;
+        WorldLocation = _tilemap.CellToWorld(_position);
+        TileBase = _tilebase;
+        TilemapMember = _tilemap;
+        name = _position.x + "," + _position.y;
+        maturity = _maturity;
+        carnivorousFishInterest = _cFI;
+        herbivorousFishInterest = _hFI;
+    }
 
     public string printData() {
         string output = "";
@@ -24,7 +39,6 @@ public class CoralCellData
         output += ("TilemapMember: " + TilemapMember + "\n");
         output += ("name: " + name + "\n");
         output += ("maturity: " + maturity + "\n");
-        output += ("fishProduction: " + fishProduction + "\n");
         output += ("carnivorousFishInterest: " + carnivorousFishInterest + "\n");
         output += ("herbivorousFishInterest: " + herbivorousFishInterest + "\n");
         return output;

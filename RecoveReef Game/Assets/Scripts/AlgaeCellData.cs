@@ -14,6 +14,21 @@ public class AlgaeCellData
     public float maturity {get; set;}
     public int herbivorousFishProduction {get; set;}
 
+    public AlgaeCellData () {
+        // this shouldnt be called; setting name to ERROR by default
+        name = "ERROR";
+    }
+
+    public AlgaeCellData (Vector3Int _position, Tilemap _tilemap, TileBase _tilebase, float _maturity, int _hFP) {
+        LocalPlace = _position;
+        WorldLocation = _tilemap.CellToWorld(_position);
+        TileBase = _tilebase;
+        TilemapMember = _tilemap;
+        name = _position.x + "," + _position.y;
+        maturity = _maturity;
+        herbivorousFishProduction = _hFP;
+    }
+
     public string printData() {
         string output = "";
         output += ("LocalPlace: " + LocalPlace + "\n");
