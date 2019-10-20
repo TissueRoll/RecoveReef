@@ -44,6 +44,12 @@ TagManager:
   - name: Ground
     uniqueID: 3615937929
     locked: 0
+  - name: Substrata
+    uniqueID: 1327357215
+    locked: 0
+  - name: Substrata_Overlay
+    uniqueID: 1143029983
+    locked: 0
   - name: Corals
     uniqueID: 2480388883
     locked: 0
