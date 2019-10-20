@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Text fishDisplay;
     [SerializeField] private Text testTimerText;
     #pragma warning restore 0649
-    private float zoom = 10f;
+    private float zoom = 20f;
     private float updateDelay = 0.5f;
     private int survivabilityFrameCounter = 0;
     private Vector3 cameraFollowPosition;
@@ -326,6 +326,7 @@ public class GameManager : MonoBehaviour
                         }
                         algaeCells.Add(cell.LocalPlace,cell);
                         algaeTileMap.SetTile(cell.LocalPlace, cell.TileBase);
+                        substrataOverlayTileMap.SetTile(cell.LocalPlace, groundTileMap.GetTile(cell.LocalPlace));
                     }
                 }
             }
@@ -373,6 +374,7 @@ public class GameManager : MonoBehaviour
                     herbivorousFishTotalInterest -= coralCells[key].herbivorousFishInterest;
                     carnivorousFishTotalInterest -= coralCells[key].carnivorousFishInterest;
                     coralCells.Remove(key);
+                    substrataOverlayTileMap.SetTile(key, null);
                 }
             }
         }
@@ -394,6 +396,7 @@ public class GameManager : MonoBehaviour
                         herbivorousFishTotalInterest += cell.herbivorousFishInterest;
                         coralCells.Add(cell.LocalPlace,cell);
                         coralTileMap.SetTile(cell.LocalPlace, cell.TileBase);
+                        substrataOverlayTileMap.SetTile(cell.LocalPlace, groundTileMap.GetTile(cell.LocalPlace));
                     }
                 }
             }
@@ -453,7 +456,7 @@ public class GameManager : MonoBehaviour
             zoom += zoomChangeAmount;
         }
 
-        zoom = Mathf.Clamp(zoom, 5f, 15f);
+        zoom = Mathf.Clamp(zoom, 5f, 30f);
     }
 
 }
