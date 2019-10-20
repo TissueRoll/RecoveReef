@@ -282,6 +282,7 @@ public class GameManager : MonoBehaviour
     private bool plantCoral(int type) {
         bool successful = false;
         // should be unable to replace a tile
+        // need to add more useful stuff like notifying why you can place a tile here
         print("right mouse button has been pressed");
         Vector3Int position = getMouseGridPosition();
         print("position: " + position);
