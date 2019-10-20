@@ -48,10 +48,12 @@ public class GameManager : MonoBehaviour
         {new Vector3Int(1,0,0), new Vector3Int(0,-1,0), new Vector3Int(-1,-1,0), new Vector3Int(-1,0,0), new Vector3Int(-1,1,0), new Vector3Int(0,1,0)}, 
         {new Vector3Int(1,0,0), new Vector3Int(1,-1,0), new Vector3Int(0,-1,0), new Vector3Int(-1,0,0), new Vector3Int(0,1,0), new Vector3Int(1,1,0)} 
     };
-
+    private string[] coralNames = new string[6] {"columnar", "branching", "encrusting", "foliaceous", "laminar", "massive"};
+    private int[] coralGrowTimes = new int[6] {45, 30, 95, 60, 120, 135};
     private CountdownTimer tempTimer;
-
-    // private List<
+    private int maxSpaceInNursery = 10;
+    private List<NursingCoral>[] growingCorals;
+    private Queue<string>[] queuedCorals;
 
     void Awake()
     {
@@ -101,6 +103,8 @@ public class GameManager : MonoBehaviour
         coralCells = new Dictionary<Vector3Int,CoralCellData>();
         substrataCells = new Dictionary<Vector3Int, float>();
         algaeCells = new Dictionary<Vector3Int, AlgaeCellData>();
+        growingCorals = new List<NursingCoral>[6];
+        queuedCorals = new Queue<string>[6];
 
         // setting values
         probCoralSurvivabilityMax = new Dictionary<TileBase, float>();
@@ -111,6 +115,11 @@ public class GameManager : MonoBehaviour
         probAlgaeSurvivabilityMax = new Dictionary<TileBase, float>();
         probAlgaeSurvivabilityMax.Add(findInTileBaseArray("brown", "algae"), 95);
         probAlgaeSurvivabilityMax.Add(findInTileBaseArray("green", "algae"), 85);
+
+        for (int i = 0; i < 6; i++) {
+            growingCorals[i] = new List<NursingCoral>();
+            queuedCorals[i] = new Queue<string>();
+        }
 
         // initialization
 
@@ -162,18 +171,38 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            testnum = 0;
+            if (!growCoral(0))
+                print("Cannot grow coral");
         } else if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            testnum = 1;
+            if (!growCoral(1))
+                print("Cannot grow coral");
         } else if (Input.GetKeyDown(KeyCode.Alpha3)) {
-            testnum = 2;
+            if (!growCoral(2))
+                print("Cannot grow coral");
         } else if (Input.GetKeyDown(KeyCode.Alpha4)) {
-            testnum = 3;
+            if (!growCoral(3))
+                print("Cannot grow coral");
         } else if (Input.GetKeyDown(KeyCode.Alpha5)) {
-            testnum = 4;
+            if (!growCoral(4))
+                print("Cannot grow coral");
         } else if (Input.GetKeyDown(KeyCode.Alpha6)) {
-            testnum = 5;
+            if (!growCoral(5))
+                print("Cannot grow coral");
         } 
+
+        if (Input.GetKeyDown(KeyCode.Z)) {
+            testnum = 0;
+        } else if (Input.GetKeyDown(KeyCode.X)) {
+            testnum = 1;
+        } else if (Input.GetKeyDown(KeyCode.C)) {
+            testnum = 2;
+        } else if (Input.GetKeyDown(KeyCode.V)) {
+            testnum = 3;
+        } else if (Input.GetKeyDown(KeyCode.B)) {
+            testnum = 4;
+        } else if (Input.GetKeyDown(KeyCode.N)) {
+            testnum = 5;
+        }
 
         // testing for hex tile coords
         bool lb = Input.GetMouseButtonDown(0);
@@ -181,36 +210,14 @@ public class GameManager : MonoBehaviour
             print("left mouse button has been pressed");
             Vector3Int position = getMouseGridPosition();
             print(":: " + position);
-            print(":: "+substrataOverlayTileMap.GetTile(position).name);
-            // if (coralCells.ContainsKey(position)) {
-            //     herbivorousFishTotal -= coralCells[position].herbivorousFishProduction;
-            //     coralTileMap.SetTile(position, null);
-            //     coralCells.Remove(position);
-            // }    
+            print(":: "+substrataOverlayTileMap.GetTile(position).name); 
         }
 
         bool rb = Input.GetMouseButtonDown(1);
         if (rb) {
-            // should be unable to replace a tile
-            print("right mouse button has been pressed");
-            Vector3Int position = getMouseGridPosition();
-            print("position: " + position);
-            if (coralTileMap.HasTile(position)) {
-                print("coral already existing; cannot place tile");
-                print(coralCells[position].printData());
-            } else if (algaeTileMap.HasTile(position)) {
-                print("algae already existing; cannot place tile");
-                print(algaeCells[position].printData());
-            } else if (substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) { 
-                CoralCellData cell = new CoralCellData(position, coralTileMap, coralTileBases[testnum], 0.0f, UnityEngine.Random.Range(0.0007f,0.0035f), UnityEngine.Random.Range(0.001f,0.005f));
-                coralCells.Add(position, cell);
-                carnivorousFishTotalInterest += coralCells[position].carnivorousFishInterest;
-                herbivorousFishTotalInterest += coralCells[position].herbivorousFishInterest;
-                coralTileMap.SetTile(position, coralTileBases[testnum]);
+            if(!plantCoral(testnum)) {
+                print("Cannot plant coral onto the reef.");
             }
-            
-            if (coralTileMap.HasTile(position))
-                print(coralCells[position].printData());
         }
 
         // movement of screen
@@ -241,8 +248,66 @@ public class GameManager : MonoBehaviour
             zoomKeys(1f);
         }
         
+        for (int i = 0; i < 6; i++) {
+            foreach (NursingCoral x in growingCorals[i]) {
+                x.timer.updateTime();
+                if (x.timer.isDone())
+                    queuedCorals[i].Enqueue(x.coral);
+            }
+            growingCorals[i].RemoveAll(coral => coral.timer.isDone() == true); // yay for internship
+        }
+
         tempTimer.updateTime();
         testTimerText.text = convertTimetoMS(tempTimer.currentTime);
+    }
+
+    private int getCoralsInNursery() {
+        int coralsInNursery = 0;
+        for (int i = 0; i < 6; i++) {
+            coralsInNursery += growingCorals[i].Count;
+            coralsInNursery += queuedCorals[i].Count;
+        }
+        return coralsInNursery;
+    }
+
+    private bool growCoral(int type) {
+        bool successful = false;
+        if (getCoralsInNursery() <= maxSpaceInNursery) {
+            successful = true;
+            growingCorals[type].Add(new NursingCoral(coralNames[type], new CountdownTimer(coralGrowTimes[type])));
+        }
+        return successful;
+    }
+
+    private bool plantCoral(int type) {
+        bool successful = false;
+        // should be unable to replace a tile
+        print("right mouse button has been pressed");
+        Vector3Int position = getMouseGridPosition();
+        print("position: " + position);
+        if (coralTileMap.HasTile(position)) {
+            print("coral already existing; cannot place tile");
+            print(coralCells[position].printData());
+        } else if (algaeTileMap.HasTile(position)) {
+            print("algae already existing; cannot place tile");
+            print(algaeCells[position].printData());
+        } else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && queuedCorals[type].Count > 0) { 
+            successful = true;
+            queuedCorals[type].Dequeue();
+            CoralCellData cell = new CoralCellData(position, coralTileMap, findInTileBaseArray(coralNames[type], "coral"), 0.0f, UnityEngine.Random.Range(0.0007f,0.0035f), UnityEngine.Random.Range(0.001f,0.005f));
+            coralCells.Add(position, cell);
+            carnivorousFishTotalInterest += coralCells[position].carnivorousFishInterest;
+            herbivorousFishTotalInterest += coralCells[position].herbivorousFishInterest;
+            coralTileMap.SetTile(position, findInTileBaseArray(coralNames[type], "coral"));
+            substrataOverlayTileMap.SetTile(position, groundTileMap.GetTile(position));
+        } else if (queuedCorals[type].Count == 0 && growingCorals[type].Count > 0) {
+            print("soonest to mature has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left");
+        }
+        
+        if (coralTileMap.HasTile(position))
+            print(coralCells[position].printData());
+
+        return successful;
     }
 
     private string convertTimetoMS(float rawTime) {

@@ -20,4 +20,8 @@ public class CountdownTimer
         if (currentTime <= 0)
             currentTime = 0;
     }
+
+    public bool isDone() {
+        return currentTime == 0;
+    }
 }
