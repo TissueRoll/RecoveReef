@@ -204,6 +204,10 @@ public class GameManager : MonoBehaviour
             testnum = 5;
         }
 
+        if (Input.GetKeyDown(KeyCode.M)) {
+            cameraFollow.GetComponent<MenuAnimator>().OpenThing();
+        }
+
         // testing for hex tile coords
         bool lb = Input.GetMouseButtonDown(0);
         if (lb) {
