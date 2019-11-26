@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TileBase[] substrataTileBases;
     [SerializeField] private Text fishDisplay;
     [SerializeField] private Text testTimerText;
+    [SerializeField] private Text CNC;
+    [SerializeField] private Text[] CNI;
+    [SerializeField] private Text[] TCG;
     #pragma warning restore 0649
     private float zoom = 20f;
     private float updateDelay = 0.5f;
@@ -191,17 +194,17 @@ public class GameManager : MonoBehaviour
         } 
 
         if (Input.GetKeyDown(KeyCode.Z)) {
-            testnum = 0;
+            change_coral(0);
         } else if (Input.GetKeyDown(KeyCode.X)) {
-            testnum = 1;
+            change_coral(1);
         } else if (Input.GetKeyDown(KeyCode.C)) {
-            testnum = 2;
+            change_coral(2);
         } else if (Input.GetKeyDown(KeyCode.V)) {
-            testnum = 3;
+            change_coral(3);
         } else if (Input.GetKeyDown(KeyCode.B)) {
-            testnum = 4;
+            change_coral(4);
         } else if (Input.GetKeyDown(KeyCode.N)) {
-            testnum = 5;
+            change_coral(5);
         }
 
         if (Input.GetKeyDown(KeyCode.M)) {
@@ -214,7 +217,7 @@ public class GameManager : MonoBehaviour
             print("left mouse button has been pressed");
             Vector3Int position = getMouseGridPosition();
             print(":: " + position);
-            print(":: " + substrataOverlayTileMap.GetTile(position).name); 
+            // print(":: " + substrataOverlayTileMap.GetTile(position).name); // temp disabled cuz it can error
         }
 
         bool rb = Input.GetMouseButtonDown(1);
@@ -253,16 +256,27 @@ public class GameManager : MonoBehaviour
         }
         
         for (int i = 0; i < 6; i++) {
+            float min_time = (growingCorals[i].Count > 0 ? growingCorals[i][0].timer.currentTime : 0);
             foreach (NursingCoral x in growingCorals[i]) {
                 x.timer.updateTime();
                 if (x.timer.isDone())
                     queuedCorals[i].Enqueue(x.coral);
+                else
+                    min_time = Math.Min(min_time, x.timer.currentTime);
             }
             growingCorals[i].RemoveAll(coral => coral.timer.isDone() == true); // yay for internship
+            CNI[i].text = "x" + queuedCorals[i].Count;
+            TCG[i].text = convertTimetoMS(min_time);
         }
+
+        CNC.text = "Coral Nursery:\n" + getCoralsInNursery() + "/" + maxSpaceInNursery;
 
         tempTimer.updateTime();
         testTimerText.text = convertTimetoMS(tempTimer.currentTime);
+    }
+
+    public void change_coral(int select) {
+        testnum = select;
     }
 
     private int getCoralsInNursery() {
@@ -276,7 +290,7 @@ public class GameManager : MonoBehaviour
 
     private bool growCoral(int type) {
         bool successful = false;
-        if (getCoralsInNursery() <= maxSpaceInNursery) {
+        if (getCoralsInNursery() < maxSpaceInNursery) {
             successful = true;
             growingCorals[type].Add(new NursingCoral(coralNames[type], new CountdownTimer(coralGrowTimes[type])));
         }
