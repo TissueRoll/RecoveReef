@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Text CNC;
     [SerializeField] private Text[] CNI;
     [SerializeField] private Text[] TCG;
+    [SerializeField] private Text feedbackText;
     #pragma warning restore 0649
     private float zoom = 20f;
     private float updateDelay = 0.5f;
@@ -54,9 +55,11 @@ public class GameManager : MonoBehaviour
     private string[] coralNames = new string[6] {"columnar", "branching", "encrusting", "foliaceous", "laminar", "massive"};
     private int[] coralGrowTimes = new int[6] {45, 30, 95, 60, 120, 135};
     private CountdownTimer tempTimer;
-    private int maxSpaceInNursery = 10;
+    private int maxSpaceInNursery = 20;
+    private int maxSpacePerCoral = 4;
     private List<NursingCoral>[] growingCorals;
     private Queue<string>[] queuedCorals;
+    private float feedbackDelayTime = 1.5f;
 
     void Awake()
     {
@@ -174,23 +177,17 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            if (!growCoral(0))
-                print("Cannot grow coral");
+            tryGrowCoral(0);
         } else if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            if (!growCoral(1))
-                print("Cannot grow coral");
+            tryGrowCoral(1);
         } else if (Input.GetKeyDown(KeyCode.Alpha3)) {
-            if (!growCoral(2))
-                print("Cannot grow coral");
+            tryGrowCoral(2);
         } else if (Input.GetKeyDown(KeyCode.Alpha4)) {
-            if (!growCoral(3))
-                print("Cannot grow coral");
+            tryGrowCoral(3);
         } else if (Input.GetKeyDown(KeyCode.Alpha5)) {
-            if (!growCoral(4))
-                print("Cannot grow coral");
+            tryGrowCoral(4);
         } else if (Input.GetKeyDown(KeyCode.Alpha6)) {
-            if (!growCoral(5))
-                print("Cannot grow coral");
+            tryGrowCoral(5);
         } 
 
         if (Input.GetKeyDown(KeyCode.Z)) {
@@ -208,7 +205,7 @@ public class GameManager : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.M)) {
-            cameraFollow.GetComponent<MenuAnimator>().OpenThing();
+            openThing();
         }
 
         // testing for hex tile coords
@@ -223,7 +220,7 @@ public class GameManager : MonoBehaviour
         bool rb = Input.GetMouseButtonDown(1);
         if (rb) {
             if(!plantCoral(testnum)) {
-                print("Cannot plant coral onto the reef.");
+                // feedbackDialogue("Cannot plant coral onto the reef", 1);
             }
         }
 
@@ -275,6 +272,21 @@ public class GameManager : MonoBehaviour
         testTimerText.text = convertTimetoMS(tempTimer.currentTime);
     }
 
+    private void feedbackDialogue(string text, float time) {
+        StartCoroutine(ShowMessage(text,time));
+    }
+
+    IEnumerator ShowMessage(string text, float time) {
+        feedbackText.text = text;
+        feedbackText.enabled = true;
+        yield return new WaitForSeconds(time);
+        feedbackText.enabled = false;
+    }
+
+    public void openThing() {
+        cameraFollow.GetComponent<MenuAnimator>().OpenThing();
+    }
+
     public void change_coral(int select) {
         testnum = select;
     }
@@ -288,13 +300,22 @@ public class GameManager : MonoBehaviour
         return coralsInNursery;
     }
 
-    private bool growCoral(int type) {
-        bool successful = false;
-        if (getCoralsInNursery() < maxSpaceInNursery) {
-            successful = true;
+    public void tryGrowCoral(int type) {
+        growCoral(type);
+        // if (!growCoral(type))
+        //     feedbackDialogue("Cannot grow coral.", 1);
+    }
+
+    private void growCoral(int type) {
+        bool spaceInNursery = getCoralsInNursery() < maxSpaceInNursery;
+        bool underMaxGrow = growingCorals[type].Count < maxSpacePerCoral;
+        if (spaceInNursery && underMaxGrow) {
             growingCorals[type].Add(new NursingCoral(coralNames[type], new CountdownTimer(coralGrowTimes[type])));
+        } else if (!underMaxGrow) {
+            feedbackDialogue("Can only grow 4 corals per type.", feedbackDelayTime);
+        } else if (!spaceInNursery) {
+            feedbackDialogue("Nursery is at maximum capacity.", feedbackDelayTime);
         }
-        return successful;
     }
 
     private bool plantCoral(int type) {
@@ -305,10 +326,11 @@ public class GameManager : MonoBehaviour
         Vector3Int position = getMouseGridPosition();
         print("position: " + position);
         if (coralTileMap.HasTile(position)) {
-            print("coral already existing; cannot place tile");
-            print(coralCells[position].printData());
+            feedbackDialogue("Coral already existing. Cannot place tile.", feedbackDelayTime);
+            // print(coralCells[position].printData());
         } else if (algaeTileMap.HasTile(position)) {
-            print("algae already existing; cannot place tile");
+            feedbackDialogue("Algae already existing. Cannot place tile.", feedbackDelayTime);
+            // print("algae already existing; cannot place tile");
             print(algaeCells[position].printData());
         } else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && queuedCorals[type].Count > 0) { 
             successful = true;
@@ -320,7 +342,9 @@ public class GameManager : MonoBehaviour
             coralTileMap.SetTile(position, findInTileBaseArray(coralNames[type], "coral"));
             substrataOverlayTileMap.SetTile(position, groundTileMap.GetTile(position));
         } else if (queuedCorals[type].Count == 0 && growingCorals[type].Count > 0) {
-            print("soonest to mature has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left");
+            string t = "Soonest to mature coral of this type has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left.";
+            feedbackDialogue(t, feedbackDelayTime);
+            // print("soonest to mature has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left");
         }
         
         if (coralTileMap.HasTile(position))
