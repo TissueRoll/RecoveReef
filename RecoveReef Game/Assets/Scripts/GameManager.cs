@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Text testTimerText;
     [SerializeField] private Text CNC;
     [SerializeField] private Text[] CNI;
+    [SerializeField] private Text[] CQNI;
     [SerializeField] private Text[] TCG;
     [SerializeField] private Text feedbackText;
     #pragma warning restore 0649
@@ -262,6 +263,7 @@ public class GameManager : MonoBehaviour
                     min_time = Math.Min(min_time, x.timer.currentTime);
             }
             growingCorals[i].RemoveAll(coral => coral.timer.isDone() == true); // yay for internship
+            CQNI[i].text = "Q: x" + growingCorals[i].Count;
             CNI[i].text = "x" + queuedCorals[i].Count;
             TCG[i].text = convertTimetoMS(min_time);
         }
