@@ -36,8 +36,8 @@ public class CameraFollow : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
-        HandleMovement();
         HandleZoom();
+        HandleMovement();
     }
 
     private void HandleMovement() {
@@ -46,15 +46,21 @@ public class CameraFollow : MonoBehaviour
 
         Vector3 cameraMoveDir = (cameraFollowPosition - transform.position).normalized;
         float distance = Vector3.Distance(cameraFollowPosition, transform.position);
-        float cameraMoveSpeed = 1f;
+        float cameraMoveSpeed = 1.5f;
 
         if (distance > 0) {
+            print("transform.position: " + transform.position);
+            print("cameraFollowPosition: " + cameraFollowPosition);
             Vector3 newCameraPosition = transform.position + cameraFollowPosition * distance * cameraMoveSpeed * Time.deltaTime;
             float distanceAfterMoving = Vector3.Distance(newCameraPosition, cameraFollowPosition);
             if (distanceAfterMoving > distance) {
                 newCameraPosition = cameraFollowPosition;
             }
-            transform.position = newCameraPosition;
+            transform.position = new Vector3(
+                Mathf.Clamp(newCameraPosition.x,-75.0f,75.0f),
+                Mathf.Clamp(newCameraPosition.y,-75.0f,75.0f),
+                newCameraPosition.z
+            );
         }  
     }
 

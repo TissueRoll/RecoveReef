@@ -249,6 +249,7 @@ public class GameManager : MonoBehaviour
             moveCameraWASD(20f);
             if (edgeScrollingEnabled) moveCameraMouseEdge(20f,10f);
             zoomKeys(1f);
+            clampCamera();
         }
         
         for (int i = 0; i < 6; i++) {
@@ -565,6 +566,14 @@ public class GameManager : MonoBehaviour
         }
 
         zoom = Mathf.Clamp(zoom, 5f, 30f);
+    }
+
+    private void clampCamera() {
+        cameraFollowPosition = new Vector3(
+            Mathf.Clamp(cameraFollowPosition.x, -75f, 75f),
+            Mathf.Clamp(cameraFollowPosition.y, -75f, 75f),
+            cameraFollowPosition.z
+        );
     }
 
 }
