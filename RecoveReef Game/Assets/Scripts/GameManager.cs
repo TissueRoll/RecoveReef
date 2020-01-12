@@ -25,9 +25,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Text fishDisplay;
     [SerializeField] private Text testTimerText;
     [SerializeField] private Text CNC;
-    [SerializeField] private Text[] CNI;
-    [SerializeField] private Text[] CQNI;
-    [SerializeField] private Text[] TCG;
+    [SerializeField] private GameObject[] CoralOptions;
     [SerializeField] private Text feedbackText;
     #pragma warning restore 0649
     private float zoom = 20f;
@@ -59,7 +57,7 @@ public class GameManager : MonoBehaviour
     private int maxSpaceInNursery = 20;
     private int maxSpacePerCoral = 4;
     private List<NursingCoral>[] growingCorals;
-    private Queue<string>[] queuedCorals;
+    private Queue<string>[] readyCorals;
     private float feedbackDelayTime = 1.5f;
 
     void Awake()
@@ -111,7 +109,7 @@ public class GameManager : MonoBehaviour
         substrataCells = new Dictionary<Vector3Int, float>();
         algaeCells = new Dictionary<Vector3Int, AlgaeCellData>();
         growingCorals = new List<NursingCoral>[6];
-        queuedCorals = new Queue<string>[6];
+        readyCorals = new Queue<string>[6];
 
         // setting values
         probCoralSurvivabilityMax = new Dictionary<TileBase, float>();
@@ -125,7 +123,7 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < 6; i++) {
             growingCorals[i] = new List<NursingCoral>();
-            queuedCorals[i] = new Queue<string>();
+            readyCorals[i] = new Queue<string>();
         }
 
         // initialization
@@ -258,14 +256,14 @@ public class GameManager : MonoBehaviour
             foreach (NursingCoral x in growingCorals[i]) {
                 x.timer.updateTime();
                 if (x.timer.isDone())
-                    queuedCorals[i].Enqueue(x.coral);
+                    readyCorals[i].Enqueue(x.coral);
                 else
                     min_time = Math.Min(min_time, x.timer.currentTime);
             }
             growingCorals[i].RemoveAll(coral => coral.timer.isDone() == true); // yay for internship
-            CQNI[i].text = "Q: x" + growingCorals[i].Count;
-            CNI[i].text = "x" + queuedCorals[i].Count;
-            TCG[i].text = convertTimetoMS(min_time);
+            CoralOptions[i].transform.Find("QueuedCoralNumber").GetComponent<Text>().text = "Q: x" + growingCorals[i].Count;
+            CoralOptions[i].transform.Find("ReadyCoralNumber").GetComponent<Text>().text = "x" + readyCorals[i].Count;
+            CoralOptions[i].transform.Find("TimeCoralGrow").GetComponent<Text>().text = convertTimetoMS(min_time); 
         }
 
         CNC.text = "Coral Nursery:\n" + getCoralsInNursery() + "/" + maxSpaceInNursery;
@@ -297,7 +295,7 @@ public class GameManager : MonoBehaviour
         int coralsInNursery = 0;
         for (int i = 0; i < 6; i++) {
             coralsInNursery += growingCorals[i].Count;
-            coralsInNursery += queuedCorals[i].Count;
+            coralsInNursery += readyCorals[i].Count;
         }
         return coralsInNursery;
     }
@@ -334,16 +332,16 @@ public class GameManager : MonoBehaviour
             feedbackDialogue("Algae already existing. Cannot place tile.", feedbackDelayTime);
             // print("algae already existing; cannot place tile");
             print(algaeCells[position].printData());
-        } else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && queuedCorals[type].Count > 0) { 
+        } else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && readyCorals[type].Count > 0) { 
             successful = true;
-            queuedCorals[type].Dequeue();
+            readyCorals[type].Dequeue();
             CoralCellData cell = new CoralCellData(position, coralTileMap, findInTileBaseArray(coralNames[type], "coral"), 0.0f, UnityEngine.Random.Range(0.0007f,0.0035f), UnityEngine.Random.Range(0.001f,0.005f));
             coralCells.Add(position, cell);
             carnivorousFishTotalInterest += coralCells[position].carnivorousFishInterest;
             herbivorousFishTotalInterest += coralCells[position].herbivorousFishInterest;
             coralTileMap.SetTile(position, findInTileBaseArray(coralNames[type], "coral"));
             substrataOverlayTileMap.SetTile(position, groundTileMap.GetTile(position));
-        } else if (queuedCorals[type].Count == 0 && growingCorals[type].Count > 0) {
+        } else if (readyCorals[type].Count == 0 && growingCorals[type].Count > 0) {
             string t = "Soonest to mature coral of this type has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left.";
             feedbackDialogue(t, feedbackDelayTime);
             // print("soonest to mature has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left");
