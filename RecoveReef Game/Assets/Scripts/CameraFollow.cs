@@ -49,8 +49,6 @@ public class CameraFollow : MonoBehaviour
         float cameraMoveSpeed = 1.5f;
 
         if (distance > 0) {
-            print("transform.position: " + transform.position);
-            print("cameraFollowPosition: " + cameraFollowPosition);
             Vector3 newCameraPosition = transform.position + cameraFollowPosition * distance * cameraMoveSpeed * Time.deltaTime;
             float distanceAfterMoving = Vector3.Distance(newCameraPosition, cameraFollowPosition);
             if (distanceAfterMoving > distance) {
