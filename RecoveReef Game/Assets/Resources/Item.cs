@@ -8,9 +8,15 @@ public class Item
     [XmlAttribute("name")]
     public string name;
 
-    [XmlAttribute("Damage")]
-    public string damage;
+    [XmlElement("Damage")]
+    public int damage;
     
-    [XmlAttribute("Durability")]
-    public string durability;
+    [XmlElement("Durability")]
+    public int durability;
+
+    public string rekt() {
+        string output = "";
+        output += name + "\n" + damage + "\n" + durability + "\n";
+        return output;
+    }
 }

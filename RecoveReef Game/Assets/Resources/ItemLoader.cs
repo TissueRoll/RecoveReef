@@ -8,7 +8,7 @@ public class ItemLoader : MonoBehaviour
     void Start() {
         ItemContainer ic = ItemContainer.Load(path);
         foreach(Item item in ic.items) {
-            print(item.name);
+            print(item.rekt());
         }
     }
 }

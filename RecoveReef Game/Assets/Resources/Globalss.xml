@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalCollection>
+    <Globals>
+        <Zoom>20</Zoom>
+        <UpdateDelay>0.5</UpdateDelay>
+        <MaxSpaceInNursery>20</MaxSpaceInNursery>
+        <MaxSpacePerCoral>4</MaxSpacePerCoral>
+        <FeedbackDelayTime>1.5</FeedbackDelayTime>
+    </Globals>
+</GlobalCollection>

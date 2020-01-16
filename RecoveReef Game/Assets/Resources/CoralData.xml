@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CoralDataCollection>
+    <CoralDatas>
+        <CoralData name="branching">
+            <GrowTime>30</GrowTime>
+            <Survivability>0.5</Survivability>
+            <CarnivorousFishInterestBase>0.001</CarnivorousFishInterestBase>
+            <HerbivorousFishInterestBase>0.005</HerbivorousFishInterestBase>
+            <CoralType>zerg</CoralType>
+            <PrefTerrain>shore</PrefTerrain>
+        </CoralData>
+        <CoralData name="columnar">
+            <GrowTime>30</GrowTime>
+            <Survivability>0.5</Survivability>
+            <CarnivorousFishInterestBase>0.001</CarnivorousFishInterestBase>
+            <HerbivorousFishInterestBase>0.005</HerbivorousFishInterestBase>
+            <CoralType>zerg</CoralType>
+            <PrefTerrain>shore</PrefTerrain>
+        </CoralData>
+        <CoralData name="encrusting">
+            <GrowTime>30</GrowTime>
+            <Survivability>0.5</Survivability>
+            <CarnivorousFishInterestBase>0.001</CarnivorousFishInterestBase>
+            <HerbivorousFishInterestBase>0.005</HerbivorousFishInterestBase>
+            <CoralType>zerg</CoralType>
+            <PrefTerrain>shore</PrefTerrain>
+        </CoralData>
+        <CoralData name="foliaceous">
+            <GrowTime>30</GrowTime>
+            <Survivability>0.5</Survivability>
+            <CarnivorousFishInterestBase>0.001</CarnivorousFishInterestBase>
+            <HerbivorousFishInterestBase>0.005</HerbivorousFishInterestBase>
+            <CoralType>zerg</CoralType>
+            <PrefTerrain>shore</PrefTerrain>
+        </CoralData>
+        <CoralData name="laminar">
+            <GrowTime>30</GrowTime>
+            <Survivability>0.5</Survivability>
+            <CarnivorousFishInterestBase>0.001</CarnivorousFishInterestBase>
+            <HerbivorousFishInterestBase>0.005</HerbivorousFishInterestBase>
+            <CoralType>zerg</CoralType>
+            <PrefTerrain>shore</PrefTerrain>
+        </CoralData>
+        <CoralData name="massive">
+            <GrowTime>30</GrowTime>
+            <Survivability>0.5</Survivability>
+            <CarnivorousFishInterestBase>0.001</CarnivorousFishInterestBase>
+            <HerbivorousFishInterestBase>0.005</HerbivorousFishInterestBase>
+            <CoralType>zerg</CoralType>
+            <PrefTerrain>shore</PrefTerrain>
+        </CoralData>
+    </CoralDatas>
+</CoralDataCollection>
