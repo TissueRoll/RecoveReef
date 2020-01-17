@@ -199,8 +199,9 @@ public class GameManager : MonoBehaviour
             carnivorousFishTotalInterest += cell.coralData.carnivorousFishInterestBase;
             herbivorousFishTotalInterest += cell.coralData.herbivorousFishInterestBase;
             coralCells.Add(cell.LocalPlace, cell);
-            substrataOverlayTileMap.SetTile(localPlace, groundTileMap.GetTile(localPlace));
+            // substrataOverlayTileMap.SetTile(localPlace, groundTileMap.GetTile(localPlace));
         }
+        print(coralCells.Count);
         
         foreach (Vector3Int pos in substrataTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
@@ -222,7 +223,7 @@ public class GameManager : MonoBehaviour
             );
             herbivorousFishTotal += cell.algaeData.herbivorousFishProductionBase;
             algaeCells.Add(cell.LocalPlace,cell);
-            substrataOverlayTileMap.SetTile(localPlace, groundTileMap.GetTile(localPlace));
+            // substrataOverlayTileMap.SetTile(localPlace, groundTileMap.GetTile(localPlace));
         }
     }
 
@@ -403,7 +404,7 @@ public class GameManager : MonoBehaviour
             carnivorousFishTotalInterest += coralCells[position].coralData.carnivorousFishInterestBase;
             herbivorousFishTotalInterest += coralCells[position].coralData.herbivorousFishInterestBase;
             coralTileMap.SetTile(position, coralTileBases[type]);
-            substrataOverlayTileMap.SetTile(position, groundTileMap.GetTile(position));
+            // substrataOverlayTileMap.SetTile(position, groundTileMap.GetTile(position));
         } else if (readyCorals[type].Count == 0 && growingCorals[type].Count > 0) {
             string t = "Soonest to mature coral of this type has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left.";
             feedbackDialogue(t, globalVarContainer.globalVariables.feedbackDelayTime);
@@ -497,7 +498,7 @@ public class GameManager : MonoBehaviour
                         }
                         algaeCells.Add(cell.LocalPlace,cell);
                         algaeTileMap.SetTile(cell.LocalPlace, cell.TileBase);
-                        substrataOverlayTileMap.SetTile(cell.LocalPlace, groundTileMap.GetTile(cell.LocalPlace));
+                        // substrataOverlayTileMap.SetTile(cell.LocalPlace, groundTileMap.GetTile(cell.LocalPlace));
                     }
                 }
             }
@@ -556,7 +557,7 @@ public class GameManager : MonoBehaviour
                         herbivorousFishTotalInterest += cell.coralData.herbivorousFishInterestBase;
                         coralCells.Add(cell.LocalPlace,cell);
                         coralTileMap.SetTile(cell.LocalPlace, cell.TileBase);
-                        substrataOverlayTileMap.SetTile(cell.LocalPlace, groundTileMap.GetTile(cell.LocalPlace));
+                        // substrataOverlayTileMap.SetTile(cell.LocalPlace, groundTileMap.GetTile(cell.LocalPlace));
                     }
                 }
             }
