@@ -40,10 +40,12 @@ public class GameManager : MonoBehaviour
         {new Vector3Int(1,0,0), new Vector3Int(0,-1,0), new Vector3Int(-1,-1,0), new Vector3Int(-1,0,0), new Vector3Int(-1,1,0), new Vector3Int(0,1,0)}, 
         {new Vector3Int(1,0,0), new Vector3Int(1,-1,0), new Vector3Int(0,-1,0), new Vector3Int(-1,0,0), new Vector3Int(0,1,0), new Vector3Int(1,1,0)} 
     };
-    private Dictionary<TileBase, float> probCoralSurvivabilityMax;
-    private Dictionary<TileBase, float> probAlgaeSurvivabilityMax;
-    CoralDataContainer coralBaseData;
+    private Dictionary<TileBase, float> probCoralSurvivabilityMax; // REMOVE THIS EVENTUALLY
+    private Dictionary<TileBase, float> probAlgaeSurvivabilityMax; // REMOVE THIS EVENTUALLY
     GlobalContainer globalVarContainer;
+    CoralDataContainer coralBaseData;
+    SubstrataDataContainer substrataDataContainer;
+    AlgaeDataContainer algaeDataContainer;
     #endregion
     #region Global Changing Values
     private float zoom;
@@ -83,7 +85,7 @@ public class GameManager : MonoBehaviour
         int index = -1;
         if (type == "coral") {
             for (int i = 0; i < coralBaseData.corals.Count; i++) {
-                if (Regex.IsMatch(coralBaseData.corals[i].name, ".*"+type+"_"+code+".*")) {
+                if (Regex.IsMatch(coralBaseData.corals[i].name, code)) {
                     index = i;
                     break;
                 }
@@ -115,6 +117,7 @@ public class GameManager : MonoBehaviour
             print("ERROR: Entity not found");
         return index;
     }
+    // FIX THIS TO NOT USE IT ANYMORE
     private TileBase findInTileBaseArray (string code, string type) {
         TileBase tileBase = null;
         if (type == "coral") {
@@ -165,12 +168,10 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
         print("loading XML data...");
-        coralBaseData = CoralDataContainer.Load("CoralDataXML");
-        foreach(CoralData cd in coralBaseData.corals) {
-            print(cd.dataToString());
-        }
         globalVarContainer = GlobalContainer.Load("GlobalsXML");
-        print(globalVarContainer.globalVariables.what_are());
+        substrataDataContainer = SubstrataDataContainer.Load("SubstrataXML");
+        coralBaseData = CoralDataContainer.Load("CoralDataXML");
+        algaeDataContainer = AlgaeDataContainer.Load("AlgaeDataXML");
         zoom = globalVarContainer.globalVariables.zoom;
         print("XML data loaded");
         print("initializing tiles...");

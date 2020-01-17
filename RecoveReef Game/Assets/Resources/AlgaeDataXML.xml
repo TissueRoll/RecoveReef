@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AlgaeDataCollection>
+    <AlgaeDatas>
+        <AlgaeData name="brown">
+            <GrowTime>30</GrowTime>
+            <Survivability>95</Survivability>
+            <CarnivorousFishInterestBase>0.000</CarnivorousFishInterestBase>
+            <HerbivorousFishInterestBase>0.090</HerbivorousFishInterestBase>
+            <AlgaeType>zerg</AlgaeType>
+            <PrefTerrain>any</PrefTerrain>
+        </AlgaeData>
+        <AlgaeData name="green">
+            <GrowTime>30</GrowTime>
+            <Survivability>85</Survivability>
+            <CarnivorousFishInterestBase>0.000</CarnivorousFishInterestBase>
+            <HerbivorousFishInterestBase>0.090</HerbivorousFishInterestBase>
+            <AlgaeType>zerg</AlgaeType>
+            <PrefTerrain>any</PrefTerrain>
+        </AlgaeData>
+    </AlgaeDatas>
+</AlgaeDataCollection>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SubstrataCollection>
+    <Substratas>
+        <Substrata name="small">
+            <GroundViability>90.0</GroundViability>
+        </Substrata>
+        <Substrata name="med">
+            <GroundViability>97.0</GroundViability>
+        </Substrata>
+        <Substrata name="big">
+            <GroundViability>99.9</GroundViability>
+        </Substrata>
+    </Substratas>
+</SubstrataCollection>
