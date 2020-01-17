@@ -40,8 +40,6 @@ public class GameManager : MonoBehaviour
         {new Vector3Int(1,0,0), new Vector3Int(0,-1,0), new Vector3Int(-1,-1,0), new Vector3Int(-1,0,0), new Vector3Int(-1,1,0), new Vector3Int(0,1,0)}, 
         {new Vector3Int(1,0,0), new Vector3Int(1,-1,0), new Vector3Int(0,-1,0), new Vector3Int(-1,0,0), new Vector3Int(0,1,0), new Vector3Int(1,1,0)} 
     };
-    private Dictionary<TileBase, float> probCoralSurvivabilityMax; // REMOVE THIS EVENTUALLY
-    private Dictionary<TileBase, float> probAlgaeSurvivabilityMax; // REMOVE THIS EVENTUALLY
     GlobalContainer globalVarContainer;
     CoralDataContainer coralBaseData;
     SubstrataDataContainer substrataDataContainer;
@@ -91,9 +89,19 @@ public class GameManager : MonoBehaviour
                 }
             }
         } else if (type == "algae") {
-            print("nothing here yet");
+            for (int i = 0; i < algaeDataContainer.algae.Count; i++) {
+                if (Regex.IsMatch(algaeDataContainer.algae[i].name, code)) {
+                    index = i;
+                    break;
+                }
+            }
         } else if (type == "substrata") {
-            print("nothing here yet");
+            for (int i = 0; i < substrataDataContainer.substrata.Count; i++) {
+                if (Regex.IsMatch(substrataDataContainer.substrata[i].name, code)) {
+                    index = i;
+                    break;
+                }
+            }
         }
         if (index == -1)
             print("ERROR: Entity not found");
@@ -109,9 +117,19 @@ public class GameManager : MonoBehaviour
                 }
             }
         } else if (Regex.IsMatch(nameOfTileBase, ".*algae.*")) {
-            print("nothing here yet");
+            for (int i = 0; i < algaeDataContainer.algae.Count; i++) {
+                if (Regex.IsMatch(nameOfTileBase, ".*algae_"+algaeDataContainer.algae[i].name+".*")) {
+                    index = i;
+                    break;
+                }
+            }
         } else if (Regex.IsMatch(nameOfTileBase, ".*substrata.*")) {
-            print("nothing here yet");
+            for (int i = 0; i < substrataDataContainer.substrata.Count; i++) {
+                if (Regex.IsMatch(nameOfTileBase, ".*substrata_"+substrataDataContainer.substrata[i].name+".*")) {
+                    index = i;
+                    break;
+                }
+            }
         }
         if (index == -1)
             print("ERROR: Entity not found");
@@ -177,7 +195,7 @@ public class GameManager : MonoBehaviour
         print("initializing tiles...");
         initializeTiles();
         print("initialization done");
-        tempTimer = new CountdownTimer(1800f); // MAKE GLOBAL VARIABLE
+        tempTimer = new CountdownTimer(globalVarContainer.globalVariables.maxGameTime);
         initializeGame();
     }
 
@@ -189,17 +207,6 @@ public class GameManager : MonoBehaviour
         algaeCells = new Dictionary<Vector3Int, AlgaeCellData>();
         growingCorals = new List<NursingCoral>[6];
         readyCorals = new Queue<string>[6];
-
-        // setting values
-        probCoralSurvivabilityMax = new Dictionary<TileBase, float>(); // MAKE GLOBAL VARIABLE
-        probCoralSurvivabilityMax.Add(findInTileBaseArray("big", "substrata"), 100);
-        probCoralSurvivabilityMax.Add(findInTileBaseArray("med", "substrata"), 97);
-        probCoralSurvivabilityMax.Add(findInTileBaseArray("small", "substrata"), 90);
-
-        probAlgaeSurvivabilityMax = new Dictionary<TileBase, float>(); // MAKE GLOBAL VARIABLE
-        probAlgaeSurvivabilityMax.Add(findInTileBaseArray("brown", "algae"), 95);
-        probAlgaeSurvivabilityMax.Add(findInTileBaseArray("green", "algae"), 85);
-
         for (int i = 0; i < 6; i++) {
             growingCorals[i] = new List<NursingCoral>();
             readyCorals[i] = new Queue<string>();
@@ -210,32 +217,39 @@ public class GameManager : MonoBehaviour
         foreach(Vector3Int pos in coralTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
             if (!coralTileMap.HasTile(localPlace)) continue;
+            TileBase currentTB = coralTileMap.GetTile(localPlace);
             CoralCellData cell = new CoralCellData(
                 localPlace, 
                 coralTileMap, 
-                coralTileMap.GetTile(localPlace), 
+                currentTB, 
                 101.0f, 
-                coralBaseData.corals[findIndexOfEntityFromName(coralTileMap.GetTile(localPlace).name)]
+                coralBaseData.corals[findIndexOfEntityFromName(currentTB.name)]
             );
             carnivorousFishTotalInterest += cell.coralData.carnivorousFishInterestBase;
             herbivorousFishTotalInterest += cell.coralData.herbivorousFishInterestBase;
             coralCells.Add(cell.LocalPlace, cell);
             substrataOverlayTileMap.SetTile(localPlace, groundTileMap.GetTile(localPlace));
         }
-
         
         foreach (Vector3Int pos in substrataTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
             if (!substrataTileMap.HasTile(localPlace)) continue;
-            substrataCells.Add(localPlace, probCoralSurvivabilityMax[substrataTileMap.GetTile(localPlace)]);
+            TileBase currentTB = substrataTileMap.GetTile(localPlace);
+            substrataCells.Add(localPlace, substrataDataContainer.substrata[findIndexOfEntityFromName(currentTB.name)].groundViability);
         }
-
         
         foreach (Vector3Int pos in algaeTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
             if (!algaeTileMap.HasTile(localPlace)) continue;
-            AlgaeCellData cell = new AlgaeCellData(localPlace, algaeTileMap, algaeTileMap.GetTile(localPlace), 101.0f, UnityEngine.Random.Range(10,20));
-            herbivorousFishTotal += cell.herbivorousFishProduction;
+            TileBase currentTB = algaeTileMap.GetTile(localPlace);
+            AlgaeCellData cell = new AlgaeCellData(
+                localPlace, 
+                algaeTileMap, 
+                currentTB, 
+                101.0f, 
+                algaeDataContainer.algae[findIndexOfEntityFromName(currentTB.name)]
+            );
+            herbivorousFishTotal += cell.algaeData.herbivorousFishProductionBase;
             algaeCells.Add(cell.LocalPlace,cell);
             substrataOverlayTileMap.SetTile(localPlace, groundTileMap.GetTile(localPlace));
         }
@@ -495,8 +509,14 @@ public class GameManager : MonoBehaviour
                                 }
                             if (randNum < avgMaturity/numCorals) continue;
                         }
-                        AlgaeCellData cell = new AlgaeCellData(localPlace, algaeTileMap, algaeCells[key].TileBase, 0.0f, UnityEngine.Random.Range(10,20));
-                        herbivorousFishTotal += cell.herbivorousFishProduction;
+                        AlgaeCellData cell = new AlgaeCellData(
+                            localPlace, 
+                            algaeTileMap, 
+                            algaeCells[key].TileBase, 
+                            0.0f, 
+                            algaeDataContainer.algae[findIndexOfEntityFromName(algaeCells[key].TileBase.name)]
+                        );
+                        herbivorousFishTotal += cell.algaeData.herbivorousFishProductionBase;
                         if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace)) {
                             coralTileMap.SetTile(localPlace, null);
                             substrataOverlayTileMap.SetTile(localPlace, null);

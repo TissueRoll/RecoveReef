@@ -18,6 +18,8 @@ public class Globals
 
     [XmlElement("FeedbackDelayTime")]
     public float feedbackDelayTime;
+    [XmlElement("MaxGameTime")]
+    public float maxGameTime;
 
     public string what_are() {
         string output = "---";
@@ -26,6 +28,7 @@ public class Globals
         output += "\nmaxSpaceInNursery: " + maxSpaceInNursery;
         output += "\nmaxSpacePerCoral: " + maxSpacePerCoral;
         output += "\nfeedbackDelayTime: " + feedbackDelayTime;
+        output += "\nmaxGameTime: " + maxGameTime;
         return output;
     }
 }

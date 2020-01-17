@@ -11,10 +11,8 @@ public class AlgaeData
     public float growTime;
     [XmlElement("Survivability")]
     public float survivability;
-    [XmlElement("CarnivorousFishInterestBase")]
-    public float carnivorousFishInterestBase;
-    [XmlElement("HerbivorousFishInterestBase")]
-    public float herbivorousFishInterestBase;
+    [XmlElement("HerbivorousFishProductionBase")]
+    public int herbivorousFishProductionBase;
     [XmlElement("AlgaeType")]
     public string algaeType;
     [XmlElement("PrefTerrain")]
@@ -25,8 +23,7 @@ public class AlgaeData
         output += "\nname: " + name;
         output += "\nGrow Time: " + growTime;
         output += "\nSurvivability: " + survivability;
-        output += "\nCarnivorous Fish Interest Base: " + carnivorousFishInterestBase;
-        output += "\nHerbivorous Fish Interest Base: " + herbivorousFishInterestBase;
+        output += "\nHerbivorous Fish Production Base: " + herbivorousFishProductionBase;
         output += "\nAlgae Type: " + algaeType;
         output += "\nPref Terrain: " + prefTerrain;
         return output;

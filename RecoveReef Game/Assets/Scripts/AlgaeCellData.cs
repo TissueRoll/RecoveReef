@@ -9,24 +9,23 @@ public class AlgaeCellData
     public Vector3 WorldLocation {get; set;}
     public TileBase TileBase {get; set;}
     public Tilemap TilemapMember {get; set;}
-    public string name {get; set;}
-
+    public string uniqueName {get; set;}
     public float maturity {get; set;}
-    public int herbivorousFishProduction {get; set;}
+    public AlgaeData algaeData {get; set;}
 
     public AlgaeCellData () {
-        // this shouldnt be called; setting name to ERROR by default
-        name = "ERROR";
+        // this shouldnt be called; setting uniqueName to ERROR by default
+        uniqueName = "ERROR";
     }
 
-    public AlgaeCellData (Vector3Int _position, Tilemap _tilemap, TileBase _tilebase, float _maturity, int _hFP) {
+    public AlgaeCellData (Vector3Int _position, Tilemap _tilemap, TileBase _tilebase, float _maturity, AlgaeData _algaeData) {
         LocalPlace = _position;
         WorldLocation = _tilemap.CellToWorld(_position);
         TileBase = _tilebase;
         TilemapMember = _tilemap;
-        name = _position.x + "," + _position.y;
+        uniqueName = _position.x + "," + _position.y;
         maturity = _maturity;
-        herbivorousFishProduction = _hFP;
+        algaeData = _algaeData;
     }
 
     public string printData() {
@@ -35,9 +34,9 @@ public class AlgaeCellData
         output += ("WorldLocation: " + WorldLocation + "\n");
         output += ("TileBase: " + TileBase + "\n");
         output += ("TilemapMember: " + TilemapMember + "\n");
-        output += ("name: " + name + "\n");
+        output += ("uniqueName: " + uniqueName + "\n");
         output += ("maturity: " + maturity + "\n");
-        output += ("herbivorousFishProduction: " + herbivorousFishProduction + "\n");
+        output += ("algaeData: " + algaeData.dataToString() + "\n");
         return output;
     }
 

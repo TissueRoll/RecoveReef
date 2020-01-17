@@ -4,16 +4,14 @@
         <AlgaeData name="brown">
             <GrowTime>30</GrowTime>
             <Survivability>95</Survivability>
-            <CarnivorousFishInterestBase>0.000</CarnivorousFishInterestBase>
-            <HerbivorousFishInterestBase>0.090</HerbivorousFishInterestBase>
+            <HerbivorousFishProductionBase>10</HerbivorousFishProductionBase>
             <AlgaeType>zerg</AlgaeType>
             <PrefTerrain>any</PrefTerrain>
         </AlgaeData>
         <AlgaeData name="green">
             <GrowTime>30</GrowTime>
             <Survivability>85</Survivability>
-            <CarnivorousFishInterestBase>0.000</CarnivorousFishInterestBase>
-            <HerbivorousFishInterestBase>0.090</HerbivorousFishInterestBase>
+            <HerbivorousFishProductionBase>20</HerbivorousFishProductionBase>
             <AlgaeType>zerg</AlgaeType>
             <PrefTerrain>any</PrefTerrain>
         </AlgaeData>
