@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance = null;
 
+    #region Things I Plug in Unity
     #pragma warning disable 0649
     [SerializeField] private CameraFollow cameraFollow;
     [SerializeField] private Camera nurseryCamera;
@@ -28,22 +29,25 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject[] CoralOptions;
     [SerializeField] private Text feedbackText;
     #pragma warning restore 0649
-    // DATA STRUCTURES FOR THE GAME
+    #endregion
+    #region Data Structures for the Game
     private Dictionary<Vector3Int,CoralCellData> coralCells;
     private Dictionary<Vector3Int,float> substrataCells;
     private Dictionary<Vector3Int,AlgaeCellData> algaeCells; 
-    private Dictionary<TileBase, float> probCoralSurvivabilityMax;
-    private Dictionary<TileBase, float> probAlgaeSurvivabilityMax;
-    // GLOBAL UNCHANGING VALUES
+    #endregion
+    #region Global Unchanging Values
     private Vector3Int[,] hexNeighbors = new Vector3Int[,] {
         {new Vector3Int(1,0,0), new Vector3Int(0,-1,0), new Vector3Int(-1,-1,0), new Vector3Int(-1,0,0), new Vector3Int(-1,1,0), new Vector3Int(0,1,0)}, 
         {new Vector3Int(1,0,0), new Vector3Int(1,-1,0), new Vector3Int(0,-1,0), new Vector3Int(-1,0,0), new Vector3Int(0,1,0), new Vector3Int(1,1,0)} 
     };
     private string[] coralNames = new string[6] {"columnar", "branching", "encrusting", "foliaceous", "laminar", "massive"};
     private int[] coralGrowTimes = new int[6] {45, 30, 95, 60, 120, 135};
+    private Dictionary<TileBase, float> probCoralSurvivabilityMax;
+    private Dictionary<TileBase, float> probAlgaeSurvivabilityMax;
     CoralDataContainer coralBaseData;
     GlobalContainer globalVarContainer;
-    // Locally Global Variables
+    #endregion
+    #region Global Changing Values
     private float zoom;
     private int survivabilityFrameCounter = 0;
     private Vector3 cameraFollowPosition;
@@ -60,30 +64,23 @@ public class GameManager : MonoBehaviour
     private CountdownTimer tempTimer;
     private List<NursingCoral>[] growingCorals;
     private Queue<string>[] readyCorals;
+    #endregion
 
-    void Awake()
-    {
-        if (instance == null) {
-            instance = this;
-        } else if (instance != this) {
-            Destroy(gameObject);
-        }
-        print("initializing tiles...");
-        initializeTiles();
-        print("initialization done");
-        print("loading XML data...");
-        coralBaseData = CoralDataContainer.Load("CoralDataXML");
-        foreach(CoralData cd in coralBaseData.corals) {
-            print(cd.toString());
-        }
-        globalVarContainer = GlobalContainer.Load("GlobalsXML");
-        print(globalVarContainer.globalVariables.what_are());
-        zoom = globalVarContainer.globalVariables.zoom;
-        print("XML data loaded");
-        tempTimer = new CountdownTimer(1800f); // MAKE GLOBAL VARIABLE
-        initializeGame();
+    #region Generic Helper Functions
+    private Vector3Int getMouseGridPosition() {
+        Grid grid = GameObject.Find("Grid").GetComponent<Grid>();
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Vector3 worldPoint = ray.GetPoint(-ray.origin.z/ray.direction.z);
+        Vector3Int position = grid.WorldToCell(worldPoint);
+        return position;
     }
-
+    private string convertTimetoMS(float rawTime) {
+        string minutes = Mathf.Floor(rawTime/60).ToString("00");
+        string seconds = Mathf.RoundToInt(rawTime%60).ToString("00");
+        return string.Format("{0}:{1}", minutes, seconds);
+    }
+    #endregion
+    #region Game-Specific Helper Functions
     private TileBase findInTileBaseArray (string code, string type) {
         TileBase tileBase = null;
         if (type == "coral") {
@@ -112,6 +109,43 @@ public class GameManager : MonoBehaviour
             print("ERROR: tileBase not found");
         return tileBase;
     }
+    public void change_coral(int select) {
+        testnum = select;
+    }
+
+    private int getCoralsInNursery() {
+        int coralsInNursery = 0;
+        for (int i = 0; i < 6; i++) {
+            coralsInNursery += growingCorals[i].Count;
+            coralsInNursery += readyCorals[i].Count;
+        }
+        return coralsInNursery;
+    }
+    #endregion
+
+    void Awake()
+    {
+        if (instance == null) {
+            instance = this;
+        } else if (instance != this) {
+            Destroy(gameObject);
+        }
+        print("initializing tiles...");
+        initializeTiles();
+        print("initialization done");
+        print("loading XML data...");
+        coralBaseData = CoralDataContainer.Load("CoralDataXML");
+        foreach(CoralData cd in coralBaseData.corals) {
+            print(cd.toString());
+        }
+        globalVarContainer = GlobalContainer.Load("GlobalsXML");
+        print(globalVarContainer.globalVariables.what_are());
+        zoom = globalVarContainer.globalVariables.zoom;
+        print("XML data loaded");
+        tempTimer = new CountdownTimer(1800f); // MAKE GLOBAL VARIABLE
+        initializeGame();
+    }
+
 
     private void initializeTiles() {
         // instantiation
@@ -137,7 +171,6 @@ public class GameManager : MonoBehaviour
         }
 
         // initialization
-
         // Setting the tiles in the tilemap to the coralCells dictionary
         foreach(Vector3Int pos in coralTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
@@ -305,19 +338,6 @@ public class GameManager : MonoBehaviour
         cameraFollow.GetComponent<MenuAnimator>().OpenThing();
     }
 
-    public void change_coral(int select) {
-        testnum = select;
-    }
-
-    private int getCoralsInNursery() {
-        int coralsInNursery = 0;
-        for (int i = 0; i < 6; i++) {
-            coralsInNursery += growingCorals[i].Count;
-            coralsInNursery += readyCorals[i].Count;
-        }
-        return coralsInNursery;
-    }
-
     public void tryGrowCoral(int type) {
         growCoral(type);
         // if (!growCoral(type))
@@ -371,12 +391,6 @@ public class GameManager : MonoBehaviour
         return successful;
     }
 
-    private string convertTimetoMS(float rawTime) {
-        string minutes = Mathf.Floor(rawTime/60).ToString("00");
-        string seconds = Mathf.RoundToInt(rawTime%60).ToString("00");
-        return string.Format("{0}:{1}", minutes, seconds);
-    }
-
     private void doStuff() {
         survivabilityFrameCounter = (++survivabilityFrameCounter % 7 == 0 ? 0 : survivabilityFrameCounter);
         if (survivabilityFrameCounter == 0) 
@@ -390,7 +404,7 @@ public class GameManager : MonoBehaviour
                         + "\nHerbivorous Fish: " + herbivorousFishTotal
                         + "\nFish Income: " + fishIncome;
     }
-
+    #region Algae Updates
     private void updateAllAlgae() {
         updateAlgaeSurvivability();
         updateAlgaePropagation();
@@ -459,25 +473,8 @@ public class GameManager : MonoBehaviour
         }
 
     }
-
-    private void updateFishOutput() {
-        int tempHFT = herbivorousFishTotal;
-        int tempCFT = carnivorousFishTotal;
-        herbivorousFishTotal += (int)Math.Round(tempHFT*herbivorousFishTotalInterest - tempCFT);
-        carnivorousFishTotal += (int)Math.Round((tempHFT-tempCFT)*carnivorousFishTotalInterest + (tempHFT-tempCFT)*0.03f);
-
-        // anti civ gandhi
-        herbivorousFishTotal = Math.Max(herbivorousFishTotal, 0);
-        carnivorousFishTotal = Math.Max(carnivorousFishTotal, 0);
-
-        herbivorousFishTotal = Math.Min(herbivorousFishTotal, 10000);
-        carnivorousFishTotal = Math.Min(carnivorousFishTotal, 10000);
-
-        fishIncome = (int)Math.Round(carnivorousFishTotal*0.3f + herbivorousFishTotal*0.2f);
-        fishOutput += fishIncome;
-        fishOutput = Math.Min(fishOutput, 50000);
-    }
-
+    #endregion
+    #region Coral Updates
     private void updateAllCoral() {
         updateCoralSurvivability();
         updateCoralPropagation();
@@ -528,15 +525,29 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    #endregion
 
-    private Vector3Int getMouseGridPosition() {
-        Grid grid = GameObject.Find("Grid").GetComponent<Grid>();
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Vector3 worldPoint = ray.GetPoint(-ray.origin.z/ray.direction.z);
-        Vector3Int position = grid.WorldToCell(worldPoint);
-        return position;
+    #region Misc Updates
+    private void updateFishOutput() {
+        int tempHFT = herbivorousFishTotal;
+        int tempCFT = carnivorousFishTotal;
+        herbivorousFishTotal += (int)Math.Round(tempHFT*herbivorousFishTotalInterest - tempCFT);
+        carnivorousFishTotal += (int)Math.Round((tempHFT-tempCFT)*carnivorousFishTotalInterest + (tempHFT-tempCFT)*0.03f);
+
+        // anti civ gandhi
+        herbivorousFishTotal = Math.Max(herbivorousFishTotal, 0);
+        carnivorousFishTotal = Math.Max(carnivorousFishTotal, 0);
+
+        herbivorousFishTotal = Math.Min(herbivorousFishTotal, 10000);
+        carnivorousFishTotal = Math.Min(carnivorousFishTotal, 10000);
+
+        fishIncome = (int)Math.Round(carnivorousFishTotal*0.3f + herbivorousFishTotal*0.2f);
+        fishOutput += fishIncome;
+        fishOutput = Math.Min(fishOutput, 50000);
     }
+    #endregion
 
+    #region Camera Movement and Zoom
     private void moveCameraWASD(float moveAmount) {
         if (Input.GetKey(KeyCode.W)) {
             cameraFollowPosition.y += moveAmount * Time.deltaTime;
@@ -592,5 +603,5 @@ public class GameManager : MonoBehaviour
             cameraFollowPosition.z
         );
     }
-
+    #endregion
 }
