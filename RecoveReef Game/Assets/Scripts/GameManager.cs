@@ -28,18 +28,28 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject[] CoralOptions;
     [SerializeField] private Text feedbackText;
     #pragma warning restore 0649
-    private float zoom = 20f;
-    private float updateDelay = 0.5f;
-    private int survivabilityFrameCounter = 0;
-    private Vector3 cameraFollowPosition;
-    private Vector3 savedCameraPosition;
-    private bool edgeScrollingEnabled = false;
-    private bool showNursery = false;
+    // DATA STRUCTURES FOR THE GAME
     private Dictionary<Vector3Int,CoralCellData> coralCells;
     private Dictionary<Vector3Int,float> substrataCells;
     private Dictionary<Vector3Int,AlgaeCellData> algaeCells; 
     private Dictionary<TileBase, float> probCoralSurvivabilityMax;
     private Dictionary<TileBase, float> probAlgaeSurvivabilityMax;
+    // GLOBAL UNCHANGING VALUES
+    private Vector3Int[,] hexNeighbors = new Vector3Int[,] {
+        {new Vector3Int(1,0,0), new Vector3Int(0,-1,0), new Vector3Int(-1,-1,0), new Vector3Int(-1,0,0), new Vector3Int(-1,1,0), new Vector3Int(0,1,0)}, 
+        {new Vector3Int(1,0,0), new Vector3Int(1,-1,0), new Vector3Int(0,-1,0), new Vector3Int(-1,0,0), new Vector3Int(0,1,0), new Vector3Int(1,1,0)} 
+    };
+    private string[] coralNames = new string[6] {"columnar", "branching", "encrusting", "foliaceous", "laminar", "massive"};
+    private int[] coralGrowTimes = new int[6] {45, 30, 95, 60, 120, 135};
+    CoralDataContainer coralBaseData;
+    GlobalContainer globalVarContainer;
+    // Locally Global Variables
+    private float zoom;
+    private int survivabilityFrameCounter = 0;
+    private Vector3 cameraFollowPosition;
+    private Vector3 savedCameraPosition;
+    private bool edgeScrollingEnabled = false;
+    private bool showNursery = false;
     private int testnum = 0;
     private int fishOutput = 0;
     private int fishIncome = 0;
@@ -47,20 +57,9 @@ public class GameManager : MonoBehaviour
     private int carnivorousFishTotal = 0;
     private float herbivorousFishTotalInterest = 0;
     private int herbivorousFishTotal = 0;
-    private Vector3Int[,] hexNeighbors = new Vector3Int[,] {
-        {new Vector3Int(1,0,0), new Vector3Int(0,-1,0), new Vector3Int(-1,-1,0), new Vector3Int(-1,0,0), new Vector3Int(-1,1,0), new Vector3Int(0,1,0)}, 
-        {new Vector3Int(1,0,0), new Vector3Int(1,-1,0), new Vector3Int(0,-1,0), new Vector3Int(-1,0,0), new Vector3Int(0,1,0), new Vector3Int(1,1,0)} 
-    };
-    private string[] coralNames = new string[6] {"columnar", "branching", "encrusting", "foliaceous", "laminar", "massive"};
-    private int[] coralGrowTimes = new int[6] {45, 30, 95, 60, 120, 135};
     private CountdownTimer tempTimer;
-    private int maxSpaceInNursery = 20;
-    private int maxSpacePerCoral = 4;
     private List<NursingCoral>[] growingCorals;
     private Queue<string>[] readyCorals;
-    private float feedbackDelayTime = 1.5f;
-    CoralDataContainer coralBaseData;
-    GlobalContainer globalVarContainer;
 
     void Awake()
     {
@@ -79,6 +78,7 @@ public class GameManager : MonoBehaviour
         }
         globalVarContainer = GlobalContainer.Load("GlobalsXML");
         print(globalVarContainer.globalVariables.what_are());
+        zoom = globalVarContainer.globalVariables.zoom;
         print("XML data loaded");
         tempTimer = new CountdownTimer(1800f); // MAKE GLOBAL VARIABLE
         initializeGame();
@@ -187,7 +187,7 @@ public class GameManager : MonoBehaviour
         cameraFollow.enabled = true;
         // nurseryCamera.Setup(() => new Vector3(500,500,-10), () => zoom);
         nurseryCamera.enabled = false;
-        InvokeRepeating("doStuff", 1.0f, updateDelay);
+        InvokeRepeating("doStuff", 1.0f, globalVarContainer.globalVariables.updateDelay);
     }
 
     void Update()
@@ -284,7 +284,7 @@ public class GameManager : MonoBehaviour
             CoralOptions[i].transform.Find("TimeCoralGrow").GetComponent<Text>().text = convertTimetoMS(min_time); 
         }
 
-        CNC.text = "Coral Nursery:\n" + getCoralsInNursery() + "/" + maxSpaceInNursery;
+        CNC.text = "Coral Nursery:\n" + getCoralsInNursery() + "/" + globalVarContainer.globalVariables.maxSpaceInNursery;
 
         tempTimer.updateTime();
         testTimerText.text = convertTimetoMS(tempTimer.currentTime);
@@ -325,14 +325,14 @@ public class GameManager : MonoBehaviour
     }
 
     private void growCoral(int type) {
-        bool spaceInNursery = getCoralsInNursery() < maxSpaceInNursery;
-        bool underMaxGrow = growingCorals[type].Count < maxSpacePerCoral;
+        bool spaceInNursery = getCoralsInNursery() < globalVarContainer.globalVariables.maxSpaceInNursery;
+        bool underMaxGrow = growingCorals[type].Count < globalVarContainer.globalVariables.maxSpacePerCoral;
         if (spaceInNursery && underMaxGrow) {
             growingCorals[type].Add(new NursingCoral(coralNames[type], new CountdownTimer(coralGrowTimes[type])));
         } else if (!underMaxGrow) {
-            feedbackDialogue("Can only grow 4 corals per type.", feedbackDelayTime);
+            feedbackDialogue("Can only grow 4 corals per type.", globalVarContainer.globalVariables.feedbackDelayTime);
         } else if (!spaceInNursery) {
-            feedbackDialogue("Nursery is at maximum capacity.", feedbackDelayTime);
+            feedbackDialogue("Nursery is at maximum capacity.", globalVarContainer.globalVariables.feedbackDelayTime);
         }
     }
 
@@ -344,10 +344,10 @@ public class GameManager : MonoBehaviour
         Vector3Int position = getMouseGridPosition();
         print("position: " + position);
         if (coralTileMap.HasTile(position)) {
-            feedbackDialogue("Coral already existing. Cannot place tile.", feedbackDelayTime);
+            feedbackDialogue("Coral already existing. Cannot place tile.", globalVarContainer.globalVariables.feedbackDelayTime);
             // print(coralCells[position].printData());
         } else if (algaeTileMap.HasTile(position)) {
-            feedbackDialogue("Algae already existing. Cannot place tile.", feedbackDelayTime);
+            feedbackDialogue("Algae already existing. Cannot place tile.", globalVarContainer.globalVariables.feedbackDelayTime);
             // print("algae already existing; cannot place tile");
             print(algaeCells[position].printData());
         } else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && readyCorals[type].Count > 0) { 
@@ -361,7 +361,7 @@ public class GameManager : MonoBehaviour
             substrataOverlayTileMap.SetTile(position, groundTileMap.GetTile(position));
         } else if (readyCorals[type].Count == 0 && growingCorals[type].Count > 0) {
             string t = "Soonest to mature coral of this type has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left.";
-            feedbackDialogue(t, feedbackDelayTime);
+            feedbackDialogue(t, globalVarContainer.globalVariables.feedbackDelayTime);
             // print("soonest to mature has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left");
         }
         
