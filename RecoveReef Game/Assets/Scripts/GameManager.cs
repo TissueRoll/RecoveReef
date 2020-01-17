@@ -79,6 +79,42 @@ public class GameManager : MonoBehaviour
     }
     #endregion
     #region Game-Specific Helper Functions
+    private int findIndexOfEntityFromType (string code, string type) {
+        int index = -1;
+        if (type == "coral") {
+            for (int i = 0; i < coralBaseData.corals.Count; i++) {
+                if (Regex.IsMatch(coralBaseData.corals[i].name, ".*"+type+"_"+code+".*")) {
+                    index = i;
+                    break;
+                }
+            }
+        } else if (type == "algae") {
+            print("nothing here yet");
+        } else if (type == "substrata") {
+            print("nothing here yet");
+        }
+        if (index == -1)
+            print("ERROR: Entity not found");
+        return index;
+    }
+    private int findIndexOfEntityFromName (string nameOfTileBase) {
+        int index = -1;
+        if (Regex.IsMatch(nameOfTileBase, ".*coral.*")) {
+            for (int i = 0; i < coralBaseData.corals.Count; i++) {
+                if (Regex.IsMatch(nameOfTileBase, ".*coral_"+coralBaseData.corals[i].name+".*")) {
+                    index = i;
+                    break;
+                }
+            }
+        } else if (Regex.IsMatch(nameOfTileBase, ".*algae.*")) {
+            print("nothing here yet");
+        } else if (Regex.IsMatch(nameOfTileBase, ".*substrata.*")) {
+            print("nothing here yet");
+        }
+        if (index == -1)
+            print("ERROR: Entity not found");
+        return index;
+    }
     private TileBase findInTileBaseArray (string code, string type) {
         TileBase tileBase = null;
         if (type == "coral") {
@@ -128,18 +164,18 @@ public class GameManager : MonoBehaviour
         } else if (instance != this) {
             Destroy(gameObject);
         }
-        print("initializing tiles...");
-        initializeTiles();
-        print("initialization done");
         print("loading XML data...");
         coralBaseData = CoralDataContainer.Load("CoralDataXML");
         foreach(CoralData cd in coralBaseData.corals) {
-            print(cd.toString());
+            print(cd.dataToString());
         }
         globalVarContainer = GlobalContainer.Load("GlobalsXML");
         print(globalVarContainer.globalVariables.what_are());
         zoom = globalVarContainer.globalVariables.zoom;
         print("XML data loaded");
+        print("initializing tiles...");
+        initializeTiles();
+        print("initialization done");
         tempTimer = new CountdownTimer(1800f); // MAKE GLOBAL VARIABLE
         initializeGame();
     }
@@ -178,11 +214,10 @@ public class GameManager : MonoBehaviour
                 coralTileMap, 
                 coralTileMap.GetTile(localPlace), 
                 101.0f, 
-                UnityEngine.Random.Range(0.0007f,0.0035f), 
-                UnityEngine.Random.Range(0.001f,0.005f)
+                coralBaseData.corals[findIndexOfEntityFromName(coralTileMap.GetTile(localPlace).name)]
             );
-            carnivorousFishTotalInterest += cell.carnivorousFishInterest;
-            herbivorousFishTotalInterest += cell.herbivorousFishInterest;
+            carnivorousFishTotalInterest += cell.coralData.carnivorousFishInterestBase;
+            herbivorousFishTotalInterest += cell.coralData.herbivorousFishInterestBase;
             coralCells.Add(cell.LocalPlace, cell);
             substrataOverlayTileMap.SetTile(localPlace, groundTileMap.GetTile(localPlace));
         }
@@ -370,11 +405,17 @@ public class GameManager : MonoBehaviour
             print(algaeCells[position].printData());
         } else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && readyCorals[type].Count > 0) { 
             successful = true;
-            readyCorals[type].Dequeue();
-            CoralCellData cell = new CoralCellData(position, coralTileMap, findInTileBaseArray(coralBaseData.corals[type].name, "coral"), 0.0f, UnityEngine.Random.Range(0.0007f,0.0035f), UnityEngine.Random.Range(0.001f,0.005f));
+            readyCorals[type].Dequeue(); // change the tilebase thing
+            CoralCellData cell = new CoralCellData(
+                position, 
+                coralTileMap, 
+                findInTileBaseArray(coralBaseData.corals[type].name, "coral"), 
+                0.0f, 
+                coralBaseData.corals[type]
+            );
             coralCells.Add(position, cell);
-            carnivorousFishTotalInterest += coralCells[position].carnivorousFishInterest;
-            herbivorousFishTotalInterest += coralCells[position].herbivorousFishInterest;
+            carnivorousFishTotalInterest += coralCells[position].coralData.carnivorousFishInterestBase;
+            herbivorousFishTotalInterest += coralCells[position].coralData.herbivorousFishInterestBase;
             coralTileMap.SetTile(position, findInTileBaseArray(coralBaseData.corals[type].name, "coral"));
             substrataOverlayTileMap.SetTile(position, groundTileMap.GetTile(position));
         } else if (readyCorals[type].Count == 0 && growingCorals[type].Count > 0) {
@@ -458,8 +499,8 @@ public class GameManager : MonoBehaviour
                         if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace)) {
                             coralTileMap.SetTile(localPlace, null);
                             substrataOverlayTileMap.SetTile(localPlace, null);
-                            herbivorousFishTotalInterest -= coralCells[localPlace].herbivorousFishInterest;
-                            carnivorousFishTotalInterest -= coralCells[localPlace].carnivorousFishInterest;
+                            herbivorousFishTotalInterest -= coralCells[localPlace].coralData.herbivorousFishInterestBase;
+                            carnivorousFishTotalInterest -= coralCells[localPlace].coralData.carnivorousFishInterestBase;
                             coralCells.Remove(localPlace);
                         }
                         algaeCells.Add(cell.LocalPlace,cell);
@@ -492,8 +533,8 @@ public class GameManager : MonoBehaviour
                 if (!coralCells[key].willSurvive(randNum, substrataCells[key], miscFactors)) {
                     coralTileMap.SetTile(key, null);
                     substrataOverlayTileMap.SetTile(key, null);
-                    herbivorousFishTotalInterest -= coralCells[key].herbivorousFishInterest;
-                    carnivorousFishTotalInterest -= coralCells[key].carnivorousFishInterest;
+                    herbivorousFishTotalInterest -= coralCells[key].coralData.herbivorousFishInterestBase;
+                    carnivorousFishTotalInterest -= coralCells[key].coralData.carnivorousFishInterestBase;
                     coralCells.Remove(key);
                     substrataOverlayTileMap.SetTile(key, null);
                 }
@@ -512,9 +553,15 @@ public class GameManager : MonoBehaviour
                         Vector3Int localPlace = key+hexNeighbors[key.y&1,i];
                         if (!substrataTileMap.HasTile(localPlace) || !substrataCells.ContainsKey(localPlace)) continue;
                         if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace) || algaeTileMap.HasTile(localPlace)) continue;
-                        CoralCellData cell = new CoralCellData(localPlace, coralTileMap, coralCells[key].TileBase, 0.0f, UnityEngine.Random.Range(0.0007f,0.0035f), UnityEngine.Random.Range(0.001f,0.005f));
-                        carnivorousFishTotalInterest += cell.carnivorousFishInterest;
-                        herbivorousFishTotalInterest += cell.herbivorousFishInterest;
+                        CoralCellData cell = new CoralCellData(
+                            localPlace, 
+                            coralTileMap, 
+                            coralCells[key].TileBase, 
+                            0.0f, 
+                            coralBaseData.corals[findIndexOfEntityFromName(coralCells[key].TileBase.name)]
+                        );
+                        carnivorousFishTotalInterest += cell.coralData.carnivorousFishInterestBase;
+                        herbivorousFishTotalInterest += cell.coralData.herbivorousFishInterestBase;
                         coralCells.Add(cell.LocalPlace,cell);
                         coralTileMap.SetTile(cell.LocalPlace, cell.TileBase);
                         substrataOverlayTileMap.SetTile(cell.LocalPlace, groundTileMap.GetTile(cell.LocalPlace));

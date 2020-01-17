@@ -26,7 +26,7 @@ public class CoralData
     [XmlElement("PrefTerrain")]
     public string prefTerrain;
 
-    public string toString() {
+    public string dataToString() {
         string output = "";
         output += "name: " + name;
         output += "\nGrow Time: " + growTime;

@@ -8,7 +8,7 @@ public class CoralDataLoader : MonoBehaviour
     void Start() {
         CoralDataContainer ic = CoralDataContainer.Load(path);
         foreach(CoralData coral in ic.corals) {
-            print(coral.toString());
+            print(coral.dataToString());
         }
     }
 }
