@@ -135,35 +135,6 @@ public class GameManager : MonoBehaviour
             print("ERROR: Entity not found");
         return index;
     }
-    // FIX THIS TO NOT USE IT ANYMORE
-    private TileBase findInTileBaseArray (string code, string type) {
-        TileBase tileBase = null;
-        if (type == "coral") {
-            for (int i = 0; i < coralTileBases.Length; i++) {
-                if (Regex.IsMatch(coralTileBases[i].name, ".*"+type+"_"+code+".*")) {
-                    tileBase = coralTileBases[i];
-                    break;
-                }
-            }
-        } else if (type == "algae") {
-            for (int i = 0; i < algaeTileBases.Length; i++) {
-                if (Regex.IsMatch(algaeTileBases[i].name, ".*"+type+"_"+code+".*")) {
-                    tileBase = algaeTileBases[i];
-                    break;
-                }
-            }
-        } else if (type == "substrata") {
-            for (int i = 0; i < substrataTileBases.Length; i++) {
-                if (Regex.IsMatch(substrataTileBases[i].name, ".*"+type+"_"+code+".*")) {
-                    tileBase = substrataTileBases[i];
-                    break;
-                }
-            }
-        }
-        if (tileBase == null)
-            print("ERROR: tileBase not found");
-        return tileBase;
-    }
     public void change_coral(int select) {
         testnum = select;
     }
@@ -424,14 +395,14 @@ public class GameManager : MonoBehaviour
             CoralCellData cell = new CoralCellData(
                 position, 
                 coralTileMap, 
-                findInTileBaseArray(coralBaseData.corals[type].name, "coral"), 
+                coralTileBases[type], 
                 0.0f, 
                 coralBaseData.corals[type]
             );
             coralCells.Add(position, cell);
             carnivorousFishTotalInterest += coralCells[position].coralData.carnivorousFishInterestBase;
             herbivorousFishTotalInterest += coralCells[position].coralData.herbivorousFishInterestBase;
-            coralTileMap.SetTile(position, findInTileBaseArray(coralBaseData.corals[type].name, "coral"));
+            coralTileMap.SetTile(position, coralTileBases[type]);
             substrataOverlayTileMap.SetTile(position, groundTileMap.GetTile(position));
         } else if (readyCorals[type].Count == 0 && growingCorals[type].Count > 0) {
             string t = "Soonest to mature coral of this type has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left.";
