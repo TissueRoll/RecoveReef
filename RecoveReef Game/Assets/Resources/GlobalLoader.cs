@@ -3,10 +3,10 @@ using System.Collections;
 
 public class GlobalLoader : MonoBehaviour
 {
-    public const string path = "GlobalVariables";
+    public const string path = "GlobalsXML";
 
     void Start() {
         GlobalContainer g = GlobalContainer.Load(path);
-        print(g.gvars.what_are());
+        print(g.globalVariables.what_are());
     }
 }

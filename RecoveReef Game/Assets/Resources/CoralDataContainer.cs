@@ -10,7 +10,7 @@ public class CoralDataContainer
 {
     [XmlArray("CoralDatas")]
     [XmlArrayItem("CoralData")]
-    public List<CoralData> cd = new List<CoralData>();
+    public List<CoralData> corals = new List<CoralData>();
 
     public static CoralDataContainer Load(string path) {
         TextAsset ta = Resources.Load<TextAsset>(path);

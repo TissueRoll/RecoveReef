@@ -10,7 +10,7 @@ public class GlobalContainer
 {
 
     [XmlElement("Globals")]
-    public Globals gvars;
+    public Globals globalVariables;
 
     public static GlobalContainer Load(string path) {
         TextAsset ta = Resources.Load<TextAsset>(path);

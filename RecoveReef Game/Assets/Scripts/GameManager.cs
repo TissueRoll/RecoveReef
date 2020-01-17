@@ -59,6 +59,8 @@ public class GameManager : MonoBehaviour
     private List<NursingCoral>[] growingCorals;
     private Queue<string>[] readyCorals;
     private float feedbackDelayTime = 1.5f;
+    CoralDataContainer coralBaseData;
+    GlobalContainer globalVarContainer;
 
     void Awake()
     {
@@ -70,7 +72,15 @@ public class GameManager : MonoBehaviour
         print("initializing tiles...");
         initializeTiles();
         print("initialization done");
-        tempTimer = new CountdownTimer(1800f);
+        print("loading XML data...");
+        coralBaseData = CoralDataContainer.Load("CoralDataXML");
+        foreach(CoralData cd in coralBaseData.corals) {
+            print(cd.toString());
+        }
+        globalVarContainer = GlobalContainer.Load("GlobalsXML");
+        print(globalVarContainer.globalVariables.what_are());
+        print("XML data loaded");
+        tempTimer = new CountdownTimer(1800f); // MAKE GLOBAL VARIABLE
         initializeGame();
     }
 
@@ -112,12 +122,12 @@ public class GameManager : MonoBehaviour
         readyCorals = new Queue<string>[6];
 
         // setting values
-        probCoralSurvivabilityMax = new Dictionary<TileBase, float>();
+        probCoralSurvivabilityMax = new Dictionary<TileBase, float>(); // MAKE GLOBAL VARIABLE
         probCoralSurvivabilityMax.Add(findInTileBaseArray("big", "substrata"), 100);
         probCoralSurvivabilityMax.Add(findInTileBaseArray("med", "substrata"), 97);
         probCoralSurvivabilityMax.Add(findInTileBaseArray("small", "substrata"), 90);
 
-        probAlgaeSurvivabilityMax = new Dictionary<TileBase, float>();
+        probAlgaeSurvivabilityMax = new Dictionary<TileBase, float>(); // MAKE GLOBAL VARIABLE
         probAlgaeSurvivabilityMax.Add(findInTileBaseArray("brown", "algae"), 95);
         probAlgaeSurvivabilityMax.Add(findInTileBaseArray("green", "algae"), 85);
 
@@ -132,7 +142,14 @@ public class GameManager : MonoBehaviour
         foreach(Vector3Int pos in coralTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
             if (!coralTileMap.HasTile(localPlace)) continue;
-            CoralCellData cell = new CoralCellData(localPlace, coralTileMap, coralTileMap.GetTile(localPlace), 101.0f, UnityEngine.Random.Range(0.0007f,0.0035f), UnityEngine.Random.Range(0.001f,0.005f));
+            CoralCellData cell = new CoralCellData(
+                localPlace, 
+                coralTileMap, 
+                coralTileMap.GetTile(localPlace), 
+                101.0f, 
+                UnityEngine.Random.Range(0.0007f,0.0035f), 
+                UnityEngine.Random.Range(0.001f,0.005f)
+            );
             carnivorousFishTotalInterest += cell.carnivorousFishInterest;
             herbivorousFishTotalInterest += cell.herbivorousFishInterest;
             coralCells.Add(cell.LocalPlace, cell);
