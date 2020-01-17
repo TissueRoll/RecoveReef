@@ -40,8 +40,6 @@ public class GameManager : MonoBehaviour
         {new Vector3Int(1,0,0), new Vector3Int(0,-1,0), new Vector3Int(-1,-1,0), new Vector3Int(-1,0,0), new Vector3Int(-1,1,0), new Vector3Int(0,1,0)}, 
         {new Vector3Int(1,0,0), new Vector3Int(1,-1,0), new Vector3Int(0,-1,0), new Vector3Int(-1,0,0), new Vector3Int(0,1,0), new Vector3Int(1,1,0)} 
     };
-    private string[] coralNames = new string[6] {"columnar", "branching", "encrusting", "foliaceous", "laminar", "massive"};
-    private int[] coralGrowTimes = new int[6] {45, 30, 95, 60, 120, 135};
     private Dictionary<TileBase, float> probCoralSurvivabilityMax;
     private Dictionary<TileBase, float> probAlgaeSurvivabilityMax;
     CoralDataContainer coralBaseData;
@@ -348,7 +346,7 @@ public class GameManager : MonoBehaviour
         bool spaceInNursery = getCoralsInNursery() < globalVarContainer.globalVariables.maxSpaceInNursery;
         bool underMaxGrow = growingCorals[type].Count < globalVarContainer.globalVariables.maxSpacePerCoral;
         if (spaceInNursery && underMaxGrow) {
-            growingCorals[type].Add(new NursingCoral(coralNames[type], new CountdownTimer(coralGrowTimes[type])));
+            growingCorals[type].Add(new NursingCoral(coralBaseData.corals[type].name, new CountdownTimer(coralBaseData.corals[type].growTime)));
         } else if (!underMaxGrow) {
             feedbackDialogue("Can only grow 4 corals per type.", globalVarContainer.globalVariables.feedbackDelayTime);
         } else if (!spaceInNursery) {
@@ -373,11 +371,11 @@ public class GameManager : MonoBehaviour
         } else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && readyCorals[type].Count > 0) { 
             successful = true;
             readyCorals[type].Dequeue();
-            CoralCellData cell = new CoralCellData(position, coralTileMap, findInTileBaseArray(coralNames[type], "coral"), 0.0f, UnityEngine.Random.Range(0.0007f,0.0035f), UnityEngine.Random.Range(0.001f,0.005f));
+            CoralCellData cell = new CoralCellData(position, coralTileMap, findInTileBaseArray(coralBaseData.corals[type].name, "coral"), 0.0f, UnityEngine.Random.Range(0.0007f,0.0035f), UnityEngine.Random.Range(0.001f,0.005f));
             coralCells.Add(position, cell);
             carnivorousFishTotalInterest += coralCells[position].carnivorousFishInterest;
             herbivorousFishTotalInterest += coralCells[position].herbivorousFishInterest;
-            coralTileMap.SetTile(position, findInTileBaseArray(coralNames[type], "coral"));
+            coralTileMap.SetTile(position, findInTileBaseArray(coralBaseData.corals[type].name, "coral"));
             substrataOverlayTileMap.SetTile(position, groundTileMap.GetTile(position));
         } else if (readyCorals[type].Count == 0 && growingCorals[type].Count > 0) {
             string t = "Soonest to mature coral of this type has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left.";
