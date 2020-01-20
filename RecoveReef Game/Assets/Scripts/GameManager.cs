@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Text CNC;
     [SerializeField] private GameObject[] CoralOptions;
     [SerializeField] private Text feedbackText;
+    [SerializeField] private TileBase toxicOverlay;
     #pragma warning restore 0649
     #endregion
     #region Data Structures for the Game
@@ -76,6 +77,17 @@ public class GameManager : MonoBehaviour
         string minutes = Mathf.Floor(rawTime/60).ToString("00");
         string seconds = Mathf.RoundToInt(rawTime%60).ToString("00");
         return string.Format("{0}:{1}", minutes, seconds);
+    }
+    private HashSet<Vector3Int> spread (Vector3Int position, int level) {
+        HashSet<Vector3Int> result = new HashSet<Vector3Int>();
+        result.Add(position);
+        if (level > 0) {
+            for (int i = 0; i < 6; i++) {
+                Vector3Int posNeighbor = position+hexNeighbors[position.y&1,i];
+                result.UnionWith(spread(posNeighbor,level-1));
+            }
+        }
+        return result;
     }
     #endregion
     #region Game-Specific Helper Functions
@@ -184,10 +196,30 @@ public class GameManager : MonoBehaviour
         }
 
         // initialization
+        // Setting the substrata data
+        foreach (Vector3Int pos in substrataTileMap.cellBounds.allPositionsWithin) {
+            Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
+            if (!substrataTileMap.HasTile(localPlace)) continue;
+            TileBase currentTB = substrataTileMap.GetTile(localPlace);
+            int idx = findIndexOfEntityFromName(currentTB.name);
+            if (idx == -1) { // UNKNOWN TILE; FOR NOW TOXIC
+                HashSet<Vector3Int> toxicSpread = spread(localPlace, 2);
+                foreach (Vector3Int toxicPos in toxicSpread) {
+                    substrataOverlayTileMap.SetTile(toxicPos,toxicOverlay);
+                }
+            } else {
+                substrataCells.Add(localPlace, substrataDataContainer.substrata[idx].groundViability);
+            }
+        }
+        
         // Setting the tiles in the tilemap to the coralCells dictionary
         foreach(Vector3Int pos in coralTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
             if (!coralTileMap.HasTile(localPlace)) continue;
+            if (!substrataCells.ContainsKey(localPlace) || substrataOverlayTileMap.HasTile(localPlace)) {
+                coralTileMap.SetTile(localPlace, null);
+                continue;
+            }
             TileBase currentTB = coralTileMap.GetTile(localPlace);
             CoralCellData cell = new CoralCellData(
                 localPlace, 
@@ -201,18 +233,14 @@ public class GameManager : MonoBehaviour
             coralCells.Add(cell.LocalPlace, cell);
             // substrataOverlayTileMap.SetTile(localPlace, groundTileMap.GetTile(localPlace));
         }
-        print(coralCells.Count);
-        
-        foreach (Vector3Int pos in substrataTileMap.cellBounds.allPositionsWithin) {
-            Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
-            if (!substrataTileMap.HasTile(localPlace)) continue;
-            TileBase currentTB = substrataTileMap.GetTile(localPlace);
-            substrataCells.Add(localPlace, substrataDataContainer.substrata[findIndexOfEntityFromName(currentTB.name)].groundViability);
-        }
         
         foreach (Vector3Int pos in algaeTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
             if (!algaeTileMap.HasTile(localPlace)) continue;
+            if (!substrataCells.ContainsKey(localPlace) || substrataOverlayTileMap.HasTile(localPlace)) {
+                algaeTileMap.SetTile(localPlace, null);
+                continue;
+            }
             TileBase currentTB = algaeTileMap.GetTile(localPlace);
             AlgaeCellData cell = new AlgaeCellData(
                 localPlace, 
@@ -245,6 +273,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        #region Keyboard Shortcuts
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
             tryGrowCoral(0);
         } else if (Input.GetKeyDown(KeyCode.Alpha2)) {
@@ -276,6 +305,7 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.M)) {
             openThing();
         }
+        #endregion
 
         // testing for hex tile coords
         bool lb = Input.GetMouseButtonDown(0);
@@ -293,6 +323,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        #region Screen Movement
         // movement of screen
         if (Input.GetKeyDown(KeyCode.Space)) {
             edgeScrollingEnabled = !edgeScrollingEnabled;
@@ -321,6 +352,7 @@ public class GameManager : MonoBehaviour
             zoomKeys(1f);
             clampCamera();
         }
+        #endregion
         
         for (int i = 0; i < 6; i++) {
             float min_time = (growingCorals[i].Count > 0 ? growingCorals[i][0].timer.currentTime : 0);
