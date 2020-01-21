@@ -615,12 +615,12 @@ GameObject:
   - component: {fileID: 81228214}
   - component: {fileID: 81228213}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: NurseryCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &81228212
 RectTransform:
   m_ObjectHideFlags: 0
@@ -147702,7 +147702,7 @@ GameObject:
   - component: {fileID: 1054924045}
   - component: {fileID: 1054924044}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: SidePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

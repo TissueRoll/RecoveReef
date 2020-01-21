@@ -337,8 +337,10 @@ public class GameManager : MonoBehaviour
                 savedCameraPosition = cameraFollow.transform.position;
                 cameraFollow.enabled = false;
                 nurseryCamera.enabled = true;
+                nurseryCamera.transform.Find("NurseryCanvas").gameObject.SetActive(true); // BAND AID
             } else {
                 cameraFollow.enabled = true;
+                nurseryCamera.transform.Find("NurseryCanvas").gameObject.SetActive(false); // BAND AID
                 nurseryCamera.enabled = false;
                 cameraFollowPosition = savedCameraPosition;
                 cameraFollow.Setup(() => cameraFollowPosition, () => zoom);
