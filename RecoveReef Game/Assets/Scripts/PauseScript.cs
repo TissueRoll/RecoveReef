@@ -6,19 +6,33 @@ using UnityEngine.SceneManagement;
 public class PauseScript : MonoBehaviour
 {
     public static bool GamePaused = false;
+    private bool SettingsActive = false;
 
     public GameObject pauseMenuUI;
+    public GameObject settingsMenuUI;
 
     // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape)) {
-            if (GamePaused) {
+            if (GamePaused && SettingsActive) {
+                SettingsOFF();
+            } else if (GamePaused && !SettingsActive) {
                 Resume();
             } else {
                 Pause();
             }
         }
+    }
+
+    public void SettingsON() {
+        settingsMenuUI.SetActive(true);
+        SettingsActive = true;
+    }
+
+    void SettingsOFF() {
+        settingsMenuUI.SetActive(false);
+        SettingsActive = false;
     }
 
     public void Resume() {
