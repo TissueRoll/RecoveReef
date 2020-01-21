@@ -273,10 +273,14 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-
         if (PauseScript.GamePaused) {
             return;
         }
+
+        // test script for popup messages
+        // if (Input.GetKeyDown(KeyCode.Slash)) {
+        //     makePopup("Hello!");
+        // }
 
         #region Keyboard Shortcuts
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
@@ -380,6 +384,11 @@ public class GameManager : MonoBehaviour
 
         tempTimer.updateTime();
         testTimerText.text = convertTimetoMS(tempTimer.currentTime);
+    }
+
+    private void makePopup(string s) {
+        cameraFollow.transform.Find("HUD/Popup").gameObject.GetComponent<PopupScript>().SetPopupMessage(s);
+        cameraFollow.transform.Find("HUD/Popup").gameObject.GetComponent<PopupScript>().OpenPopup();
     }
 
     private void feedbackDialogue(string text, float time) {
