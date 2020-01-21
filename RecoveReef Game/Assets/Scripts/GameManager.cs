@@ -273,6 +273,11 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+
+        if (PauseScript.GamePaused) {
+            return;
+        }
+
         #region Keyboard Shortcuts
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
             tryGrowCoral(0);
