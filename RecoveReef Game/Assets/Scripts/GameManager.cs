@@ -287,12 +287,13 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        #region Disaster Happenings
         disasterTimer.updateTime();
         if (disasterTimer.isDone()) {
             disasterTimer = new CountdownTimer(60f);
             randomDisaster();
         }
-
+        
         if (!climateChangeTimer.isDone())
             climateChangeTimer.updateTime();
         if (!climateChangeHasWarned && climateChangeTimer.currentTime <= climateChangeTimer.timeDuration*(2.0/3.0)) {
@@ -308,6 +309,7 @@ public class GameManager : MonoBehaviour
             makePopup("Hello!");
             // randomDisaster(2);
         }
+        #endregion
 
         #region Keyboard Shortcuts
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
@@ -368,20 +370,7 @@ public class GameManager : MonoBehaviour
         
         // transporting to some far off place for the nursery
         if (Input.GetKeyDown(KeyCode.DownArrow)) {
-            showNursery = !showNursery;
-            if (showNursery) {
-                savedCameraPosition = cameraFollow.transform.position;
-                cameraFollow.enabled = false;
-                nurseryCamera.enabled = true;
-                nurseryCamera.transform.Find("NurseryCanvas").gameObject.SetActive(true); // BAND AID
-            } else {
-                cameraFollow.enabled = true;
-                nurseryCamera.transform.Find("NurseryCanvas").gameObject.SetActive(false); // BAND AID
-                nurseryCamera.enabled = false;
-                cameraFollowPosition = savedCameraPosition;
-                cameraFollow.Setup(() => cameraFollowPosition, () => zoom);
-            }
-            
+            operateNursery();
         }
 
         if (!showNursery) {
@@ -411,6 +400,21 @@ public class GameManager : MonoBehaviour
 
         tempTimer.updateTime();
         testTimerText.text = convertTimetoMS(tempTimer.currentTime);
+    }
+    public void operateNursery() {
+        showNursery = !showNursery;
+        if (showNursery) {
+            savedCameraPosition = cameraFollow.transform.position;
+            cameraFollow.enabled = false;
+            nurseryCamera.enabled = true;
+            nurseryCamera.transform.Find("NurseryCanvas").gameObject.SetActive(true); // BAND AID
+        } else {
+            cameraFollow.enabled = true;
+            nurseryCamera.transform.Find("NurseryCanvas").gameObject.SetActive(false); // BAND AID
+            nurseryCamera.enabled = false;
+            cameraFollowPosition = savedCameraPosition;
+            cameraFollow.Setup(() => cameraFollowPosition, () => zoom);
+        }
     }
 
     private void makePopup(string s) {

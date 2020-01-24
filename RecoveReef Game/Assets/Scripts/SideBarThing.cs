@@ -13,4 +13,7 @@ public class SideBarThing : MonoBehaviour
     public void setNum(int x) {
         GameManager.instance.change_coral(x);
     }
+    public void opNursery() {
+        GameManager.instance.operateNursery();
+    }
 }
