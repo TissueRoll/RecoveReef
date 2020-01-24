@@ -68,6 +68,8 @@ public class GameManager : MonoBehaviour
     private CountdownTimer disasterTimer;
     private CountdownTimer climateChangeTimer;
     private bool climateChangeHasWarned;
+    private float coralPropagationDebuff = 0;
+    private float coralSurvivabilityDebuff = 0;
     #endregion
 
     #region Generic Helper Functions
@@ -594,7 +596,7 @@ public class GameManager : MonoBehaviour
                     if (coralCells.ContainsKey(key+hexNeighbors[key.y&1, i]))
                         miscFactors += 0.01f*coralCells[key+hexNeighbors[key.y&1, i]].maturity;
                 coralCells[key].addMaturity(1.0f);
-                if (!coralCells[key].willSurvive(randNum, substrataCells[key], miscFactors)) {
+                if (!coralCells[key].willSurvive(randNum, substrataCells[key], miscFactors-coralSurvivabilityDebuff)) {
                     coralTileMap.SetTile(key, null);
                     substrataOverlayTileMap.SetTile(key, null);
                     herbivorousFishTotalInterest -= coralCells[key].coralData.herbivorousFishInterestBase;
@@ -613,7 +615,7 @@ public class GameManager : MonoBehaviour
             float basePropagationChance = UnityEngine.Random.Range(50.0f, 60.0f);
             if (coralCells[key].maturity > 100.0f) { // propagate only if "mature"
                 for (int i = 0; i < 6; i++) {
-                    if (UnityEngine.Random.Range(0.0f,100.0f) <= basePropagationChance + UnityEngine.Random.Range(0.0f, 5.0f)) {
+                    if (UnityEngine.Random.Range(0.0f,100.0f) <= basePropagationChance + UnityEngine.Random.Range(0.0f, 5.0f) - coralPropagationDebuff) {
                         Vector3Int localPlace = key+hexNeighbors[key.y&1,i];
                         if (!substrataTileMap.HasTile(localPlace) || !substrataCells.ContainsKey(localPlace)) continue;
                         if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace) || algaeTileMap.HasTile(localPlace)) continue;
@@ -676,6 +678,8 @@ public class GameManager : MonoBehaviour
     private void applyClimateChange() {
         // scripted event
         // reduce the growth rates globally
+        coralPropagationDebuff = 1f;
+        coralSurvivabilityDebuff = 1f;
     }
     #endregion
 
