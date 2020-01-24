@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Tilemaps;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
@@ -23,6 +24,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TileBase[] groundTileBases;
     [SerializeField] private TileBase[] algaeTileBases;
     [SerializeField] private TileBase[] substrataTileBases;
+    [SerializeField] private TileBase[] toxicTileBases;
     [SerializeField] private Text fishDisplay;
     [SerializeField] private Text testTimerText;
     [SerializeField] private Text CNC;
@@ -63,6 +65,9 @@ public class GameManager : MonoBehaviour
     private CountdownTimer tempTimer;
     private List<NursingCoral>[] growingCorals;
     private Queue<string>[] readyCorals;
+    private CountdownTimer disasterTimer;
+    private CountdownTimer climateChangeTimer;
+    private bool climateChangeHasWarned;
     #endregion
 
     #region Generic Helper Functions
@@ -179,6 +184,9 @@ public class GameManager : MonoBehaviour
         initializeTiles();
         print("initialization done");
         tempTimer = new CountdownTimer(globalVarContainer.globalVariables.maxGameTime);
+        disasterTimer = new CountdownTimer(60f); // make into first 5 mins immunity
+        climateChangeTimer = new CountdownTimer(globalVarContainer.globalVariables.timeUntilClimateChange);
+        climateChangeHasWarned = false;
         initializeGame();
     }
 
@@ -277,10 +285,27 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        disasterTimer.updateTime();
+        if (disasterTimer.isDone()) {
+            disasterTimer = new CountdownTimer(60f);
+            randomDisaster();
+        }
+
+        if (!climateChangeTimer.isDone())
+            climateChangeTimer.updateTime();
+        if (!climateChangeHasWarned && climateChangeTimer.currentTime <= climateChangeTimer.timeDuration*(2.0/3.0)) {
+            climateChangeHasWarned = true;
+            makePopup("Scientists have predicted that our carbon emmisions will lead to devastating damages to sea life in a few years! This could slow down the growth of coral reefs soon...");
+        } else if (climateChangeHasWarned && climateChangeTimer.isDone()) {
+            makePopup("Scientists have determined that the increased temperature and ocean acidity has slowed down coral growth! We have to make a greater effort to coral conservation and rehabilitation!");
+            applyClimateChange();
+        }
+
         // test script for popup messages
-        // if (Input.GetKeyDown(KeyCode.Slash)) {
-        //     makePopup("Hello!");
-        // }
+        if (Input.GetKeyDown(KeyCode.Slash)) {
+            makePopup("Hello!");
+            // randomDisaster(2);
+        }
 
         #region Keyboard Shortcuts
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
@@ -406,65 +431,6 @@ public class GameManager : MonoBehaviour
         cameraFollow.GetComponent<MenuAnimator>().OpenThing();
     }
 
-    public void tryGrowCoral(int type) {
-        growCoral(type);
-        // if (!growCoral(type))
-        //     feedbackDialogue("Cannot grow coral.", 1);
-    }
-
-    private void growCoral(int type) {
-        bool spaceInNursery = getCoralsInNursery() < globalVarContainer.globalVariables.maxSpaceInNursery;
-        bool underMaxGrow = growingCorals[type].Count < globalVarContainer.globalVariables.maxSpacePerCoral;
-        if (spaceInNursery && underMaxGrow) {
-            growingCorals[type].Add(new NursingCoral(coralBaseData.corals[type].name, new CountdownTimer(coralBaseData.corals[type].growTime)));
-        } else if (!underMaxGrow) {
-            feedbackDialogue("Can only grow 4 corals per type.", globalVarContainer.globalVariables.feedbackDelayTime);
-        } else if (!spaceInNursery) {
-            feedbackDialogue("Nursery is at maximum capacity.", globalVarContainer.globalVariables.feedbackDelayTime);
-        }
-    }
-
-    private bool plantCoral(int type) {
-        bool successful = false;
-        // should be unable to replace a tile
-        // need to add more useful stuff like notifying why you can place a tile here
-        print("right mouse button has been pressed");
-        Vector3Int position = getMouseGridPosition();
-        print("position: " + position);
-        if (coralTileMap.HasTile(position)) {
-            feedbackDialogue("Coral already existing. Cannot place tile.", globalVarContainer.globalVariables.feedbackDelayTime);
-            // print(coralCells[position].printData());
-        } else if (algaeTileMap.HasTile(position)) {
-            feedbackDialogue("Algae already existing. Cannot place tile.", globalVarContainer.globalVariables.feedbackDelayTime);
-            // print("algae already existing; cannot place tile");
-            print(algaeCells[position].printData());
-        } else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && readyCorals[type].Count > 0) { 
-            successful = true;
-            readyCorals[type].Dequeue(); // change the tilebase thing
-            CoralCellData cell = new CoralCellData(
-                position, 
-                coralTileMap, 
-                coralTileBases[type], 
-                0.0f, 
-                coralBaseData.corals[type]
-            );
-            coralCells.Add(position, cell);
-            carnivorousFishTotalInterest += coralCells[position].coralData.carnivorousFishInterestBase;
-            herbivorousFishTotalInterest += coralCells[position].coralData.herbivorousFishInterestBase;
-            coralTileMap.SetTile(position, coralTileBases[type]);
-            // substrataOverlayTileMap.SetTile(position, groundTileMap.GetTile(position));
-        } else if (readyCorals[type].Count == 0 && growingCorals[type].Count > 0) {
-            string t = "Soonest to mature coral of this type has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left.";
-            feedbackDialogue(t, globalVarContainer.globalVariables.feedbackDelayTime);
-            // print("soonest to mature has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left");
-        }
-        
-        if (coralTileMap.HasTile(position))
-            print(coralCells[position].printData());
-
-        return successful;
-    }
-
     private void doStuff() {
         survivabilityFrameCounter = (++survivabilityFrameCounter % 7 == 0 ? 0 : survivabilityFrameCounter);
         if (survivabilityFrameCounter == 0) 
@@ -559,7 +525,64 @@ public class GameManager : MonoBehaviour
         updateCoralSurvivability();
         updateCoralPropagation();
     }
+    public void tryGrowCoral(int type) {
+        growCoral(type);
+        // if (!growCoral(type))
+        //     feedbackDialogue("Cannot grow coral.", 1);
+    }
 
+    private void growCoral(int type) {
+        bool spaceInNursery = getCoralsInNursery() < globalVarContainer.globalVariables.maxSpaceInNursery;
+        bool underMaxGrow = growingCorals[type].Count < globalVarContainer.globalVariables.maxSpacePerCoral;
+        if (spaceInNursery && underMaxGrow) {
+            growingCorals[type].Add(new NursingCoral(coralBaseData.corals[type].name, new CountdownTimer(coralBaseData.corals[type].growTime)));
+        } else if (!underMaxGrow) {
+            feedbackDialogue("Can only grow 4 corals per type.", globalVarContainer.globalVariables.feedbackDelayTime);
+        } else if (!spaceInNursery) {
+            feedbackDialogue("Nursery is at maximum capacity.", globalVarContainer.globalVariables.feedbackDelayTime);
+        }
+    }
+
+    private bool plantCoral(int type) {
+        bool successful = false;
+        // should be unable to replace a tile
+        // need to add more useful stuff like notifying why you can place a tile here
+        print("right mouse button has been pressed");
+        Vector3Int position = getMouseGridPosition();
+        print("position: " + position);
+        if (coralTileMap.HasTile(position)) {
+            feedbackDialogue("Coral already existing. Cannot place tile.", globalVarContainer.globalVariables.feedbackDelayTime);
+            // print(coralCells[position].printData());
+        } else if (algaeTileMap.HasTile(position)) {
+            feedbackDialogue("Algae already existing. Cannot place tile.", globalVarContainer.globalVariables.feedbackDelayTime);
+            // print("algae already existing; cannot place tile");
+            print(algaeCells[position].printData());
+        } else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && readyCorals[type].Count > 0) { 
+            successful = true;
+            readyCorals[type].Dequeue(); // change the tilebase thing
+            CoralCellData cell = new CoralCellData(
+                position, 
+                coralTileMap, 
+                coralTileBases[type], 
+                0.0f, 
+                coralBaseData.corals[type]
+            );
+            coralCells.Add(position, cell);
+            carnivorousFishTotalInterest += coralCells[position].coralData.carnivorousFishInterestBase;
+            herbivorousFishTotalInterest += coralCells[position].coralData.herbivorousFishInterestBase;
+            coralTileMap.SetTile(position, coralTileBases[type]);
+            // substrataOverlayTileMap.SetTile(position, groundTileMap.GetTile(position));
+        } else if (readyCorals[type].Count == 0 && growingCorals[type].Count > 0) {
+            string t = "Soonest to mature coral of this type has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left.";
+            feedbackDialogue(t, globalVarContainer.globalVariables.feedbackDelayTime);
+            // print("soonest to mature has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left");
+        }
+        
+        if (coralTileMap.HasTile(position))
+            print(coralCells[position].printData());
+
+        return successful;
+    }
     private void updateCoralSurvivability() {
         List<Vector3Int> keys = new List<Vector3Int>(coralCells.Keys);
         foreach (Vector3Int key in keys) {
@@ -610,6 +633,49 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+    }
+    #endregion
+    #region Disasters
+    private void randomDisaster(int forceEvent = 0) {
+        // chance: 1/100
+        // random: random area selection
+        // toxic: center must be a coral
+        int t = UnityEngine.Random.Range(0,1000);
+        if (t == 69 || forceEvent == 1) {
+            if (coralCells.Count > 15) {
+                Vector3Int pos = coralCells.ElementAt(UnityEngine.Random.Range(0,coralCells.Count)).Key;
+                HashSet<Vector3Int> removeSpread = spread(pos, 2);
+                foreach (Vector3Int removePos in removeSpread) {
+                    if (coralCells.ContainsKey(removePos)) {
+                        coralCells.Remove(removePos);
+                        coralTileMap.SetTile(removePos, null);
+                    }
+                }
+                makePopup("Oh no! A group of tourists took coral parts as a souvenir! A coral group has died due to this!");
+            }
+        } else if (t == 420 || forceEvent == 2) {
+            Vector3Int pos = new Vector3Int(UnityEngine.Random.Range(-30,31), UnityEngine.Random.Range(-30,31), 0);
+            if (substrataCells.ContainsKey(pos))
+                substrataCells.Remove(pos);
+            substrataTileMap.SetTile(pos, toxicTileBases[UnityEngine.Random.Range(0,toxicTileBases.Length)]);
+            HashSet<Vector3Int> toxicSpread = spread(pos, 2);
+            foreach (Vector3Int toxicPos in toxicSpread) {
+                if (coralCells.ContainsKey(toxicPos)) {
+                    coralCells.Remove(toxicPos);
+                    coralTileMap.SetTile(toxicPos, null);
+                }
+                if (algaeCells.ContainsKey(toxicPos)) {
+                    algaeCells.Remove(toxicPos);
+                    algaeTileMap.SetTile(toxicPos, null);
+                }
+                substrataOverlayTileMap.SetTile(toxicPos,toxicOverlay);
+            }
+            makePopup("Oh no! Toxic waste has been dumped in the ocean again! Seaweed and coral alike have died around the fallen toxic waste.");
+        }
+    }
+    private void applyClimateChange() {
+        // scripted event
+        // reduce the growth rates globally
     }
     #endregion
 
