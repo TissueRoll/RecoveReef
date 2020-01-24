@@ -247,7 +247,7 @@ public class GameManager : MonoBehaviour
         foreach (Vector3Int pos in algaeTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
             if (!algaeTileMap.HasTile(localPlace)) continue;
-            if (!substrataCells.ContainsKey(localPlace) || substrataOverlayTileMap.HasTile(localPlace)) {
+            if (!substrataCells.ContainsKey(localPlace) || substrataOverlayTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace)) {
                 algaeTileMap.SetTile(localPlace, null);
                 continue;
             }
@@ -486,7 +486,7 @@ public class GameManager : MonoBehaviour
                 for (int i = 0; i < 6; i++) {
                     if (UnityEngine.Random.Range(0.0f,100.0f) <= basePropagationChance + UnityEngine.Random.Range(0.0f, 5.0f)) {
                         Vector3Int localPlace = key+hexNeighbors[key.y&1,i];
-                        if (!substrataTileMap.HasTile(localPlace) || !substrataCells.ContainsKey(localPlace)) continue;
+                        if (!substrataTileMap.HasTile(localPlace) || !substrataCells.ContainsKey(localPlace) || substrataOverlayTileMap.HasTile(localPlace)) continue;
                         if (algaeTileMap.HasTile(localPlace) || algaeCells.ContainsKey(localPlace)) continue;
                         if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace)) {
                             randNum -= coralCells[localPlace].maturity*0.15f;
@@ -563,7 +563,9 @@ public class GameManager : MonoBehaviour
             feedbackDialogue("Algae already existing. Cannot place tile.", globalVarContainer.globalVariables.feedbackDelayTime);
             // print("algae already existing; cannot place tile");
             print(algaeCells[position].printData());
-        } else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && readyCorals[type].Count > 0) { 
+        } else if (substrataOverlayTileMap.HasTile(position)) {
+            feedbackDialogue("This is a toxic tile! Coral won't survive here.", globalVarContainer.globalVariables.feedbackDelayTime);
+        }else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && readyCorals[type].Count > 0) { 
             successful = true;
             readyCorals[type].Dequeue(); // change the tilebase thing
             CoralCellData cell = new CoralCellData(
@@ -621,7 +623,7 @@ public class GameManager : MonoBehaviour
                 for (int i = 0; i < 6; i++) {
                     if (UnityEngine.Random.Range(0.0f,100.0f) <= basePropagationChance + UnityEngine.Random.Range(0.0f, 5.0f) - coralPropagationDebuff) {
                         Vector3Int localPlace = key+hexNeighbors[key.y&1,i];
-                        if (!substrataTileMap.HasTile(localPlace) || !substrataCells.ContainsKey(localPlace)) continue;
+                        if (!substrataTileMap.HasTile(localPlace) || !substrataCells.ContainsKey(localPlace) || substrataOverlayTileMap.HasTile(localPlace)) continue;
                         if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace) || algaeTileMap.HasTile(localPlace)) continue;
                         CoralCellData cell = new CoralCellData(
                             localPlace, 

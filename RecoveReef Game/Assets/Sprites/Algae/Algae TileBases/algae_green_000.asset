@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: algae_green_000
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300000, guid: 99e578b1d7cb6374dbe00b1ed3e7d626, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4d61fc9fdd88e344cad6086c68a871eb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
