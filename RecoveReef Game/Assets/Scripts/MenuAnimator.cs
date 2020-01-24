@@ -5,13 +5,17 @@ using UnityEngine;
 public class MenuAnimator : MonoBehaviour
 {
     [SerializeField] private GameObject thing;
+    private bool isOpen = false;
+    private float prevX;
+    void Start() {
+        prevX = thing.transform.localPosition.x;
+    }
     public void OpenThing() {
-        if (thing != null) {
-            Animator animator = thing.GetComponent<Animator>();
-            if (animator != null) {
-                bool isOpen = animator.GetBool("open");
-                animator.SetBool("open", !isOpen);
-            }
+        if (isOpen) {
+            LeanTween.moveLocalX(thing, prevX, 1);
+        } else {
+            LeanTween.moveLocalX(thing, prevX-142.12f, 1);
         }
+        isOpen = !isOpen;
     }
 }

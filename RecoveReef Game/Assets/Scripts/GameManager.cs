@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TileBase[] toxicTileBases;
     [SerializeField] private Text fishDisplay;
     [SerializeField] private Text testTimerText;
-    [SerializeField] private Text CNC;
+    [SerializeField] private GameObject CNC;
     [SerializeField] private GameObject[] CoralOptions;
     [SerializeField] private Text feedbackText;
     [SerializeField] private TileBase toxicOverlay;
@@ -390,13 +390,10 @@ public class GameManager : MonoBehaviour
                 else
                     min_time = Math.Min(min_time, x.timer.currentTime);
             }
-            growingCorals[i].RemoveAll(coral => coral.timer.isDone() == true); // yay for internship
-            CoralOptions[i].transform.Find("QueuedCoralNumber").GetComponent<Text>().text = "Q: x" + growingCorals[i].Count;
-            CoralOptions[i].transform.Find("ReadyCoralNumber").GetComponent<Text>().text = "x" + readyCorals[i].Count;
-            CoralOptions[i].transform.Find("TimeCoralGrow").GetComponent<Text>().text = convertTimetoMS(min_time); 
+            growingCorals[i].RemoveAll(coral => coral.timer.isDone() == true); // yay for internship 
         }
 
-        CNC.text = "Coral Nursery:\n" + getCoralsInNursery() + "/" + globalVarContainer.globalVariables.maxSpaceInNursery;
+        CNC.GetComponent<TMPro.TextMeshProUGUI>().text = getCoralsInNursery() + "/" + globalVarContainer.globalVariables.maxSpaceInNursery + " SLOTS LEFT";
 
         tempTimer.updateTime();
         testTimerText.text = convertTimetoMS(tempTimer.currentTime);
