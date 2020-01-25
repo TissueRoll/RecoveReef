@@ -73,6 +73,7 @@ public class GameManager : MonoBehaviour
     private CountdownTimer disasterTimer;
     private CountdownTimer climateChangeTimer;
     private bool climateChangeHasWarned;
+    private bool climateChangeHasHappened;
     private float coralPropagationDebuff = 0;
     private float coralSurvivabilityDebuff = 0;
     #endregion
@@ -221,6 +222,7 @@ public class GameManager : MonoBehaviour
         disasterTimer = new CountdownTimer(60f); // make into first 5 mins immunity
         climateChangeTimer = new CountdownTimer(globalVarContainer.globalVariables.timeUntilClimateChange);
         climateChangeHasWarned = false;
+        climateChangeHasHappened = false;
         initializeGame();
     }
 
@@ -331,7 +333,8 @@ public class GameManager : MonoBehaviour
         if (!climateChangeHasWarned && climateChangeTimer.currentTime <= climateChangeTimer.timeDuration*(2.0/3.0)) {
             climateChangeHasWarned = true;
             makePopup("Scientists have predicted that our carbon emmisions will lead to devastating damages to sea life in a few years! This could slow down the growth of coral reefs soon...");
-        } else if (climateChangeHasWarned && climateChangeTimer.isDone()) {
+        } else if (climateChangeHasWarned && !climateChangeHasHappened && climateChangeTimer.isDone()) {
+            climateChangeHasHappened = true;
             makePopup("Scientists have determined that the increased temperature and ocean acidity has slowed down coral growth! We have to make a greater effort to coral conservation and rehabilitation!");
             applyClimateChange();
         }
@@ -427,7 +430,7 @@ public class GameManager : MonoBehaviour
                 }
                 growingCorals[i][j].timer.updateTime();
                 thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.Lerp(progressNotDone, progressIsDone, growingCorals[i][j].timer.percentComplete);
-                rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.Lerp(new Color(1f,1f,1f,0f), new Color(1f,1f,1f,1f), growingCorals[i][j].timer.percentComplete);
+                rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.Lerp(new Color(1f,1f,1f,0f), new Color(1f,1f,1f,1f), Math.Max(0.2f,growingCorals[i][j].timer.percentComplete));
             }
         }
 
