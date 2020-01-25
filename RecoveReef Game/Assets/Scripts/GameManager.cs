@@ -31,6 +31,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject[] CoralOptions;
     [SerializeField] private Text feedbackText;
     [SerializeField] private TileBase toxicOverlay;
+    [SerializeField] private Sprite nothing;
+    [SerializeField] private Sprite[] coralSprites;
+    [SerializeField] private GameObject popupCanvas;
     #pragma warning restore 0649
     #endregion
     #region Data Structures for the Game
@@ -412,13 +415,19 @@ public class GameManager : MonoBehaviour
         
         for (int i = 0; i < 6; i++) {
             GameObject thing = CoralOptions[i].transform.Find("CoralIndicator").gameObject;
+            GameObject rack = nurseryCamera.transform.Find("NurseryCanvas/Racks")
+                            .gameObject.transform.GetChild(i/3)
+                            .gameObject.transform.GetChild(i%3)
+                            .gameObject.transform.Find("RackImage/RackPlacements").gameObject;
             for (int j = 0; j < globalVarContainer.globalVariables.maxSpacePerCoral; j++) {
                 if (growingCorals[i][j] == null) {
-                    thing.transform.GetChild(j).gameObject.GetComponent<Image>().color = progressNotDone;
+                    thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = progressNotDone;
+                    rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = new Color(1f,1f,1f,0f);
                     continue;
                 }
                 growingCorals[i][j].timer.updateTime();
-                thing.transform.GetChild(j).gameObject.GetComponent<Image>().color = Color.Lerp(progressNotDone, progressIsDone, growingCorals[i][j].timer.percentComplete);
+                thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.Lerp(progressNotDone, progressIsDone, growingCorals[i][j].timer.percentComplete);
+                rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.Lerp(new Color(1f,1f,1f,0f), new Color(1f,1f,1f,1f), growingCorals[i][j].timer.percentComplete);
             }
         }
 
@@ -444,8 +453,8 @@ public class GameManager : MonoBehaviour
     }
 
     private void makePopup(string s) {
-        cameraFollow.transform.Find("HUD/Popup").gameObject.GetComponent<PopupScript>().SetPopupMessage(s);
-        cameraFollow.transform.Find("HUD/Popup").gameObject.GetComponent<PopupScript>().OpenPopup();
+        popupCanvas.GetComponent<PopupScript>().SetPopupMessage(s);
+        popupCanvas.GetComponent<PopupScript>().OpenPopup();
     }
 
     private void feedbackDialogue(string text, float time) {

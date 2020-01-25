@@ -38,7 +38,8 @@ public class PauseScript : MonoBehaviour
     public void Resume() {
         SettingsOFF();
         pauseMenuUI.SetActive(false);
-        Time.timeScale = 1f;
+        if (!PopupScript.PopupOpen)
+            Time.timeScale = 1f;
         GamePaused = false;
     }
 

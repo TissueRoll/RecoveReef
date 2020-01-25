@@ -6,11 +6,11 @@ public class PopupScript : MonoBehaviour
 {
     public static bool PopupOpen = false;
 
-    public GameObject popupPanel;
+    public GameObject popupCanvas;
     public GameObject outText;
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.Return)) {
+        if (!PauseScript.GamePaused && Input.GetKeyDown(KeyCode.Return)) {
             ClosePopup();
         }
     }
@@ -20,13 +20,13 @@ public class PopupScript : MonoBehaviour
     }
 
     public void OpenPopup() {
-        popupPanel.SetActive(true);
+        popupCanvas.SetActive(true);
         Time.timeScale = 0f;
         PopupOpen = true;
     }
 
     void ClosePopup() {
-        popupPanel.SetActive(false);
+        popupCanvas.SetActive(false);
         Time.timeScale = 1f;
         PopupOpen = false;
     }
