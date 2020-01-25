@@ -6,6 +6,7 @@ public class CountdownTimer
 {
     public float currentTime {get; set;}
     public float timeDuration {get; set;}
+    public float percentComplete {get; set;}
     
     public CountdownTimer() {
         timeDuration = 5f;
@@ -19,6 +20,7 @@ public class CountdownTimer
         currentTime -= 1 * Time.deltaTime;
         if (currentTime <= 0)
             currentTime = 0;
+        percentComplete = 1f-currentTime/timeDuration;
     }
 
     public bool isDone() {
