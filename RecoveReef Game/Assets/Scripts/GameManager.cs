@@ -272,6 +272,7 @@ public class GameManager : MonoBehaviour
                 101.0f, 
                 coralBaseData.corals[findIndexOfEntityFromName(currentTB.name)]
             );
+            // __ECONOMY__
             carnivorousFishTotalInterest += cell.coralData.carnivorousFishInterestBase;
             herbivorousFishTotalInterest += cell.coralData.herbivorousFishInterestBase;
             coralCells.Add(cell.LocalPlace, cell);
@@ -293,6 +294,7 @@ public class GameManager : MonoBehaviour
                 101.0f, 
                 algaeDataContainer.algae[findIndexOfEntityFromName(currentTB.name)]
             );
+            // __ECONOMY__
             herbivorousFishTotal += cell.algaeData.herbivorousFishProductionBase;
             algaeCells.Add(cell.LocalPlace,cell);
             // substrataOverlayTileMap.SetTile(localPlace, groundTileMap.GetTile(localPlace));
@@ -476,6 +478,7 @@ public class GameManager : MonoBehaviour
     }
 
     private void doStuff() {
+        // __ECONOMY__
         survivabilityFrameCounter = (++survivabilityFrameCounter % 7 == 0 ? 0 : survivabilityFrameCounter);
         if (survivabilityFrameCounter == 0) 
             updateAllCoral();
@@ -488,6 +491,8 @@ public class GameManager : MonoBehaviour
                         + "\nHerbivorous Fish: " + herbivorousFishTotal
                         + "\nFish Income: " + fishIncome;
     }
+
+    // __ECONOMY__
     #region Algae Updates
     private void updateAllAlgae() {
         updateAlgaeSurvivability();
@@ -564,6 +569,8 @@ public class GameManager : MonoBehaviour
 
     }
     #endregion
+
+    // __ECONOMY__
     #region Coral Updates
     private void updateAllCoral() {
         updateCoralSurvivability();
@@ -643,7 +650,6 @@ public class GameManager : MonoBehaviour
             }
             string t = "Soonest to mature coral of this type has " + convertTimetoMS(minTime) + " time left.";
             feedbackDialogue(t, globalVarContainer.globalVariables.feedbackDelayTime);
-            // print("soonest to mature has " + convertTimetoMS(growingCorals[type][0].timer.currentTime) + " time left");
         }
         
         if (coralTileMap.HasTile(position))
@@ -741,6 +747,7 @@ public class GameManager : MonoBehaviour
             makePopup("Oh no! Toxic waste has been dumped in the ocean again! Seaweed and coral alike have died around the fallen toxic waste.");
         }
     }
+    // __ECONOMY__
     private void applyClimateChange() {
         // scripted event
         // reduce the growth rates globally
@@ -749,6 +756,7 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
+    // __ECONOMY__
     #region Misc Updates
     private void updateFishOutput() {
         int tempHFT = herbivorousFishTotal;

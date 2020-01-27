@@ -27,7 +27,7 @@ public class CoralCellData
         maturity = _maturity;
         coralData = _coralData;
     }
-    public string printData() {
+    public string printData() { 
         string output = "";
         output += ("LocalPlace: " + LocalPlace + "\n");
         output += ("WorldLocation: " + WorldLocation + "\n");

@@ -2,52 +2,52 @@
 <CoralDataCollection>
     <CoralDatas>
         <CoralData name="branching">
-            <GrowTime>30</GrowTime>
+            <GrowTime>15</GrowTime>
             <Survivability>0.5</Survivability>
-            <CarnivorousFishInterestBase>0.001</CarnivorousFishInterestBase>
-            <HerbivorousFishInterestBase>0.005</HerbivorousFishInterestBase>
-            <CoralType>zerg</CoralType>
+            <CarnivorousFishInterestBase>0.8</CarnivorousFishInterestBase>
+            <HerbivorousFishInterestBase>0.1</HerbivorousFishInterestBase>
+            <CoralType>fast</CoralType>
             <PrefTerrain>shore</PrefTerrain>
         </CoralData>
         <CoralData name="columnar">
-            <GrowTime>30</GrowTime>
+            <GrowTime>20</GrowTime>
             <Survivability>0.5</Survivability>
-            <CarnivorousFishInterestBase>0.001</CarnivorousFishInterestBase>
-            <HerbivorousFishInterestBase>0.005</HerbivorousFishInterestBase>
-            <CoralType>zerg</CoralType>
+            <CarnivorousFishInterestBase>0.2</CarnivorousFishInterestBase>
+            <HerbivorousFishInterestBase>0.5</HerbivorousFishInterestBase>
+            <CoralType>normal</CoralType>
             <PrefTerrain>shore</PrefTerrain>
         </CoralData>
         <CoralData name="encrusting">
-            <GrowTime>30</GrowTime>
+            <GrowTime>45</GrowTime>
             <Survivability>0.5</Survivability>
-            <CarnivorousFishInterestBase>0.001</CarnivorousFishInterestBase>
-            <HerbivorousFishInterestBase>0.005</HerbivorousFishInterestBase>
-            <CoralType>zerg</CoralType>
-            <PrefTerrain>shore</PrefTerrain>
+            <CarnivorousFishInterestBase>0.15</CarnivorousFishInterestBase>
+            <HerbivorousFishInterestBase>0.7</HerbivorousFishInterestBase>
+            <CoralType>slow</CoralType>
+            <PrefTerrain>middle</PrefTerrain>
         </CoralData>
         <CoralData name="foliaceous">
-            <GrowTime>30</GrowTime>
+            <GrowTime>25</GrowTime>
             <Survivability>0.5</Survivability>
-            <CarnivorousFishInterestBase>0.001</CarnivorousFishInterestBase>
-            <HerbivorousFishInterestBase>0.005</HerbivorousFishInterestBase>
-            <CoralType>zerg</CoralType>
-            <PrefTerrain>shore</PrefTerrain>
+            <CarnivorousFishInterestBase>0.5</CarnivorousFishInterestBase>
+            <HerbivorousFishInterestBase>0.3</HerbivorousFishInterestBase>
+            <CoralType>normal</CoralType>
+            <PrefTerrain>middle</PrefTerrain>
         </CoralData>
         <CoralData name="laminar">
-            <GrowTime>30</GrowTime>
+            <GrowTime>50</GrowTime>
             <Survivability>0.5</Survivability>
-            <CarnivorousFishInterestBase>0.001</CarnivorousFishInterestBase>
-            <HerbivorousFishInterestBase>0.005</HerbivorousFishInterestBase>
-            <CoralType>zerg</CoralType>
-            <PrefTerrain>shore</PrefTerrain>
+            <CarnivorousFishInterestBase>0.4</CarnivorousFishInterestBase>
+            <HerbivorousFishInterestBase>0.4</HerbivorousFishInterestBase>
+            <CoralType>normal</CoralType>
+            <PrefTerrain>deep</PrefTerrain>
         </CoralData>
         <CoralData name="massive">
-            <GrowTime>30</GrowTime>
+            <GrowTime>75</GrowTime>
             <Survivability>0.5</Survivability>
-            <CarnivorousFishInterestBase>0.001</CarnivorousFishInterestBase>
-            <HerbivorousFishInterestBase>0.005</HerbivorousFishInterestBase>
-            <CoralType>zerg</CoralType>
-            <PrefTerrain>shore</PrefTerrain>
+            <CarnivorousFishInterestBase>0.1</CarnivorousFishInterestBase>
+            <HerbivorousFishInterestBase>1.0</HerbivorousFishInterestBase>
+            <CoralType>slow</CoralType>
+            <PrefTerrain>deep</PrefTerrain>
         </CoralData>
     </CoralDatas>
 </CoralDataCollection>
