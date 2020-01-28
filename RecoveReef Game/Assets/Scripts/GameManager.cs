@@ -398,6 +398,12 @@ public class GameManager : MonoBehaviour
             Vector3Int position = getMouseGridPosition();
             print("L:: " + position);
             // print(":: " + substrataOverlayTileMap.GetTile(position).name); // temp disabled cuz it can error
+            RaycastHit2D hit = Physics2D.Raycast(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y), Vector2.zero, 0);
+            if (hit) {
+                if (hit.collider.CompareTag("plastic")) {
+                    Debug.Log("This is plastic");
+                }
+            }
         }
 
         bool rb = Input.GetMouseButtonDown(1);

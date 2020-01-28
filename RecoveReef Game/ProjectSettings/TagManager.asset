@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - plastic
   layers:
   - Default
   - TransparentFX
@@ -55,6 +56,9 @@ TagManager:
     locked: 0
   - name: Algae
     uniqueID: 390934489
+    locked: 0
+  - name: Plastics
+    uniqueID: 3834143979
     locked: 0
   - name: HUD
     uniqueID: 3211224705
