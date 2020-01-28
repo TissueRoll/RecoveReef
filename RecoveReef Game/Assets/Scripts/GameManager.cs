@@ -76,6 +76,7 @@ public class GameManager : MonoBehaviour
     private bool climateChangeHasHappened;
     private float coralPropagationDebuff = 0;
     private float coralSurvivabilityDebuff = 0;
+    private EconomyMachine economyMachine;
     #endregion
 
     #region Generic Helper Functions
@@ -223,6 +224,7 @@ public class GameManager : MonoBehaviour
         climateChangeTimer = new CountdownTimer(globalVarContainer.globalVariables.timeUntilClimateChange);
         climateChangeHasWarned = false;
         climateChangeHasHappened = false;
+        economyMachine = new EconomyMachine(0f,0f,5f);
         initializeGame();
     }
 
@@ -759,6 +761,8 @@ public class GameManager : MonoBehaviour
     // __ECONOMY__
     #region Misc Updates
     private void updateFishOutput() {
+        economyMachine.updateHFCF(herbivorousFishTotal, carnivorousFishTotal);
+
         int tempHFT = herbivorousFishTotal;
         int tempCFT = carnivorousFishTotal;
         herbivorousFishTotal += (int)Math.Round(tempHFT*herbivorousFishTotalInterest - tempCFT);
