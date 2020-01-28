@@ -382,11 +382,9 @@ public class GameManager : MonoBehaviour
         #endregion
 
         // testing for hex tile coords
-        bool lb = Input.GetMouseButtonDown(0);
-        if (lb) {
-            print("left mouse button has been pressed");
+        if (Input.GetMouseButtonDown(0)) {
             Vector3Int position = getMouseGridPosition();
-            print(":: " + position);
+            print("L:: " + position);
             // print(":: " + substrataOverlayTileMap.GetTile(position).name); // temp disabled cuz it can error
         }
 
@@ -640,9 +638,6 @@ public class GameManager : MonoBehaviour
             string t = "Soonest to mature coral of this type has " + convertTimetoMS(minTime) + " time left.";
             feedbackDialogue(t, globalVarContainer.globalVariables.feedbackDelayTime);
         }
-        
-        if (coralTileMap.HasTile(position))
-            print(coralCells[position].printData());
 
         return successful;
     }
