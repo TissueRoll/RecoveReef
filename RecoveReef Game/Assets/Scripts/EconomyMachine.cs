@@ -15,15 +15,35 @@ public class EconomyMachine
         tolerance = tol;
     }
 
-    public bool algaeWillSurvive () {
+    public bool algaeWillSurvive (AlgaeCellData algaeCellData, float groundViability, float additiveFactors, float multiplicativeFactors) {
         bool result = true;
-
+        float computedSurvivability = (groundViability - 75.0f)/100.0f*algaeCellData.maturity + 75.0f;
+        result = (computedSurvivability <= UnityEngine.Random.Range(0.0f,100.0f));
         return result;
     }
 
-    public bool coralWillSurvive () {
+    public bool coralWillSurvive (CoralCellData coralCellData, float groundViability, float additiveFactors, float multiplicativeFactors) {
         bool result = true;
+        float computedSurvivability = (groundViability - 75.0f)/100.0f*coralCellData.maturity + 75.0f;
+        result = (UnityEngine.Random.Range(0.0f,100.0f) <= computedSurvivability+additiveFactors);
+        return result;
+    }
 
+    public bool coralWillPropagate (CoralCellData coralCellData, float additiveFactors, float multiplicativeFactors) {
+        bool result = true;
+        float basePropagationChance = UnityEngine.Random.Range(50.0f,60.0f); // USE CELL DATA FOR THIS
+        float computedPropagationChance = basePropagationChance + UnityEngine.Random.Range(0.0f, 5.0f) + additiveFactors;
+        computedPropagationChance = Mathf.Min(100.0f, computedPropagationChance*multiplicativeFactors);
+        result = (UnityEngine.Random.Range(0.0f,100.0f) <= computedPropagationChance);
+        return result;
+    }
+
+    public bool algaeWillPropagate (AlgaeCellData algaeCellData, float additiveFactors, float multiplicativeFactors) {
+        bool result = true;
+        float basePropagationChance = UnityEngine.Random.Range(50.0f,60.0f); // USE CELL DATA FOR THIS
+        float computedPropagationChance = basePropagationChance + UnityEngine.Random.Range(0.0f, 5.0f) + additiveFactors;
+        computedPropagationChance = Mathf.Min(100.0f, computedPropagationChance*multiplicativeFactors);
+        result = (UnityEngine.Random.Range(0.0f,100.0f) <= computedPropagationChance);
         return result;
     }
 
@@ -49,6 +69,10 @@ public class EconomyMachine
 
     public float getActualCF() {
         return actualCF;
+    }
+
+    public float getTotalFish() {
+        return 0.2f*actualHF+0.3f*actualCF;
     }
 
 }

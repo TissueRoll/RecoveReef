@@ -55,7 +55,6 @@ public class GameManager : MonoBehaviour
     #endregion
     #region Global Changing Values
     private float zoom;
-    private int survivabilityFrameCounter = 0;
     private Vector3 cameraFollowPosition;
     private Vector3 savedCameraPosition;
     private bool edgeScrollingEnabled = false;
@@ -63,13 +62,10 @@ public class GameManager : MonoBehaviour
     private int testnum = 0;
     private int fishOutput = 0;
     private int fishIncome = 0;
-    private float carnivorousFishTotalInterest = 0;
-    private int carnivorousFishTotal = 0;
-    private float herbivorousFishTotalInterest = 0;
-    private int herbivorousFishTotal = 0;
+    private float cfTotalProduction = 0;
+    private float hfTotalProduction = 0;
     private CountdownTimer tempTimer;
     private List<NursingCoral>[] growingCorals;
-    // private Queue<string>[] readyCorals;
     private CountdownTimer disasterTimer;
     private CountdownTimer climateChangeTimer;
     private bool climateChangeHasWarned;
@@ -274,11 +270,9 @@ public class GameManager : MonoBehaviour
                 101.0f, 
                 coralBaseData.corals[findIndexOfEntityFromName(currentTB.name)]
             );
-            // __ECONOMY__
-            carnivorousFishTotalInterest += cell.coralData.carnivorousFishInterestBase;
-            herbivorousFishTotalInterest += cell.coralData.herbivorousFishInterestBase;
+            cfTotalProduction += cell.coralData.cfProduction;
+            hfTotalProduction += cell.coralData.hfProduction;
             coralCells.Add(cell.LocalPlace, cell);
-            // substrataOverlayTileMap.SetTile(localPlace, groundTileMap.GetTile(localPlace));
         }
         
         foreach (Vector3Int pos in algaeTileMap.cellBounds.allPositionsWithin) {
@@ -296,10 +290,8 @@ public class GameManager : MonoBehaviour
                 101.0f, 
                 algaeDataContainer.algae[findIndexOfEntityFromName(currentTB.name)]
             );
-            // __ECONOMY__
-            herbivorousFishTotal += cell.algaeData.herbivorousFishProductionBase;
+            hfTotalProduction += cell.algaeData.hfProduction;
             algaeCells.Add(cell.LocalPlace,cell);
-            // substrataOverlayTileMap.SetTile(localPlace, groundTileMap.GetTile(localPlace));
         }
     }
 
@@ -316,11 +308,16 @@ public class GameManager : MonoBehaviour
         cameraFollow.enabled = true;
         // nurseryCamera.Setup(() => new Vector3(500,500,-10), () => zoom);
         nurseryCamera.enabled = false;
-        InvokeRepeating("doStuff", 1.0f, globalVarContainer.globalVariables.updateDelay);
+        // __FIX__ MAKE INTO GLOBALS?
+        // InvokeRepeating("updateFishData", 0f, 1.0f);
+        InvokeRepeating("updateAllAlgae", 0.5f, 0.5f); 
+        InvokeRepeating("updateAllCoral", 1.0f, 1.0f); 
     }
 
     void Update()
     {
+        updateFishData();
+
         if (PauseScript.GamePaused) {
             return;
         }
@@ -479,18 +476,11 @@ public class GameManager : MonoBehaviour
         cameraFollow.GetComponent<MenuAnimator>().OpenThing();
     }
 
-    private void doStuff() {
-        // __ECONOMY__
-        survivabilityFrameCounter = (++survivabilityFrameCounter % 7 == 0 ? 0 : survivabilityFrameCounter);
-        if (survivabilityFrameCounter == 0) 
-            updateAllCoral();
-        else if (survivabilityFrameCounter == 3 || survivabilityFrameCounter == 6)
-            updateAllAlgae();
-        
+    private void updateFishData() {        
         updateFishOutput();
         fishDisplay.text = "Fish Output: " + fishOutput
-                        + "\nCarnivorous Fish: " + carnivorousFishTotal
-                        + "\nHerbivorous Fish: " + herbivorousFishTotal
+                        + "\nCF Production: " + cfTotalProduction
+                        + "\nHF Production: " + hfTotalProduction
                         + "\nFish Income: " + fishIncome;
     }
 
@@ -504,12 +494,10 @@ public class GameManager : MonoBehaviour
     private void updateAlgaeSurvivability() {
         List<Vector3Int> keys = new List<Vector3Int>(algaeCells.Keys);
         foreach (Vector3Int key in keys) {
-            float randNum = UnityEngine.Random.Range(0.0f, 100.0f);
             if (algaeCells[key].maturity <= 100.0f) {
                 algaeCells[key].addMaturity(1);
-                if (!algaeCells[key].willSurvive(randNum, substrataCells[key])) { // BUGGED
+                if (economyMachine.algaeWillSurvive(algaeCells[key], substrataCells[key], 0f, 1f)) { // BUGGED
                     algaeTileMap.SetTile(key, null);
-                    substrataOverlayTileMap.SetTile(key, null);
                     algaeCells.Remove(key);
                 }
             }
@@ -526,18 +514,20 @@ public class GameManager : MonoBehaviour
         List<Vector3Int> keys = new List<Vector3Int>(algaeCells.Keys);
         foreach (Vector3Int key in keys) {
             float randNum = UnityEngine.Random.Range(0.0f, 100.0f);
-            float basePropagationChance = UnityEngine.Random.Range(50.0f, 60.0f);
             if (algaeCells[key].maturity > 100.0f) { // propagate only if "mature"
                 for (int i = 0; i < 6; i++) {
-                    if (UnityEngine.Random.Range(0.0f,100.0f) <= basePropagationChance + UnityEngine.Random.Range(0.0f, 5.0f)) {
+                    if (economyMachine.algaeWillPropagate(algaeCells[key], 0f, 1f)) {
                         Vector3Int localPlace = key+hexNeighbors[key.y&1,i];
-                        if (!substrataTileMap.HasTile(localPlace) || !substrataCells.ContainsKey(localPlace) || substrataOverlayTileMap.HasTile(localPlace)) continue;
+                        if (!substrataTileMap.HasTile(localPlace) || !substrataCells.ContainsKey(localPlace)) continue;
+                        if (substrataOverlayTileMap.HasTile(localPlace)) continue;
                         if (algaeTileMap.HasTile(localPlace) || algaeCells.ContainsKey(localPlace)) continue;
+                        // __ECONOMY__ MANUAL OVERRIDE TO CHECK IF ALGAE CAN TAKE OVER
                         if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace)) {
                             randNum -= coralCells[localPlace].maturity*0.15f;
                             CoralCellData temp;
                             float avgMaturity = 0;
                             float numCorals = 1;
+                            // __FIX__ can improve this check with spread; but will do for now
                             for (int j = 0; j < 6; j++)
                                 if (coralCells.TryGetValue(localPlace+hexNeighbors[localPlace.y&1, j], out temp)) {
                                     randNum -= coralCells[localPlace+hexNeighbors[localPlace.y&1, j]].maturity*0.05f;
@@ -546,6 +536,7 @@ public class GameManager : MonoBehaviour
                                 }
                             if (randNum < avgMaturity/numCorals) continue;
                         }
+                        // adding algae
                         AlgaeCellData cell = new AlgaeCellData(
                             localPlace, 
                             algaeTileMap, 
@@ -553,17 +544,17 @@ public class GameManager : MonoBehaviour
                             0.0f, 
                             algaeDataContainer.algae[findIndexOfEntityFromName(algaeCells[key].TileBase.name)]
                         );
-                        herbivorousFishTotal += cell.algaeData.herbivorousFishProductionBase;
+                        hfTotalProduction += cell.algaeData.hfProduction;
+                        algaeCells.Add(cell.LocalPlace,cell);
+                        algaeTileMap.SetTile(cell.LocalPlace, cell.TileBase);
+                        // delete coral under algae
                         if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace)) {
                             coralTileMap.SetTile(localPlace, null);
                             substrataOverlayTileMap.SetTile(localPlace, null);
-                            herbivorousFishTotalInterest -= coralCells[localPlace].coralData.herbivorousFishInterestBase;
-                            carnivorousFishTotalInterest -= coralCells[localPlace].coralData.carnivorousFishInterestBase;
+                            hfTotalProduction -= coralCells[localPlace].coralData.hfProduction;
+                            cfTotalProduction -= coralCells[localPlace].coralData.cfProduction;
                             coralCells.Remove(localPlace);
                         }
-                        algaeCells.Add(cell.LocalPlace,cell);
-                        algaeTileMap.SetTile(cell.LocalPlace, cell.TileBase);
-                        // substrataOverlayTileMap.SetTile(cell.LocalPlace, groundTileMap.GetTile(cell.LocalPlace));
                     }
                 }
             }
@@ -572,7 +563,6 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    // __ECONOMY__
     #region Coral Updates
     private void updateAllCoral() {
         updateCoralSurvivability();
@@ -615,12 +605,9 @@ public class GameManager : MonoBehaviour
         int readyNum = getReadyCoralsPerType(type);
         int loadedNum = getCoralsPerType(type);
         if (coralTileMap.HasTile(position)) {
-            feedbackDialogue("Coral already existing. Cannot place tile.", globalVarContainer.globalVariables.feedbackDelayTime);
-            // print(coralCells[position].printData());
+            feedbackDialogue("Can't put corals on top of other corals!.", globalVarContainer.globalVariables.feedbackDelayTime);
         } else if (algaeTileMap.HasTile(position)) {
-            feedbackDialogue("Algae already existing. Cannot place tile.", globalVarContainer.globalVariables.feedbackDelayTime);
-            // print("algae already existing; cannot place tile");
-            print(algaeCells[position].printData());
+            feedbackDialogue("Can't put corals on top of algae! The coral will die!.", globalVarContainer.globalVariables.feedbackDelayTime);
         } else if (substrataOverlayTileMap.HasTile(position)) {
             feedbackDialogue("This is a toxic tile! Coral won't survive here.", globalVarContainer.globalVariables.feedbackDelayTime);
         }else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && readyNum > 0) { 
@@ -639,8 +626,8 @@ public class GameManager : MonoBehaviour
                 coralBaseData.corals[type]
             );
             coralCells.Add(position, cell);
-            carnivorousFishTotalInterest += coralCells[position].coralData.carnivorousFishInterestBase;
-            herbivorousFishTotalInterest += coralCells[position].coralData.herbivorousFishInterestBase;
+            cfTotalProduction += coralCells[position].coralData.cfProduction;
+            hfTotalProduction += coralCells[position].coralData.hfProduction;
             coralTileMap.SetTile(position, coralTileBases[type]);
             // substrataOverlayTileMap.SetTile(position, groundTileMap.GetTile(position));
         } else if (readyNum == 0 && loadedNum-readyNum > 0) {
@@ -662,19 +649,22 @@ public class GameManager : MonoBehaviour
     private void updateCoralSurvivability() {
         List<Vector3Int> keys = new List<Vector3Int>(coralCells.Keys);
         foreach (Vector3Int key in keys) {
-            float randNum = UnityEngine.Random.Range(0.0f, 100.0f);
             if (coralCells[key].maturity <= 100) {
                 // check adj corals
+                // miscFactors aka the amount of corals around it influences how much more they can add to the survivability of one
+                // how much they actually contribue can be varied; change the amount 0.01f to something that makes more sense
                 float miscFactors = 0.0f;
+                // __FIX__ MAYBE USE SPREAD?
                 for (int i = 0; i < 6; i++)
                     if (coralCells.ContainsKey(key+hexNeighbors[key.y&1, i]))
-                        miscFactors += 0.01f*coralCells[key+hexNeighbors[key.y&1, i]].maturity;
+                        miscFactors += 0.01f*coralCells[key+hexNeighbors[key.y&1, i]].maturity; 
                 coralCells[key].addMaturity(1.0f);
-                if (!coralCells[key].willSurvive(randNum, substrataCells[key], miscFactors-coralSurvivabilityDebuff)) {
+                if (economyMachine.coralWillSurvive(coralCells[key], substrataCells[key], miscFactors, coralSurvivabilityDebuff)) {
+                    // setting data
                     coralTileMap.SetTile(key, null);
                     substrataOverlayTileMap.SetTile(key, null);
-                    herbivorousFishTotalInterest -= coralCells[key].coralData.herbivorousFishInterestBase;
-                    carnivorousFishTotalInterest -= coralCells[key].coralData.carnivorousFishInterestBase;
+                    hfTotalProduction -= coralCells[key].coralData.hfProduction;
+                    cfTotalProduction -= coralCells[key].coralData.cfProduction;
                     coralCells.Remove(key);
                     substrataOverlayTileMap.SetTile(key, null);
                 }
@@ -685,11 +675,9 @@ public class GameManager : MonoBehaviour
     private void updateCoralPropagation() {
         List<Vector3Int> keys = new List<Vector3Int>(coralCells.Keys);
         foreach (Vector3Int key in keys) {
-            float randNum = UnityEngine.Random.Range(0.0f, 100.0f);
-            float basePropagationChance = UnityEngine.Random.Range(50.0f, 60.0f);
             if (coralCells[key].maturity > 100.0f) { // propagate only if "mature"
                 for (int i = 0; i < 6; i++) {
-                    if (UnityEngine.Random.Range(0.0f,100.0f) <= basePropagationChance + UnityEngine.Random.Range(0.0f, 5.0f) - coralPropagationDebuff) {
+                    if (economyMachine.coralWillPropagate(coralCells[key], 0f, 1f)) { // __FIX__ the additive and multiplicative
                         Vector3Int localPlace = key+hexNeighbors[key.y&1,i];
                         if (!substrataTileMap.HasTile(localPlace) || !substrataCells.ContainsKey(localPlace) || substrataOverlayTileMap.HasTile(localPlace)) continue;
                         if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace) || algaeTileMap.HasTile(localPlace)) continue;
@@ -700,8 +688,8 @@ public class GameManager : MonoBehaviour
                             0.0f, 
                             coralBaseData.corals[findIndexOfEntityFromName(coralCells[key].TileBase.name)]
                         );
-                        carnivorousFishTotalInterest += cell.coralData.carnivorousFishInterestBase;
-                        herbivorousFishTotalInterest += cell.coralData.herbivorousFishInterestBase;
+                        cfTotalProduction += cell.coralData.cfProduction;
+                        hfTotalProduction += cell.coralData.hfProduction;
                         coralCells.Add(cell.LocalPlace,cell);
                         coralTileMap.SetTile(cell.LocalPlace, cell.TileBase);
                         // substrataOverlayTileMap.SetTile(cell.LocalPlace, groundTileMap.GetTile(cell.LocalPlace));
@@ -761,21 +749,10 @@ public class GameManager : MonoBehaviour
     // __ECONOMY__
     #region Misc Updates
     private void updateFishOutput() {
-        economyMachine.updateHFCF(herbivorousFishTotal, carnivorousFishTotal);
-
-        int tempHFT = herbivorousFishTotal;
-        int tempCFT = carnivorousFishTotal;
-        herbivorousFishTotal += (int)Math.Round(tempHFT*herbivorousFishTotalInterest - tempCFT);
-        carnivorousFishTotal += (int)Math.Round((tempHFT-tempCFT)*carnivorousFishTotalInterest + (tempHFT-tempCFT)*0.03f);
-
-        // anti civ gandhi
-        herbivorousFishTotal = Math.Max(herbivorousFishTotal, 0);
-        carnivorousFishTotal = Math.Max(carnivorousFishTotal, 0);
-
-        herbivorousFishTotal = Math.Min(herbivorousFishTotal, 10000);
-        carnivorousFishTotal = Math.Min(carnivorousFishTotal, 10000);
-
-        fishIncome = (int)Math.Round(carnivorousFishTotal*0.3f + herbivorousFishTotal*0.2f);
+        economyMachine.updateHFCF(hfTotalProduction, cfTotalProduction);
+        float hf = economyMachine.getActualHF();
+        float cf = economyMachine.getActualCF();
+        fishIncome = (int)Math.Round(economyMachine.getTotalFish());
         fishOutput += fishIncome;
         fishOutput = Math.Min(fishOutput, 50000);
     }

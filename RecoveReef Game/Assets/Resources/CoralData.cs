@@ -14,11 +14,11 @@ public class CoralData
     [XmlElement("Survivability")]
     public float survivability;
 
-    [XmlElement("CarnivorousFishInterestBase")]
-    public float carnivorousFishInterestBase;
+    [XmlElement("CFProduction")]
+    public float cfProduction;
 
-    [XmlElement("HerbivorousFishInterestBase")]
-    public float herbivorousFishInterestBase;
+    [XmlElement("HFProduction")]
+    public float hfProduction;
 
     [XmlElement("CoralType")]
     public string coralType;
@@ -31,8 +31,8 @@ public class CoralData
         output += "\nname: " + name;
         output += "\nGrow Time: " + growTime;
         output += "\nSurvivability: " + survivability;
-        output += "\nCarnivorous Fish Interest Base: " + carnivorousFishInterestBase;
-        output += "\nHerbivorous Fish Interest Base: " + herbivorousFishInterestBase;
+        output += "\nCarnivorous Fish Interest Base: " + cfProduction;
+        output += "\nHerbivorous Fish Interest Base: " + hfProduction;
         output += "\nCoral Type: " + coralType;
         output += "\nPref Terrain: " + prefTerrain;
         return output;
