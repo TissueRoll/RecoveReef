@@ -31,9 +31,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject[] CoralOptions;
     [SerializeField] private Text feedbackText;
     [SerializeField] private TileBase toxicOverlay;
-    [SerializeField] private Sprite nothing;
-    [SerializeField] private Sprite[] coralSprites;
     [SerializeField] private GameObject popupCanvas;
+    [SerializeField] private Sprite emptyRack;
+    [SerializeField] private Sprite[] smallRack;
+    [SerializeField] private Sprite[] bigRack;
     #pragma warning restore 0649
     #endregion
     #region Data Structures for the Game
@@ -420,16 +421,22 @@ public class GameManager : MonoBehaviour
             GameObject rack = nurseryCamera.transform.Find("NurseryCanvas/Racks")
                             .gameObject.transform.GetChild(i/3)
                             .gameObject.transform.GetChild(i%3)
-                            .gameObject.transform.Find("RackImage/RackPlacements").gameObject;
+                            .gameObject.transform.Find("Selection/RackPlacements").gameObject;
             for (int j = 0; j < globalVarContainer.globalVariables.maxSpacePerCoral; j++) {
+                Sprite currentPositionSprite = rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().sprite;
                 if (growingCorals[i][j] == null) {
                     thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = progressNotDone;
-                    rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = new Color(1f,1f,1f,0f);
+                    if (currentPositionSprite.name != emptyRack.name)
+                        rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().sprite = emptyRack;
                     continue;
                 }
                 growingCorals[i][j].timer.updateTime();
+                bool currentCoralDone = growingCorals[i][j].timer.isDone();
                 thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.Lerp(progressNotDone, progressIsDone, growingCorals[i][j].timer.percentComplete);
-                rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.Lerp(new Color(1f,1f,1f,0f), new Color(1f,1f,1f,1f), Math.Max(0.2f,growingCorals[i][j].timer.percentComplete));
+                if (currentCoralDone && currentPositionSprite.name != bigRack[i].name) 
+                    rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().sprite = bigRack[i];
+                else if (!currentCoralDone && currentPositionSprite.name != smallRack[i].name)
+                    rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().sprite = smallRack[i];
             }
         }
 
