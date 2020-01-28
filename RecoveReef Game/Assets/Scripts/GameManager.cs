@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Sprite emptyRack;
     [SerializeField] private Sprite[] smallRack;
     [SerializeField] private Sprite[] bigRack;
+    [SerializeField] private GameObject endGameScreen;
     #pragma warning restore 0649
     #endregion
     #region Data Structures for the Game
@@ -74,6 +75,7 @@ public class GameManager : MonoBehaviour
     private float coralPropagationDebuff = 0;
     private float coralSurvivabilityDebuff = 0;
     private EconomyMachine economyMachine;
+    private CountdownTimer timeUntilEnd;
     #endregion
 
     #region Generic Helper Functions
@@ -222,6 +224,7 @@ public class GameManager : MonoBehaviour
         climateChangeHasWarned = false;
         climateChangeHasHappened = false;
         economyMachine = new EconomyMachine(0f,0f,5f);
+        timeUntilEnd = new CountdownTimer(60f);
         initializeGame();
     }
 
@@ -317,6 +320,14 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        if (GameEnd.gameHasEnded) {
+            return;
+        }
+
+        // if (Input.GetKeyDown(KeyCode.Backspace)) {
+        //     endTheGame("force end");
+        // }
+
         updateFishData();
 
         if (PauseScript.GamePaused) {
@@ -444,6 +455,23 @@ public class GameManager : MonoBehaviour
 
         tempTimer.updateTime();
         testTimerText.text = convertTimetoMS(tempTimer.currentTime);
+        if (tempTimer.isDone()) {
+            endTheGame("The reef could not recover...");
+        }
+
+        if (fishIncome >= 5000f) {
+            timeUntilEnd.updateTime();
+        } else {
+            timeUntilEnd.reset();
+        }
+
+        if (timeUntilEnd.isDone()) {
+            endTheGame("You have recovered the reef!");
+        }
+    }
+    private void endTheGame(string s) {
+        endGameScreen.GetComponent<GameEnd>().endMessage(s);
+        endGameScreen.GetComponent<GameEnd>().gameEndReached();
     }
     public void operateNursery() {
         showNursery = !showNursery;
@@ -484,8 +512,8 @@ public class GameManager : MonoBehaviour
     private void updateFishData() {        
         updateFishOutput();
         fishDisplay.text = "Fish Output: " + fishOutput
-                        + "\nCF Production: " + cfTotalProduction
-                        + "\nHF Production: " + hfTotalProduction
+                        + "\nHerbivorous Fish: " + economyMachine.getActualHF()
+                        + "\nCarnivorous Fish: " + economyMachine.getActualCF()
                         + "\nFish Income: " + fishIncome;
     }
 

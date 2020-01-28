@@ -26,4 +26,8 @@ public class CountdownTimer
     public bool isDone() {
         return currentTime == 0;
     }
+
+    public void reset() {
+        currentTime = timeDuration;
+    }
 }

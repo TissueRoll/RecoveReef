@@ -10,7 +10,7 @@ public class PopupScript : MonoBehaviour
     public GameObject outText;
 
     void Update() {
-        if (!PauseScript.GamePaused && Input.GetKeyDown(KeyCode.Return)) {
+        if (!GameEnd.gameHasEnded && !PauseScript.GamePaused && Input.GetKeyDown(KeyCode.Return)) {
             ClosePopup();
         }
     }
