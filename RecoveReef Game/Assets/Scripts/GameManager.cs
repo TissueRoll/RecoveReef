@@ -223,7 +223,7 @@ public class GameManager : MonoBehaviour
         climateChangeTimer = new CountdownTimer(globalVarContainer.globalVariables.timeUntilClimateChange);
         climateChangeHasWarned = false;
         climateChangeHasHappened = false;
-        economyMachine = new EconomyMachine(0f,0f,5f);
+        economyMachine = new EconomyMachine(10f,0f,5f);
         timeUntilEnd = new CountdownTimer(60f);
         initializeGame();
     }
@@ -314,8 +314,8 @@ public class GameManager : MonoBehaviour
         nurseryCamera.enabled = false;
         // __FIX__ MAKE INTO GLOBALS?
         // InvokeRepeating("updateFishData", 0f, 1.0f);
-        InvokeRepeating("updateAllAlgae", 0.5f, 0.5f); 
-        InvokeRepeating("updateAllCoral", 1.0f, 1.0f); 
+        InvokeRepeating("updateAllAlgae", 1.0f, 1.0f); 
+        InvokeRepeating("updateAllCoral", 2.0f, 2.0f); 
     }
 
     void Update()
@@ -465,7 +465,7 @@ public class GameManager : MonoBehaviour
             endTheGame("The reef could not recover...");
         }
 
-        if (fishIncome >= 5000f) {
+        if (fishIncome >= 50000f) {
             timeUntilEnd.updateTime();
         } else {
             timeUntilEnd.reset();
@@ -661,7 +661,7 @@ public class GameManager : MonoBehaviour
                 position, 
                 coralTileMap, 
                 coralTileBases[type], 
-                0.0f, 
+                98.0f, 
                 coralBaseData.corals[type]
             );
             coralCells.Add(position, cell);
@@ -721,7 +721,7 @@ public class GameManager : MonoBehaviour
                             localPlace, 
                             coralTileMap, 
                             coralCells[key].TileBase, 
-                            0.0f, 
+                            98.0f, 
                             coralBaseData.corals[findIndexOfEntityFromName(coralCells[key].TileBase.name)]
                         );
                         cfTotalProduction += cell.coralData.cfProduction;

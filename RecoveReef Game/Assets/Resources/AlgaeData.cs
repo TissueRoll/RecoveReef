@@ -12,7 +12,7 @@ public class AlgaeData
     [XmlElement("Survivability")]
     public float survivability;
     [XmlElement("HFProduction")]
-    public int hfProduction;
+    public float hfProduction;
     [XmlElement("AlgaeType")]
     public string algaeType;
     [XmlElement("PrefTerrain")]

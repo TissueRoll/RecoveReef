@@ -5,8 +5,8 @@
         <UpdateDelay>0.5</UpdateDelay>
         <MaxSpaceInNursery>20</MaxSpaceInNursery>
         <MaxSpacePerCoral>4</MaxSpacePerCoral>
-        <FeedbackDelayTime>1.5</FeedbackDelayTime>
-        <MaxGameTime>1800</MaxGameTime>
+        <FeedbackDelayTime>2.5</FeedbackDelayTime>
+        <MaxGameTime>900</MaxGameTime>
         <TimeUntilClimateChange>60</TimeUntilClimateChange>
     </Globals>
 </GlobalCollection>
