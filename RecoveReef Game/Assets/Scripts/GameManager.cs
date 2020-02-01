@@ -590,7 +590,6 @@ public class GameManager : MonoBehaviour
                         // delete coral under algae
                         if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace)) {
                             coralTileMap.SetTile(localPlace, null);
-                            substrataOverlayTileMap.SetTile(localPlace, null);
                             hfTotalProduction -= coralCells[localPlace].coralData.hfProduction;
                             cfTotalProduction -= coralCells[localPlace].coralData.cfProduction;
                             coralCells.Remove(localPlace);
@@ -669,7 +668,6 @@ public class GameManager : MonoBehaviour
             cfTotalProduction += coralCells[position].coralData.cfProduction;
             hfTotalProduction += coralCells[position].coralData.hfProduction;
             coralTileMap.SetTile(position, coralTileBases[type]);
-            // substrataOverlayTileMap.SetTile(position, groundTileMap.GetTile(position));
         } else if (readyNum == 0 && loadedNum-readyNum > 0) {
             float minTime = 3600f;
             for (int i = 0; i < globalVarContainer.globalVariables.maxSpacePerCoral; i++) {
@@ -699,11 +697,9 @@ public class GameManager : MonoBehaviour
                 if (!economyMachine.coralWillSurvive(coralCells[key], substrataCells[key], miscFactors, coralSurvivabilityDebuff)) {
                     // setting data
                     coralTileMap.SetTile(key, null);
-                    substrataOverlayTileMap.SetTile(key, null);
                     hfTotalProduction -= coralCells[key].coralData.hfProduction;
                     cfTotalProduction -= coralCells[key].coralData.cfProduction;
                     coralCells.Remove(key);
-                    substrataOverlayTileMap.SetTile(key, null);
                 }
             }
         }
@@ -729,7 +725,6 @@ public class GameManager : MonoBehaviour
                         hfTotalProduction += cell.coralData.hfProduction;
                         coralCells.Add(cell.LocalPlace,cell);
                         coralTileMap.SetTile(cell.LocalPlace, cell.TileBase);
-                        // substrataOverlayTileMap.SetTile(cell.LocalPlace, groundTileMap.GetTile(cell.LocalPlace));
                     }
                 }
             }
