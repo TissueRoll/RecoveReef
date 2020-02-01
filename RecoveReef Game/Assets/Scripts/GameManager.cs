@@ -354,6 +354,7 @@ public class GameManager : MonoBehaviour
 
         // test script for popup messages
         if (Input.GetKeyDown(KeyCode.Slash)) {
+            
             makePopup("Hello!");
             // randomDisaster(2);
         }
@@ -535,7 +536,7 @@ public class GameManager : MonoBehaviour
         foreach (Vector3Int key in keys) {
             if (algaeCells[key].maturity <= 100.0f) {
                 algaeCells[key].addMaturity(1);
-                if (economyMachine.algaeWillSurvive(algaeCells[key], substrataCells[key], 0f, 1f)) { // BUGGED
+                if (!economyMachine.algaeWillSurvive(algaeCells[key], substrataCells[key], 0f, 1f)) { // BUGGED
                     algaeTileMap.SetTile(key, null);
                     algaeCells.Remove(key);
                 }
@@ -661,7 +662,7 @@ public class GameManager : MonoBehaviour
                 position, 
                 coralTileMap, 
                 coralTileBases[type], 
-                98.0f, 
+                0.0f, 
                 coralBaseData.corals[type]
             );
             coralCells.Add(position, cell);
@@ -695,7 +696,7 @@ public class GameManager : MonoBehaviour
                     if (coralCells.ContainsKey(key+hexNeighbors[key.y&1, i]))
                         miscFactors += 0.01f*coralCells[key+hexNeighbors[key.y&1, i]].maturity; 
                 coralCells[key].addMaturity(1.0f);
-                if (economyMachine.coralWillSurvive(coralCells[key], substrataCells[key], miscFactors, coralSurvivabilityDebuff)) {
+                if (!economyMachine.coralWillSurvive(coralCells[key], substrataCells[key], miscFactors, coralSurvivabilityDebuff)) {
                     // setting data
                     coralTileMap.SetTile(key, null);
                     substrataOverlayTileMap.SetTile(key, null);
@@ -721,7 +722,7 @@ public class GameManager : MonoBehaviour
                             localPlace, 
                             coralTileMap, 
                             coralCells[key].TileBase, 
-                            98.0f, 
+                            0.0f, 
                             coralBaseData.corals[findIndexOfEntityFromName(coralCells[key].TileBase.name)]
                         );
                         cfTotalProduction += cell.coralData.cfProduction;
