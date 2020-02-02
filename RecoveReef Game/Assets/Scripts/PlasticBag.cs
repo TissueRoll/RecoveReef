@@ -5,11 +5,12 @@ using UnityEngine;
 public class PlasticBag : MonoBehaviour
 {
     void Start() {
+        // Vector3 pos = new Vector3(0f,10f,0f);
         Vector3 pos = new Vector3(UnityEngine.Random.Range(-10f,10f), UnityEngine.Random.Range(-10f,10f), 0) + new Vector3(0,10,0);
         this.gameObject.transform.position = pos;
         LTSeq seq = LeanTween.sequence();
         for (int i = 0; i < 10; i++) {
-            seq.append(LeanTween.move(this.gameObject, pos+new Vector3((-1*(i%2))*2*(i > 0 && i < 9 ? 2 : 1), -10, 0), 0.5f));
+            seq.append(LeanTween.move(this.gameObject, pos+new Vector3((-1*(i%2))*2*(i > 0 && i < 9 ? 2 : 1), -1*i, 0), 0.45f));
         }
     }
     void OnMouseDown() {
