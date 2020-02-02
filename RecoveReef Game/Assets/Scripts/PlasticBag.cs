@@ -5,8 +5,8 @@ using UnityEngine;
 public class PlasticBag : MonoBehaviour
 {
     void Start() {
-        // Vector3 pos = new Vector3(0f,10f,0f);
-        Vector3 pos = new Vector3(UnityEngine.Random.Range(-10f,10f), UnityEngine.Random.Range(-10f,10f), 0) + new Vector3(0,10,0);
+        Vector2 randomPositionOnScreen = Camera.main.ViewportToWorldPoint(new Vector2(UnityEngine.Random.value, UnityEngine.Random.value));
+        Vector3 pos = new Vector3(randomPositionOnScreen.x, randomPositionOnScreen.y+10, 0);
         this.gameObject.transform.position = pos;
         LTSeq seq = LeanTween.sequence();
         for (int i = 0; i < 10; i++) {

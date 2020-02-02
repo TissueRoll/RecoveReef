@@ -219,7 +219,7 @@ public class GameManager : MonoBehaviour
         initializeTiles();
         print("initialization done");
         tempTimer = new CountdownTimer(globalVarContainer.globalVariables.maxGameTime);
-        disasterTimer = new CountdownTimer(60f); // make into first 5 mins immunity
+        disasterTimer = new CountdownTimer(1200f); // make into first 5 mins immunity
         climateChangeTimer = new CountdownTimer(globalVarContainer.globalVariables.timeUntilClimateChange);
         climateChangeHasWarned = false;
         climateChangeHasHappened = false;
@@ -235,10 +235,8 @@ public class GameManager : MonoBehaviour
         substrataCells = new Dictionary<Vector3Int, float>();
         algaeCells = new Dictionary<Vector3Int, AlgaeCellData>();
         growingCorals = new List<NursingCoral>[6];
-        // readyCorals = new Queue<string>[6];
         for (int i = 0; i < 6; i++) {
             growingCorals[i] = new List<NursingCoral>() {null, null, null, null};
-            // readyCorals[i] = new Queue<string>();
         }
 
         // initialization
