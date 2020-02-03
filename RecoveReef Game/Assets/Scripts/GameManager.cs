@@ -42,6 +42,7 @@ public class GameManager : MonoBehaviour
     private Dictionary<Vector3Int,CoralCellData> coralCells;
     private Dictionary<Vector3Int,float> substrataCells;
     private Dictionary<Vector3Int,AlgaeCellData> algaeCells; 
+    private ObjectPooler objectPooler;
     #endregion
     #region Global Unchanging Values
     private Vector3Int[,] hexNeighbors = new Vector3Int[,] {
@@ -76,6 +77,8 @@ public class GameManager : MonoBehaviour
     private float coralSurvivabilityDebuff = 0;
     private EconomyMachine economyMachine;
     private CountdownTimer timeUntilEnd;
+    private CountdownTimer plasticSpawner;
+    private int totalPlasticSpawned;
     #endregion
 
     #region Generic Helper Functions
@@ -219,12 +222,15 @@ public class GameManager : MonoBehaviour
         initializeTiles();
         print("initialization done");
         tempTimer = new CountdownTimer(globalVarContainer.globalVariables.maxGameTime);
-        disasterTimer = new CountdownTimer(1200f); // make into first 5 mins immunity
+        disasterTimer = new CountdownTimer(60f); // make into first 5 mins immunity
         climateChangeTimer = new CountdownTimer(globalVarContainer.globalVariables.timeUntilClimateChange);
         climateChangeHasWarned = false;
         climateChangeHasHappened = false;
         economyMachine = new EconomyMachine(10f,0f,5f);
         timeUntilEnd = new CountdownTimer(60f);
+        plasticSpawner = new CountdownTimer(15f);
+        totalPlasticSpawned = 0;
+        objectPooler = ObjectPooler.instance;
         initializeGame();
     }
 
@@ -326,10 +332,17 @@ public class GameManager : MonoBehaviour
         //     endTheGame("force end");
         // }
 
-        updateFishData();
-
         if (PauseScript.GamePaused) {
             return;
+        }
+
+        updateFishData();
+
+        plasticSpawner.updateTime();
+        if (plasticSpawner.isDone()) {
+            objectPooler.SpawnFromPool("plastic");
+            totalPlasticSpawned++;
+            plasticSpawner.currentTime = plasticSpawner.timeDuration;
         }
 
         #region Disaster Happenings
@@ -478,6 +491,7 @@ public class GameManager : MonoBehaviour
         endGameScreen.GetComponent<GameEnd>().endMessage(s);
         endGameScreen.GetComponent<GameEnd>().gameEndReached();
     }
+    
     public void operateNursery() {
         showNursery = !showNursery;
         if (showNursery) {

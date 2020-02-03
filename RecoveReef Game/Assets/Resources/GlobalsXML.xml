@@ -7,6 +7,6 @@
         <MaxSpacePerCoral>4</MaxSpacePerCoral>
         <FeedbackDelayTime>2.5</FeedbackDelayTime>
         <MaxGameTime>900</MaxGameTime>
-        <TimeUntilClimateChange>60</TimeUntilClimateChange>
+        <TimeUntilClimateChange>720</TimeUntilClimateChange>
     </Globals>
 </GlobalCollection>
