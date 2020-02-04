@@ -36,13 +36,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Sprite[] smallRack;
     [SerializeField] private Sprite[] bigRack;
     [SerializeField] private GameObject endGameScreen;
+    [SerializeField] private GameObject plasticBag;
     #pragma warning restore 0649
     #endregion
     #region Data Structures for the Game
     private Dictionary<Vector3Int,CoralCellData> coralCells;
     private Dictionary<Vector3Int,float> substrataCells;
     private Dictionary<Vector3Int,AlgaeCellData> algaeCells; 
-    private ObjectPooler objectPooler;
     #endregion
     #region Global Unchanging Values
     private Vector3Int[,] hexNeighbors = new Vector3Int[,] {
@@ -230,7 +230,6 @@ public class GameManager : MonoBehaviour
         timeUntilEnd = new CountdownTimer(60f);
         plasticSpawner = new CountdownTimer(15f);
         totalPlasticSpawned = 0;
-        objectPooler = ObjectPooler.instance;
         initializeGame();
     }
 
@@ -305,7 +304,7 @@ public class GameManager : MonoBehaviour
 
     private void initializeGame() {
         fishDisplay = GameObject.Find("FishDisplay").GetComponent<Text>();
-        fishDisplay.text = "Fish Output: 0\nCarnivorous Fish: 0\nHerbivorous Fish: 0\nFish Income: 0";
+        fishDisplay.text = "Carnivorous Fish: 0\nHerbivorous Fish: 0\nFish Income: 0";
         testTimerText.text = convertTimetoMS(tempTimer.currentTime);
     }
 
@@ -340,8 +339,8 @@ public class GameManager : MonoBehaviour
 
         plasticSpawner.updateTime();
         if (plasticSpawner.isDone()) {
-            objectPooler.SpawnFromPool("plastic");
-            totalPlasticSpawned++;
+            Instantiate(plasticBag);
+            adjustTotalPlasticBags(1);
             plasticSpawner.currentTime = plasticSpawner.timeDuration;
         }
 
@@ -410,12 +409,6 @@ public class GameManager : MonoBehaviour
             Vector3Int position = getMouseGridPosition();
             print("L:: " + position);
             // print(":: " + substrataOverlayTileMap.GetTile(position).name); // temp disabled cuz it can error
-            RaycastHit2D hit = Physics2D.Raycast(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y), Vector2.zero, 0);
-            if (hit) {
-                if (hit.collider.CompareTag("plastic")) {
-                    Debug.Log("This is plastic");
-                }
-            }
         }
 
         bool rb = Input.GetMouseButtonDown(1);
@@ -487,6 +480,9 @@ public class GameManager : MonoBehaviour
             endTheGame("You have recovered the reef!");
         }
     }
+    public void adjustTotalPlasticBags(int x) {
+        totalPlasticSpawned += x;
+    }
     private void endTheGame(string s) {
         endGameScreen.GetComponent<GameEnd>().endMessage(s);
         endGameScreen.GetComponent<GameEnd>().gameEndReached();
@@ -530,8 +526,7 @@ public class GameManager : MonoBehaviour
 
     private void updateFishData() {        
         updateFishOutput();
-        fishDisplay.text = "Fish Output: " + fishOutput
-                        + "\nHerbivorous Fish: " + economyMachine.getActualHF()
+        fishDisplay.text = "Herbivorous Fish: " + economyMachine.getActualHF()
                         + "\nCarnivorous Fish: " + economyMachine.getActualCF()
                         + "\nFish Income: " + fishIncome;
     }
