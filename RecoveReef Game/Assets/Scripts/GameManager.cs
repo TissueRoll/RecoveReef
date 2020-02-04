@@ -433,7 +433,7 @@ public class GameManager : MonoBehaviour
         if (!showNursery) {
             moveCameraWASD(20f);
             if (edgeScrollingEnabled) moveCameraMouseEdge(20f,10f);
-            zoomKeys(1f);
+            zoomKeys(5f);
             clampCamera();
         }
         #endregion
@@ -829,10 +829,10 @@ public class GameManager : MonoBehaviour
     }
 
     private void zoomKeys(float zoomChangeAmount) {
-        if (Input.GetKey(KeyCode.KeypadPlus)) {
+        if (Input.GetKey(KeyCode.Q)) {
             zoom -= zoomChangeAmount * Time.deltaTime;
         }
-        if (Input.GetKey(KeyCode.KeypadMinus)) {
+        if (Input.GetKey(KeyCode.E)) {
             zoom += zoomChangeAmount * Time.deltaTime;
         }
 
