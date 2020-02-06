@@ -109,6 +109,10 @@ public class GameManager : MonoBehaviour
         }
         return result;
     }
+    private bool withinBoardBounds (Vector3Int position, int bound) {
+        bool ok = (Math.Abs(position.x) <= bound && Math.Abs(position.y) <= bound);
+        return ok;
+    }
     #endregion
     #region Game-Specific Helper Functions
     private int findIndexOfEntityFromType (string code, string type) {
@@ -270,7 +274,7 @@ public class GameManager : MonoBehaviour
         foreach(Vector3Int pos in coralTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
             if (!coralTileMap.HasTile(localPlace)) continue;
-            if (!substrataCells.ContainsKey(localPlace) || substrataOverlayTileMap.HasTile(localPlace)) {
+            if (!substrataCells.ContainsKey(localPlace) || substrataOverlayTileMap.HasTile(localPlace) || !withinBoardBounds(localPlace, 30)) {
                 coralTileMap.SetTile(localPlace, null);
                 continue;
             }
@@ -290,7 +294,7 @@ public class GameManager : MonoBehaviour
         foreach (Vector3Int pos in algaeTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
             if (!algaeTileMap.HasTile(localPlace)) continue;
-            if (!substrataCells.ContainsKey(localPlace) || substrataOverlayTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace)) {
+            if (!substrataCells.ContainsKey(localPlace) || substrataOverlayTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace) || !withinBoardBounds(localPlace, 30)) {
                 algaeTileMap.SetTile(localPlace, null);
                 continue;
             }
@@ -576,6 +580,7 @@ public class GameManager : MonoBehaviour
                         Vector3Int localPlace = key+hexNeighbors[key.y&1,i];
                         if (!substrataTileMap.HasTile(localPlace) || !substrataCells.ContainsKey(localPlace)) continue;
                         if (substrataOverlayTileMap.HasTile(localPlace)) continue;
+                        if (!withinBoardBounds(localPlace, 30)) continue;
                         if (algaeTileMap.HasTile(localPlace) || algaeCells.ContainsKey(localPlace)) continue;
                         // __ECONOMY__ MANUAL OVERRIDE TO CHECK IF ALGAE CAN TAKE OVER
                         if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace)) {
@@ -729,6 +734,7 @@ public class GameManager : MonoBehaviour
                     if (economyMachine.coralWillPropagate(coralCells[key], 0f, 1f)) { // __FIX__ the additive and multiplicative
                         Vector3Int localPlace = key+hexNeighbors[key.y&1,i];
                         if (!substrataTileMap.HasTile(localPlace) || !substrataCells.ContainsKey(localPlace) || substrataOverlayTileMap.HasTile(localPlace)) continue;
+                        if (!withinBoardBounds(localPlace, 30)) continue;
                         if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace) || algaeTileMap.HasTile(localPlace)) continue;
                         CoralCellData cell = new CoralCellData(
                             localPlace, 
