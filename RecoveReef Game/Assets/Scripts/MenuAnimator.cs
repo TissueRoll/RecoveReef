@@ -14,7 +14,7 @@ public class MenuAnimator : MonoBehaviour
         if (isOpen) {
             LeanTween.moveLocalX(thing, prevX, 1);
         } else {
-            LeanTween.moveLocalX(thing, prevX-142.12f, 1);
+            LeanTween.moveLocalX(thing, prevX-140.27f, 1);
         }
         isOpen = !isOpen;
     }
