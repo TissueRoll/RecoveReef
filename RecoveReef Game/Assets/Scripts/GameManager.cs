@@ -25,11 +25,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TileBase[] algaeTileBases;
     [SerializeField] private TileBase[] substrataTileBases;
     [SerializeField] private TileBase[] toxicTileBases;
-    [SerializeField] private Text fishDisplay;
-    [SerializeField] private Text testTimerText;
+    [SerializeField] private GameObject fishDisplay;
+    [SerializeField] private GameObject timeLeft;
+    [SerializeField] private GameObject feedbackText;
     [SerializeField] private GameObject CNC;
     [SerializeField] private GameObject[] CoralOptions;
-    [SerializeField] private Text feedbackText;
     [SerializeField] private TileBase toxicOverlay;
     [SerializeField] private GameObject popupCanvas;
     [SerializeField] private Sprite emptyRack;
@@ -55,6 +55,7 @@ public class GameManager : MonoBehaviour
     AlgaeDataContainer algaeDataContainer;
     Color progressNotDone = new Color(43f/255f,90f/255f,147f/255f,1f);
     Color progressIsDone = new Color(0f,1f,176f/255f,1f);
+    Color progressDefinitelyDone = new Color(1f, 200f/255f, 102f/255f, 1f);
     #endregion
     #region Global Changing Values
     private float zoom;
@@ -303,9 +304,8 @@ public class GameManager : MonoBehaviour
     }
 
     private void initializeGame() {
-        fishDisplay = GameObject.Find("FishDisplay").GetComponent<Text>();
-        fishDisplay.text = "Carnivorous Fish: 0\nHerbivorous Fish: 0\nFish Income: 0";
-        testTimerText.text = convertTimetoMS(tempTimer.currentTime);
+        fishDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = "Fish Income: 0";
+        timeLeft.GetComponent<TMPro.TextMeshProUGUI>().text = convertTimetoMS(tempTimer.currentTime);
     }
 
     private void Start() {
@@ -454,7 +454,10 @@ public class GameManager : MonoBehaviour
                 }
                 growingCorals[i][j].timer.updateTime();
                 bool currentCoralDone = growingCorals[i][j].timer.isDone();
-                thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.Lerp(progressNotDone, progressIsDone, growingCorals[i][j].timer.percentComplete);
+                if (!currentCoralDone)
+                    thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.Lerp(progressNotDone, progressIsDone, growingCorals[i][j].timer.percentComplete);
+                else if (currentCoralDone && thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color != progressDefinitelyDone)
+                    thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = progressDefinitelyDone;
                 if (currentCoralDone && currentPositionSprite.name != bigRack[i].name) 
                     rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().sprite = bigRack[i];
                 else if (!currentCoralDone && currentPositionSprite.name != smallRack[i].name)
@@ -465,12 +468,12 @@ public class GameManager : MonoBehaviour
         CNC.GetComponent<TMPro.TextMeshProUGUI>().text = getCoralsInNursery() + "/" + globalVarContainer.globalVariables.maxSpaceInNursery + " SLOTS LEFT";
 
         tempTimer.updateTime();
-        testTimerText.text = convertTimetoMS(tempTimer.currentTime);
+        timeLeft.GetComponent<TMPro.TextMeshProUGUI>().text = convertTimetoMS(tempTimer.currentTime);
         if (tempTimer.isDone()) {
             endTheGame("The reef could not recover...");
         }
 
-        if (fishIncome >= 50000f) {
+        if (fishIncome >= 500000f) {
             timeUntilEnd.updateTime();
         } else {
             timeUntilEnd.reset();
@@ -514,10 +517,10 @@ public class GameManager : MonoBehaviour
     }
 
     IEnumerator ShowMessage(string text, float time) {
-        feedbackText.text = text;
-        feedbackText.enabled = true;
+        feedbackText.GetComponent<TMPro.TextMeshProUGUI>().text = text;
+        feedbackText.GetComponent<TMPro.TextMeshProUGUI>().enabled = true;
         yield return new WaitForSeconds(time);
-        feedbackText.enabled = false;
+        feedbackText.GetComponent<TMPro.TextMeshProUGUI>().enabled = false;
     }
 
     public void openThing() {
@@ -526,9 +529,7 @@ public class GameManager : MonoBehaviour
 
     private void updateFishData() {        
         updateFishOutput();
-        fishDisplay.text = "Herbivorous Fish: " + economyMachine.getActualHF()
-                        + "\nCarnivorous Fish: " + economyMachine.getActualCF()
-                        + "\nFish Income: " + fishIncome;
+        fishDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = "Fish Income: " + fishIncome;
     }
 
     // __ECONOMY__
