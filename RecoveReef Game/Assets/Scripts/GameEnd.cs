@@ -13,7 +13,15 @@ public class GameEnd : MonoBehaviour
         Time.timeScale = 0f;
     }
 
+    public void setCongrats(Sprite wordArt) {
+        gameEndCanvas.transform.Find("Panel/ScreenOrganizer/ResultGreeting").gameObject.GetComponent<UnityEngine.UI.Image>().sprite = wordArt;
+    }
+
+    public void finalStatistics(int fishIncome, string timeLeft) {
+        gameEndCanvas.transform.Find("Panel/ScreenOrganizer/Texts/StatText").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = "Fish Income: " + fishIncome + "\nTime Left: " + timeLeft;
+    }
+
     public void endMessage(string s) {
-        gameEndCanvas.transform.Find("Panel/Image/Message").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = s;
+        gameEndCanvas.transform.Find("Panel/ScreenOrganizer/Texts/FlavorText").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = s;
     }
 }

@@ -37,6 +37,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Sprite[] bigRack;
     [SerializeField] private GameObject endGameScreen;
     [SerializeField] private GameObject plasticBag;
+    [SerializeField] private Sprite gameWinWordArt;
+    [SerializeField] private Sprite gameLoseWordArt;
     #pragma warning restore 0649
     #endregion
     #region Data Structures for the Game
@@ -80,6 +82,7 @@ public class GameManager : MonoBehaviour
     private CountdownTimer timeUntilEnd;
     private CountdownTimer plasticSpawner;
     private int totalPlasticSpawned;
+    private bool gameIsWon;
     #endregion
 
     #region Generic Helper Functions
@@ -231,6 +234,7 @@ public class GameManager : MonoBehaviour
         timeUntilEnd = new CountdownTimer(60f);
         plasticSpawner = new CountdownTimer(15f);
         totalPlasticSpawned = 0;
+        gameIsWon = false;
         initializeGame();
     }
 
@@ -327,9 +331,10 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // if (Input.GetKeyDown(KeyCode.Backspace)) {
-        //     endTheGame("force end");
-        // }
+        if (Input.GetKeyDown(KeyCode.Backspace)) {
+            gameIsWon = true;
+            endTheGame("force end");
+        }
 
         if (PauseScript.GamePaused) {
             return;
@@ -480,6 +485,7 @@ public class GameManager : MonoBehaviour
         }
 
         if (timeUntilEnd.isDone()) {
+            gameIsWon = true;
             endTheGame("You have recovered the reef!");
         }
     }
@@ -487,6 +493,8 @@ public class GameManager : MonoBehaviour
         totalPlasticSpawned += x;
     }
     private void endTheGame(string s) {
+        endGameScreen.GetComponent<GameEnd>().finalStatistics(fishIncome, convertTimetoMS(tempTimer.currentTime));
+        endGameScreen.GetComponent<GameEnd>().setCongrats((gameIsWon ? gameWinWordArt : gameLoseWordArt));
         endGameScreen.GetComponent<GameEnd>().endMessage(s);
         endGameScreen.GetComponent<GameEnd>().gameEndReached();
     }
