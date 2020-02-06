@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Sprite[] smallRack;
     [SerializeField] private Sprite[] bigRack;
     [SerializeField] private GameObject endGameScreen;
-    [SerializeField] private GameObject plasticBag;
+    [SerializeField] private GameObject[] plasticBags;
     [SerializeField] private Sprite gameWinWordArt;
     [SerializeField] private Sprite gameLoseWordArt;
     #pragma warning restore 0649
@@ -348,7 +348,7 @@ public class GameManager : MonoBehaviour
 
         plasticSpawner.updateTime();
         if (plasticSpawner.isDone()) {
-            Instantiate(plasticBag);
+            Instantiate(plasticBags[UnityEngine.Random.Range(0,plasticBags.Length)]);
             adjustTotalPlasticBags(1);
             plasticSpawner.currentTime = plasticSpawner.timeDuration;
         }

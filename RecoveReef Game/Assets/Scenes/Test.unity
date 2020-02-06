@@ -61789,6 +61789,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
         type: 3}
+      propertyPath: plasticBags.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
       propertyPath: cameraFollow
       value: 
       objectReference: {fileID: 519420033}
@@ -62305,6 +62310,18 @@ PrefabInstance:
       propertyPath: gameLoseWordArt
       value: 
       objectReference: {fileID: 21300000, guid: 9337dfe0f2136a14d801826cf6ba9dbe,
+        type: 3}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
+      propertyPath: plasticBags.Array.data[0]
+      value: 
+      objectReference: {fileID: 6394525599158174667, guid: bb1a719a85af54b4eac20539bd06cd68,
+        type: 3}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
+      propertyPath: plasticBags.Array.data[1]
+      value: 
+      objectReference: {fileID: 3129508482539322251, guid: 8e7fee41c2a17fe4ab7162c3aea234f4,
         type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a42c425e58ec2bc4b9b466b78437a1df, type: 3}
