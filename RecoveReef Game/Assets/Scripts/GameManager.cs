@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Tilemap substrataOverlayTileMap;
     [SerializeField] private Tilemap algaeTileMap;
     [SerializeField] private TileBase[] coralTileBases;
+    [SerializeField] private TileBase[] coralDeadTileBases;
     [SerializeField] private TileBase[] groundTileBases;
     [SerializeField] private TileBase[] algaeTileBases;
     [SerializeField] private TileBase[] substrataTileBases;
@@ -83,6 +84,8 @@ public class GameManager : MonoBehaviour
     private CountdownTimer plasticSpawner;
     private int totalPlasticSpawned;
     private bool gameIsWon;
+    private List<Vector3Int> markedToDieCoral;
+    private bool timeToKillCorals;
     #endregion
 
     #region Generic Helper Functions
@@ -239,6 +242,7 @@ public class GameManager : MonoBehaviour
         plasticSpawner = new CountdownTimer(15f);
         totalPlasticSpawned = 0;
         gameIsWon = false;
+        timeToKillCorals = false;
         initializeGame();
     }
 
@@ -252,6 +256,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < 6; i++) {
             growingCorals[i] = new List<NursingCoral>() {null, null, null, null};
         }
+        markedToDieCoral = new List<Vector3Int>();
 
         // initialization
         // Setting the substrata data
@@ -327,6 +332,7 @@ public class GameManager : MonoBehaviour
         // InvokeRepeating("updateFishData", 0f, 1.0f);
         InvokeRepeating("updateAllAlgae", 1.0f, 1.0f); 
         InvokeRepeating("updateAllCoral", 2.0f, 2.0f); 
+        InvokeRepeating("killCorals", 1.0f, 3.0f);
     }
 
     void Update()
@@ -335,10 +341,10 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // if (Input.GetKeyDown(KeyCode.Backspace)) {
-        //     gameIsWon = true;
-        //     endTheGame("force end");
-        // }
+        if (Input.GetKeyDown(KeyCode.Backspace)) {
+            gameIsWon = false;
+            endTheGame("force end");
+        }
 
         if (PauseScript.GamePaused) {
             return;
@@ -717,13 +723,26 @@ public class GameManager : MonoBehaviour
                 coralCells[key].addMaturity(1.0f);
                 if (!economyMachine.coralWillSurvive(coralCells[key], substrataCells[key], miscFactors, coralSurvivabilityDebuff)) {
                     // setting data
-                    coralTileMap.SetTile(key, null);
-                    hfTotalProduction -= coralCells[key].coralData.hfProduction;
-                    cfTotalProduction -= coralCells[key].coralData.cfProduction;
-                    coralCells.Remove(key);
+                    coralTileMap.SetTile(key, coralDeadTileBases[findIndexOfEntityFromName(coralCells[key].TileBase.name)]);
+                    markedToDieCoral.Add(key);
                 }
             }
         }
+    }
+
+    private void killCorals() {
+        timeToKillCorals = !timeToKillCorals;
+        if (!timeToKillCorals)
+            return;
+        foreach(Vector3Int key in markedToDieCoral) {
+            if (!coralCells.ContainsKey(key))
+                continue;
+            coralTileMap.SetTile(key, null);
+            hfTotalProduction -= coralCells[key].coralData.hfProduction;
+            cfTotalProduction -= coralCells[key].coralData.cfProduction;
+            coralCells.Remove(key);
+        }
+        markedToDieCoral.Clear();
     }
 
     private void updateCoralPropagation() {
@@ -765,8 +784,8 @@ public class GameManager : MonoBehaviour
                 HashSet<Vector3Int> removeSpread = spread(pos, 2);
                 foreach (Vector3Int removePos in removeSpread) {
                     if (coralCells.ContainsKey(removePos)) {
-                        coralCells.Remove(removePos);
-                        coralTileMap.SetTile(removePos, null);
+                        markedToDieCoral.Add(removePos); // __TIMING__
+                        coralTileMap.SetTile(removePos, coralDeadTileBases[findIndexOfEntityFromName(coralCells[removePos].TileBase.name)]);
                     }
                 }
                 makePopup("Oh no! A group of tourists took coral parts as a souvenir! A coral group has died due to this!");
@@ -779,8 +798,8 @@ public class GameManager : MonoBehaviour
             HashSet<Vector3Int> toxicSpread = spread(pos, 2);
             foreach (Vector3Int toxicPos in toxicSpread) {
                 if (coralCells.ContainsKey(toxicPos)) {
-                    coralCells.Remove(toxicPos);
-                    coralTileMap.SetTile(toxicPos, null);
+                    markedToDieCoral.Add(toxicPos); // __TIMING__
+                    coralTileMap.SetTile(toxicPos, coralDeadTileBases[findIndexOfEntityFromName(coralCells[toxicPos].TileBase.name)]);
                 }
                 if (algaeCells.ContainsKey(toxicPos)) {
                     algaeCells.Remove(toxicPos);

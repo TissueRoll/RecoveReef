@@ -61794,6 +61794,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
         type: 3}
+      propertyPath: coralDeadTileBases.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
       propertyPath: cameraFollow
       value: 
       objectReference: {fileID: 519420033}
@@ -62323,6 +62328,42 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3129508482539322251, guid: 8e7fee41c2a17fe4ab7162c3aea234f4,
         type: 3}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
+      propertyPath: coralDeadTileBases.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 7db3d3b8dbf43fa43b6a1565fb911fca,
+        type: 2}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
+      propertyPath: coralDeadTileBases.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: 1c2b278e73d014a4aaf6ea6355672811,
+        type: 2}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
+      propertyPath: coralDeadTileBases.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: 84db5df3b00c1074c9f6569126389329,
+        type: 2}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
+      propertyPath: coralDeadTileBases.Array.data[3]
+      value: 
+      objectReference: {fileID: 11400000, guid: 82023603317b03a43b53d190b3adbb10,
+        type: 2}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
+      propertyPath: coralDeadTileBases.Array.data[4]
+      value: 
+      objectReference: {fileID: 11400000, guid: 41aebba147ebb6440a719cd8129164ef,
+        type: 2}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
+      propertyPath: coralDeadTileBases.Array.data[5]
+      value: 
+      objectReference: {fileID: 11400000, guid: 6d12a064fe187b04782a8c9a691d3d47,
+        type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a42c425e58ec2bc4b9b466b78437a1df, type: 3}
 --- !u!1 &993739988
@@ -70927,7 +70968,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 500, y: 0}
+  m_SizeDelta: {x: 1000, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2077164834
 MonoBehaviour:
