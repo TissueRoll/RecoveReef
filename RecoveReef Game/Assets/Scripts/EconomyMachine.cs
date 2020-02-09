@@ -25,7 +25,6 @@ public class EconomyMachine
 
     public bool coralWillSurvive (CoralCellData coralCellData, int groundViability, int additiveFactors, string groundName) {
         bool result = true;
-        // groundViability + coralCellData.maturity + coralCellData.coralData.survivability + additiveFactors + (-2 if not apt area else +2)
         int computedSurvivability = groundViability 
                                     + coralCellData.maturity 
                                     + coralCellData.coralData.survivability 
@@ -35,12 +34,13 @@ public class EconomyMachine
         return result;
     }
 
-    public bool coralWillPropagate (CoralCellData coralCellData, float additiveFactors, float multiplicativeFactors) {
+    public bool coralWillPropagate (CoralCellData coralCellData, int additiveFactors, string groundName) {
         bool result = true;
-        float basePropagationChance = UnityEngine.Random.Range(50.0f,60.0f); // USE CELL DATA FOR THIS
-        float computedPropagationChance = basePropagationChance + UnityEngine.Random.Range(0.0f, 5.0f) + additiveFactors;
-        computedPropagationChance = Mathf.Min(100.0f, computedPropagationChance*multiplicativeFactors);
-        result = (UnityEngine.Random.Range(0.0f,100.0f) <= computedPropagationChance);
+        int computedPropagatability = UnityEngine.Random.Range(30,41) // base
+                                    + coralCellData.coralData.propagatability 
+                                    + additiveFactors
+                                    + (Regex.IsMatch(groundName, "." + coralCellData.coralData.prefTerrain + ".") ? 5 : -3);
+        result = (UnityEngine.Random.Range(0,101) <= computedPropagatability);
         return result;
     }
 

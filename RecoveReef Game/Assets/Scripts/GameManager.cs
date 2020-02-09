@@ -752,7 +752,7 @@ public class GameManager : MonoBehaviour
         foreach (Vector3Int key in keys) {
             if (coralCells[key].maturity > 25) { // propagate only if "mature"
                 for (int i = 0; i < 6; i++) {
-                    if (economyMachine.coralWillPropagate(coralCells[key], 0f, 1f)) { // __FIX__ the additive and multiplicative
+                    if (economyMachine.coralWillPropagate(coralCells[key], -coralPropagationDebuff, groundTileMap.GetTile(key).name)) {
                         Vector3Int localPlace = key+hexNeighbors[key.y&1,i];
                         if (!groundTileMap.HasTile(localPlace)) continue;
                         if (!substrataTileMap.HasTile(localPlace) || !substrataCells.ContainsKey(localPlace) || substrataOverlayTileMap.HasTile(localPlace)) continue;
