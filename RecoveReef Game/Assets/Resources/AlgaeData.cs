@@ -10,7 +10,9 @@ public class AlgaeData
     [XmlElement("GrowTime")]
     public float growTime;
     [XmlElement("Survivability")]
-    public float survivability;
+    public int survivability;
+    [XmlElement("Propagatability")]
+    public int propagatability;
     [XmlElement("HFProduction")]
     public float hfProduction;
     [XmlElement("AlgaeType")]

@@ -3,14 +3,16 @@
     <AlgaeDatas>
         <AlgaeData name="brown">
             <GrowTime>30</GrowTime>
-            <Survivability>98</Survivability>
+            <Survivability>10</Survivability>
+            <Propagatability>5</Propagatability>
             <HFProduction>0</HFProduction>
             <AlgaeType>zerg</AlgaeType>
             <PrefTerrain>any</PrefTerrain>
         </AlgaeData>
         <AlgaeData name="green">
             <GrowTime>30</GrowTime>
-            <Survivability>95</Survivability>
+            <Survivability>5</Survivability>
+            <Propagatability>10</Propagatability>
             <HFProduction>0</HFProduction>
             <AlgaeType>zerg</AlgaeType>
             <PrefTerrain>any</PrefTerrain>

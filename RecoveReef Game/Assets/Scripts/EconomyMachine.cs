@@ -16,10 +16,13 @@ public class EconomyMachine
         tolerance = tol;
     }
 
-    public bool algaeWillSurvive (AlgaeCellData algaeCellData, float groundViability, float additiveFactors, float multiplicativeFactors) {
+    public bool algaeWillSurvive (AlgaeCellData algaeCellData, int groundViability, int additiveFactors) {
         bool result = true;
-        // float computedSurvivability = (groundViability - 75.0f)/100.0f*algaeCellData.maturity + 75.0f;
-        result = (UnityEngine.Random.Range(0.0f,100.0f) <= 5f);
+        int computedSurvivability = groundViability
+                                    + algaeCellData.maturity
+                                    + algaeCellData.algaeData.survivability
+                                    + additiveFactors;
+        result = (UnityEngine.Random.Range(0,1001) <= computedSurvivability);
         return result;
     }
 
@@ -44,12 +47,12 @@ public class EconomyMachine
         return result;
     }
 
-    public bool algaeWillPropagate (AlgaeCellData algaeCellData, float additiveFactors, float multiplicativeFactors) {
+    public bool algaeWillPropagate (AlgaeCellData algaeCellData, int additiveFactors, string groundName) {
         bool result = true;
-        float basePropagationChance = UnityEngine.Random.Range(50.0f,60.0f); // USE CELL DATA FOR THIS
-        float computedPropagationChance = basePropagationChance + UnityEngine.Random.Range(0.0f, 5.0f) + additiveFactors;
-        computedPropagationChance = Mathf.Min(100.0f, computedPropagationChance*multiplicativeFactors);
-        result = (UnityEngine.Random.Range(0.0f,100.0f) <= 5f);
+        int computedPropagatability = UnityEngine.Random.Range(40,51) // base
+                                    + algaeCellData.algaeData.propagatability 
+                                    + additiveFactors;
+        result = (UnityEngine.Random.Range(0,101) <= computedPropagatability);
         return result;
     }
 

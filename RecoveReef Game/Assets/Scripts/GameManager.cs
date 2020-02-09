@@ -309,7 +309,7 @@ public class GameManager : MonoBehaviour
                 localPlace, 
                 algaeTileMap, 
                 currentTB, 
-                26.0f, 
+                26, 
                 algaeDataContainer.algae[findIndexOfEntityFromName(currentTB.name)]
             );
             hfTotalProduction += cell.algaeData.hfProduction;
@@ -563,7 +563,7 @@ public class GameManager : MonoBehaviour
         foreach (Vector3Int key in keys) {
             if (algaeCells[key].maturity <= 25) {
                 algaeCells[key].addMaturity(1);
-                if (!economyMachine.algaeWillSurvive(algaeCells[key], substrataCells[key], 0f, 1f)) { // BUGGED
+                if (!economyMachine.algaeWillSurvive(algaeCells[key], substrataCells[key], coralSurvivabilityDebuff)) {
                     algaeTileMap.SetTile(key, null);
                     algaeCells.Remove(key);
                 }
@@ -580,37 +580,33 @@ public class GameManager : MonoBehaviour
 
         List<Vector3Int> keys = new List<Vector3Int>(algaeCells.Keys);
         foreach (Vector3Int key in keys) {
-            float randNum = UnityEngine.Random.Range(0.0f, 100.0f);
             if (algaeCells[key].maturity > 25) { // propagate only if "mature"
                 for (int i = 0; i < 6; i++) {
-                    if (economyMachine.algaeWillPropagate(algaeCells[key], 0f, 1f)) {
+                    if (economyMachine.algaeWillPropagate(algaeCells[key], coralPropagationDebuff, groundTileMap.GetTile(key).name)) {
                         Vector3Int localPlace = key+hexNeighbors[key.y&1,i];
                         if (!groundTileMap.HasTile(localPlace)) continue;
                         if (!substrataTileMap.HasTile(localPlace) || !substrataCells.ContainsKey(localPlace)) continue;
                         if (substrataOverlayTileMap.HasTile(localPlace)) continue;
                         if (!withinBoardBounds(localPlace, 30)) continue;
                         if (algaeTileMap.HasTile(localPlace) || algaeCells.ContainsKey(localPlace)) continue;
-                        // __ECONOMY__ MANUAL OVERRIDE TO CHECK IF ALGAE CAN TAKE OVER
+                        // __ECONOMY__ __FIX__ MANUAL OVERRIDE TO CHECK IF ALGAE CAN TAKE OVER
                         if (coralTileMap.HasTile(localPlace) || coralCells.ContainsKey(localPlace)) {
-                            randNum -= coralCells[localPlace].maturity*0.15f;
+                            int randNum = UnityEngine.Random.Range(0, 101);
+                            HashSet<Vector3Int> surrounding = spread(localPlace, 1);
                             CoralCellData temp;
-                            float avgMaturity = 0;
-                            float numCorals = 1;
-                            // __FIX__ can improve this check with spread; but will do for now
-                            for (int j = 0; j < 6; j++)
-                                if (coralCells.TryGetValue(localPlace+hexNeighbors[localPlace.y&1, j], out temp)) {
-                                    randNum -= coralCells[localPlace+hexNeighbors[localPlace.y&1, j]].maturity*0.05f;
-                                    avgMaturity += coralCells[localPlace+hexNeighbors[localPlace.y&1, j]].maturity;
-                                    numCorals++;
+                            foreach(Vector3Int tempLocation in surrounding) {
+                                if (coralCells.TryGetValue(tempLocation, out temp)) {
+                                    randNum -= coralCells[tempLocation].maturity/3;
                                 }
-                            if (randNum < avgMaturity/numCorals) continue;
+                            }
+                            if (randNum < 60) continue;
                         }
                         // adding algae
                         AlgaeCellData cell = new AlgaeCellData(
                             localPlace, 
                             algaeTileMap, 
                             algaeCells[key].TileBase, 
-                            0f, 
+                            0, 
                             algaeDataContainer.algae[findIndexOfEntityFromName(algaeCells[key].TileBase.name)]
                         );
                         hfTotalProduction += cell.algaeData.hfProduction;
