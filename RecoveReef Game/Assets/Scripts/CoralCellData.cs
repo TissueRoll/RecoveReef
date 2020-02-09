@@ -11,14 +11,14 @@ public class CoralCellData
     public Tilemap TilemapMember {get; set;}
     public string uniqueName {get; set;}
 
-    public float maturity {get; set;}
+    public int maturity {get; set;}
     public CoralData coralData {get; set;}
 
     public CoralCellData () {
         // this shouldnt be called; setting uniqueName to ERROR by default
         uniqueName = "ERROR";
     }
-    public CoralCellData (Vector3Int _position, Tilemap _tilemap, TileBase _tilebase, float _maturity, CoralData _coralData) {
+    public CoralCellData (Vector3Int _position, Tilemap _tilemap, TileBase _tilebase, int _maturity, CoralData _coralData) {
         LocalPlace = _position;
         WorldLocation = _tilemap.CellToWorld(_position);
         TileBase = _tilebase;
@@ -39,15 +39,7 @@ public class CoralCellData
         return output;
     }
 
-    public void addMaturity (float maturitySpeed) {
+    public void addMaturity (int maturitySpeed) {
         maturity += maturitySpeed;
     }
-
-    public bool willSurvive (float randNum, float groundViability, float miscFactors) {
-        float computedSurvivability = Mathf.Min((groundViability - 75.0f)/100.0f*maturity + 75.0f, groundViability);
-        
-        if (randNum <= computedSurvivability+miscFactors) return true;
-        else return false;
-    }
-
 }

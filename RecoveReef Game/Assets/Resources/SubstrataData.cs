@@ -8,7 +8,7 @@ public class SubstrataData
     [XmlAttribute("name")]
     public string name;
     [XmlElement("GroundViability")]
-    public float groundViability;
+    public int groundViability;
 
     public string dataToString() {
         string output = "---SubstrataData---";

@@ -3,51 +3,57 @@
     <CoralDatas>
         <CoralData name="branching">
             <GrowTime>15</GrowTime>
-            <Survivability>0.5</Survivability>
+            <Survivability>1</Survivability>
+            <Propagatability>6</Propagatability>
             <CarnivorousFishInterestBase>0.8</CarnivorousFishInterestBase>
             <HFProduction>0.1</HFProduction>
             <CoralType>fast</CoralType>
-            <PrefTerrain>shore</PrefTerrain>
+            <PrefTerrain>layer00</PrefTerrain>
         </CoralData>
         <CoralData name="columnar">
             <GrowTime>20</GrowTime>
-            <Survivability>0.5</Survivability>
+            <Survivability>2</Survivability>
+            <Propagatability>4</Propagatability>
             <CFProduction>0.2</CFProduction>
             <HFProduction>0.5</HFProduction>
             <CoralType>normal</CoralType>
-            <PrefTerrain>shore</PrefTerrain>
+            <PrefTerrain>layer00</PrefTerrain>
         </CoralData>
         <CoralData name="encrusting">
             <GrowTime>45</GrowTime>
-            <Survivability>0.5</Survivability>
+            <Survivability>4</Survivability>
+            <Propagatability>2</Propagatability>
             <CFProduction>0.15</CFProduction>
             <HFProduction>0.7</HFProduction>
             <CoralType>slow</CoralType>
-            <PrefTerrain>middle</PrefTerrain>
+            <PrefTerrain>layer01</PrefTerrain>
         </CoralData>
         <CoralData name="foliaceous">
             <GrowTime>25</GrowTime>
-            <Survivability>0.5</Survivability>
+            <Survivability>2</Survivability>
+            <Propagatability>5</Propagatability>
             <CFProduction>0.5</CFProduction>
             <HFProduction>0.3</HFProduction>
             <CoralType>normal</CoralType>
-            <PrefTerrain>middle</PrefTerrain>
+            <PrefTerrain>layer01</PrefTerrain>
         </CoralData>
         <CoralData name="laminar">
             <GrowTime>50</GrowTime>
-            <Survivability>0.5</Survivability>
+            <Survivability>5</Survivability>
+            <Propagatability>2</Propagatability>
             <CFProduction>0.4</CFProduction>
             <HFProduction>0.4</HFProduction>
             <CoralType>normal</CoralType>
-            <PrefTerrain>deep</PrefTerrain>
+            <PrefTerrain>layer02</PrefTerrain>
         </CoralData>
         <CoralData name="massive">
             <GrowTime>75</GrowTime>
-            <Survivability>0.5</Survivability>
+            <Survivability>6</Survivability>
+            <Propagatability>1</Propagatability>
             <CFProduction>0.1</CFProduction>
             <HFProduction>1.0</HFProduction>
             <CoralType>slow</CoralType>
-            <PrefTerrain>deep</PrefTerrain>
+            <PrefTerrain>layer02</PrefTerrain>
         </CoralData>
     </CoralDatas>
 </CoralDataCollection>

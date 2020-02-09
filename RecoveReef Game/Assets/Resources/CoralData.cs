@@ -12,7 +12,9 @@ public class CoralData
     public int growTime;
 
     [XmlElement("Survivability")]
-    public float survivability;
+    public int survivability;
+    [XmlElement("Propagatability")]
+    public int propagatability;
 
     [XmlElement("CFProduction")]
     public float cfProduction;

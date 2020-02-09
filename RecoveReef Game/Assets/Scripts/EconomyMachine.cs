@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Text.RegularExpressions;
 
 public class EconomyMachine
 {
@@ -17,15 +18,20 @@ public class EconomyMachine
 
     public bool algaeWillSurvive (AlgaeCellData algaeCellData, float groundViability, float additiveFactors, float multiplicativeFactors) {
         bool result = true;
-        float computedSurvivability = (groundViability - 75.0f)/100.0f*algaeCellData.maturity + 75.0f;
-        result = (computedSurvivability <= UnityEngine.Random.Range(0.0f,100.0f));
+        // float computedSurvivability = (groundViability - 75.0f)/100.0f*algaeCellData.maturity + 75.0f;
+        result = (UnityEngine.Random.Range(0.0f,100.0f) <= 5f);
         return result;
     }
 
-    public bool coralWillSurvive (CoralCellData coralCellData, float groundViability, float additiveFactors, float multiplicativeFactors) {
+    public bool coralWillSurvive (CoralCellData coralCellData, int groundViability, int additiveFactors, string groundName) {
         bool result = true;
-        float computedSurvivability = (groundViability - 75.0f)/100.0f*coralCellData.maturity + 75.0f;
-        result = (UnityEngine.Random.Range(0.0f,100.0f) <= computedSurvivability+additiveFactors);
+        // groundViability + coralCellData.maturity + coralCellData.coralData.survivability + additiveFactors + (-2 if not apt area else +2)
+        int computedSurvivability = groundViability 
+                                    + coralCellData.maturity 
+                                    + coralCellData.coralData.survivability 
+                                    + additiveFactors
+                                    + (Regex.IsMatch(groundName, "." + coralCellData.coralData.prefTerrain + ".") ? 2 : -2);
+        result = (UnityEngine.Random.Range(0,1001) <= computedSurvivability);
         return result;
     }
 
@@ -43,7 +49,7 @@ public class EconomyMachine
         float basePropagationChance = UnityEngine.Random.Range(50.0f,60.0f); // USE CELL DATA FOR THIS
         float computedPropagationChance = basePropagationChance + UnityEngine.Random.Range(0.0f, 5.0f) + additiveFactors;
         computedPropagationChance = Mathf.Min(100.0f, computedPropagationChance*multiplicativeFactors);
-        result = (UnityEngine.Random.Range(0.0f,100.0f) <= computedPropagationChance);
+        result = (UnityEngine.Random.Range(0.0f,100.0f) <= 5f);
         return result;
     }
 

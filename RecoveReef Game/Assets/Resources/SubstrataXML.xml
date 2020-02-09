@@ -2,13 +2,13 @@
 <SubstrataCollection>
     <Substratas>
         <Substrata name="small">
-            <GroundViability>90.0</GroundViability>
+            <GroundViability>950</GroundViability>
         </Substrata>
         <Substrata name="med">
-            <GroundViability>97.0</GroundViability>
+            <GroundViability>963</GroundViability>
         </Substrata>
         <Substrata name="big">
-            <GroundViability>99.9</GroundViability>
+            <GroundViability>970</GroundViability>
         </Substrata>
     </Substratas>
 </SubstrataCollection>
