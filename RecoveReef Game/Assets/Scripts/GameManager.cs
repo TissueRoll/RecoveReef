@@ -335,10 +335,10 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.Backspace)) {
-            gameIsWon = true;
-            endTheGame("force end");
-        }
+        // if (Input.GetKeyDown(KeyCode.Backspace)) {
+        //     gameIsWon = true;
+        //     endTheGame("force end");
+        // }
 
         if (PauseScript.GamePaused) {
             return;
@@ -482,7 +482,7 @@ public class GameManager : MonoBehaviour
             endTheGame("The reef could not recover...");
         }
 
-        if (fishIncome >= 500000f) {
+        if (fishIncome >= 150f) {
             timeUntilEnd.updateTime();
         } else {
             timeUntilEnd.reset();
@@ -602,7 +602,7 @@ public class GameManager : MonoBehaviour
                             localPlace, 
                             algaeTileMap, 
                             algaeCells[key].TileBase, 
-                            0.0f, 
+                            50.0f, 
                             algaeDataContainer.algae[findIndexOfEntityFromName(algaeCells[key].TileBase.name)]
                         );
                         hfTotalProduction += cell.algaeData.hfProduction;
@@ -667,9 +667,9 @@ public class GameManager : MonoBehaviour
         if (coralTileMap.HasTile(position)) {
             feedbackDialogue("Can't put corals on top of other corals!.", globalVarContainer.globalVariables.feedbackDelayTime);
         } else if (algaeTileMap.HasTile(position)) {
-            feedbackDialogue("Can't put corals on top of algae! The coral will die!.", globalVarContainer.globalVariables.feedbackDelayTime);
+            feedbackDialogue("Can't put corals on top of algae! The coral will die!", globalVarContainer.globalVariables.feedbackDelayTime);
         } else if (substrataOverlayTileMap.HasTile(position)) {
-            feedbackDialogue("This is a toxic tile! Coral won't survive here.", globalVarContainer.globalVariables.feedbackDelayTime);
+            feedbackDialogue("This is a toxic tile! Corals won't survive here.", globalVarContainer.globalVariables.feedbackDelayTime);
         }else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && readyNum > 0) { 
             successful = true;
             int tempIdx = getIndexOfReadyCoral(type);
@@ -682,7 +682,7 @@ public class GameManager : MonoBehaviour
                 position, 
                 coralTileMap, 
                 coralTileBases[type], 
-                0.0f, 
+                75.0f, 
                 coralBaseData.corals[type]
             );
             coralCells.Add(position, cell);
@@ -740,7 +740,7 @@ public class GameManager : MonoBehaviour
                             localPlace, 
                             coralTileMap, 
                             coralCells[key].TileBase, 
-                            0.0f, 
+                            75.0f, 
                             coralBaseData.corals[findIndexOfEntityFromName(coralCells[key].TileBase.name)]
                         );
                         cfTotalProduction += cell.coralData.cfProduction;
