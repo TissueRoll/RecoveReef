@@ -261,7 +261,7 @@ public class GameManager : MonoBehaviour
         // Setting the substrata data
         foreach (Vector3Int pos in substrataTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
-            if (!substrataTileMap.HasTile(localPlace)) continue;
+            if (!substrataTileMap.HasTile(localPlace) || !withinBoardBounds(localPlace, 30)) continue;
             TileBase currentTB = substrataTileMap.GetTile(localPlace);
             int idx = findIndexOfEntityFromName(currentTB.name);
             if (idx == -1) { // UNKNOWN TILE; FOR NOW TOXIC
@@ -447,7 +447,7 @@ public class GameManager : MonoBehaviour
         }
 
         if (!showNursery) {
-            moveCameraWASD(20f);
+            moveCameraWASD(40f);
             if (edgeScrollingEnabled) moveCameraMouseEdge(20f,10f);
             zoomKeys(5f);
             clampCamera();
@@ -548,7 +548,9 @@ public class GameManager : MonoBehaviour
 
     private void updateFishData() {        
         updateFishOutput();
-        fishDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = "Fish Income: " + fishIncome;
+
+        fishDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = "Fish Income: " + fishIncome
+                                                            + (hfTotalProduction >= cfTotalProduction ? "\nFlourishing!" : "\nUnbalanced...");
     }
 
     // __ECONOMY__
@@ -563,10 +565,17 @@ public class GameManager : MonoBehaviour
         foreach (Vector3Int key in keys) {
             if (algaeCells[key].maturity <= 25) {
                 algaeCells[key].addMaturity(1);
-                if (!economyMachine.algaeWillSurvive(algaeCells[key], substrataCells[key], coralSurvivabilityDebuff)) {
-                    algaeTileMap.SetTile(key, null);
-                    algaeCells.Remove(key);
+            }
+            HashSet<Vector3Int> coralsAround = spread(key, 1);
+            int weightedCoralMaturity = 0;
+            foreach(Vector3Int pos in coralsAround) {
+                if (coralCells.ContainsKey(pos)) {
+                    weightedCoralMaturity += coralCells[pos].maturity;
                 }
+            }
+            if (!economyMachine.algaeWillSurvive(algaeCells[key], substrataCells[key], -4*weightedCoralMaturity/3+coralSurvivabilityDebuff)) {
+                algaeTileMap.SetTile(key, null);
+                algaeCells.Remove(key);
             }
         }
     }
@@ -668,13 +677,15 @@ public class GameManager : MonoBehaviour
         print("position: " + position);
         int readyNum = getReadyCoralsPerType(type);
         int loadedNum = getCoralsPerType(type);
-        if (coralTileMap.HasTile(position)) {
+        if (!withinBoardBounds(position, 30)) {
+            feedbackDialogue("Bawal dito", globalVarContainer.globalVariables.feedbackDelayTime);
+        } else if (coralTileMap.HasTile(position)) {
             feedbackDialogue("Can't put corals on top of other corals!.", globalVarContainer.globalVariables.feedbackDelayTime);
         } else if (algaeTileMap.HasTile(position)) {
             feedbackDialogue("Can't put corals on top of algae! The coral will die!", globalVarContainer.globalVariables.feedbackDelayTime);
         } else if (substrataOverlayTileMap.HasTile(position)) {
             feedbackDialogue("This is a toxic tile! Corals won't survive here.", globalVarContainer.globalVariables.feedbackDelayTime);
-        }else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && readyNum > 0) { 
+        } else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && readyNum > 0) { 
             successful = true;
             int tempIdx = getIndexOfReadyCoral(type);
             NursingCoral tempCoral = null;
@@ -776,7 +787,7 @@ public class GameManager : MonoBehaviour
         // chance: 1/100
         // random: random area selection
         // toxic: center must be a coral
-        int t = UnityEngine.Random.Range(0,1000);
+        int t = UnityEngine.Random.Range(0,1001);
         if (t == 69 || forceEvent == 1) {
             if (coralCells.Count > 15) {
                 Vector3Int pos = coralCells.ElementAt(UnityEngine.Random.Range(0,coralCells.Count)).Key;
@@ -880,7 +891,7 @@ public class GameManager : MonoBehaviour
     private void clampCamera() {
         cameraFollowPosition = new Vector3(
             Mathf.Clamp(cameraFollowPosition.x, -75f, 75f),
-            Mathf.Clamp(cameraFollowPosition.y, -75f, 75f),
+            Mathf.Clamp(cameraFollowPosition.y, -150f, 150f),
             cameraFollowPosition.z
         );
     }

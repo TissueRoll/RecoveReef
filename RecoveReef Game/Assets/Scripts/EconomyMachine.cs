@@ -49,7 +49,7 @@ public class EconomyMachine
 
     public bool algaeWillPropagate (AlgaeCellData algaeCellData, int additiveFactors, string groundName) {
         bool result = true;
-        int computedPropagatability = UnityEngine.Random.Range(40,51) // base
+        int computedPropagatability = UnityEngine.Random.Range(20,31) // base
                                     + algaeCellData.algaeData.propagatability 
                                     + additiveFactors;
         result = (UnityEngine.Random.Range(0,101) <= computedPropagatability);
