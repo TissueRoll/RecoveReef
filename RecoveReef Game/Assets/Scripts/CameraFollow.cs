@@ -55,7 +55,7 @@ public class CameraFollow : MonoBehaviour
                 newCameraPosition = cameraFollowPosition;
             }
             transform.position = new Vector3(
-                Mathf.Clamp(newCameraPosition.x,-75.0f,75.0f),
+                Mathf.Clamp(newCameraPosition.x,-90.0f,90.0f),
                 Mathf.Clamp(newCameraPosition.y,-150.0f,150.0f),
                 newCameraPosition.z
             );

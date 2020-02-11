@@ -261,7 +261,11 @@ public class GameManager : MonoBehaviour
         // Setting the substrata data
         foreach (Vector3Int pos in substrataTileMap.cellBounds.allPositionsWithin) {
             Vector3Int localPlace = new Vector3Int(pos.x, pos.y, pos.z);
-            if (!substrataTileMap.HasTile(localPlace) || !withinBoardBounds(localPlace, 30)) continue;
+            if (!substrataTileMap.HasTile(localPlace)) continue;
+            if (!withinBoardBounds(localPlace, 30)) {
+                substrataTileMap.SetTile(localPlace, null);
+                continue;
+            }
             TileBase currentTB = substrataTileMap.GetTile(localPlace);
             int idx = findIndexOfEntityFromName(currentTB.name);
             if (idx == -1) { // UNKNOWN TILE; FOR NOW TOXIC
@@ -890,8 +894,8 @@ public class GameManager : MonoBehaviour
 
     private void clampCamera() {
         cameraFollowPosition = new Vector3(
-            Mathf.Clamp(cameraFollowPosition.x, -75f, 75f),
-            Mathf.Clamp(cameraFollowPosition.y, -150f, 150f),
+            Mathf.Clamp(cameraFollowPosition.x, -90.0f, 90.0f),
+            Mathf.Clamp(cameraFollowPosition.y, -150.0f, 150.0f),
             cameraFollowPosition.z
         );
     }
