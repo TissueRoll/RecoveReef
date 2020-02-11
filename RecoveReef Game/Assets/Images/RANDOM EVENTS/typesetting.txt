@@ -1,0 +1,2 @@
+titan one for title 36pt
+open sans semibold for body text 24pt
