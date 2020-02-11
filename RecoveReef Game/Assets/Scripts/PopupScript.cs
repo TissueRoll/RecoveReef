@@ -8,11 +8,21 @@ public class PopupScript : MonoBehaviour
 
     public GameObject popupCanvas;
     public GameObject outText;
+    public GameObject popupTitle;
+    public UnityEngine.UI.Image popupSprite;
 
     void Update() {
         if (!GameEnd.gameHasEnded && !PauseScript.GamePaused && Input.GetKeyDown(KeyCode.Return)) {
             ClosePopup();
         }
+    }
+
+    public void SetPopupSprite(Sprite sprite) {
+        popupSprite.sprite = sprite;
+    }
+
+    public void SetPopupTitle(string e) {
+        popupTitle.GetComponent<TMPro.TextMeshProUGUI>().text = e;
     }
 
     public void SetPopupMessage(string e) {
@@ -25,7 +35,7 @@ public class PopupScript : MonoBehaviour
         PopupOpen = true;
     }
 
-    void ClosePopup() {
+    public void ClosePopup() {
         popupCanvas.SetActive(false);
         Time.timeScale = 1f;
         PopupOpen = false;
