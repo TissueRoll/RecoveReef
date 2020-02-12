@@ -32,7 +32,7 @@ public class EconomyMachine
                                     + coralCellData.maturity 
                                     + coralCellData.coralData.survivability 
                                     + additiveFactors
-                                    + (Regex.IsMatch(groundName, "." + coralCellData.coralData.prefTerrain + ".") ? 2 : -2);
+                                    + (Regex.IsMatch(groundName, "." + coralCellData.coralData.prefTerrain + ".") ? 5 : -10);
         result = (UnityEngine.Random.Range(0,1001) <= computedSurvivability);
         return result;
     }
@@ -42,7 +42,7 @@ public class EconomyMachine
         int computedPropagatability = UnityEngine.Random.Range(30,41) // base
                                     + coralCellData.coralData.propagatability 
                                     + additiveFactors
-                                    + (Regex.IsMatch(groundName, "." + coralCellData.coralData.prefTerrain + ".") ? 5 : -3);
+                                    + (Regex.IsMatch(groundName, "." + coralCellData.coralData.prefTerrain + ".") ? 5 : -10);
         result = (UnityEngine.Random.Range(0,101) <= computedPropagatability);
         return result;
     }

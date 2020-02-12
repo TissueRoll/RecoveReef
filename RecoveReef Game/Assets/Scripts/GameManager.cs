@@ -595,7 +595,7 @@ public class GameManager : MonoBehaviour
                     weightedCoralMaturity += coralCells[pos].maturity;
                 }
             }
-            if (!economyMachine.algaeWillSurvive(algaeCells[key], substrataCells[key], -17*weightedCoralMaturity/12+coralSurvivabilityDebuff)) {
+            if (!economyMachine.algaeWillSurvive(algaeCells[key], substrataCells[key], -3*weightedCoralMaturity/2+coralSurvivabilityDebuff)) {
                 algaeTileMap.SetTile(key, null);
                 algaeCells.Remove(key);
             }
@@ -750,7 +750,7 @@ public class GameManager : MonoBehaviour
                 // __FIX__ MAYBE USE SPREAD?
                 for (int i = 0; i < 6; i++)
                     if (coralCells.ContainsKey(key+hexNeighbors[key.y&1, i]))
-                        miscFactors += coralCells[key+hexNeighbors[key.y&1, i]].maturity/3; 
+                        miscFactors += coralCells[key+hexNeighbors[key.y&1, i]].maturity/5; 
                 coralCells[key].addMaturity(1);
                 if (!economyMachine.coralWillSurvive(coralCells[key], substrataCells[key], miscFactors-coralSurvivabilityDebuff, groundTileMap.GetTile(key).name)) {
                     // setting data

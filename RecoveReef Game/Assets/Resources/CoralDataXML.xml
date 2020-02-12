@@ -2,7 +2,7 @@
 <CoralDataCollection>
     <CoralDatas>
         <CoralData name="branching">
-            <GrowTime>12</GrowTime>
+            <GrowTime>10</GrowTime>
             <Survivability>1</Survivability>
             <Propagatability>6</Propagatability>
             <CFProduction>1.0</CFProduction>
@@ -11,7 +11,7 @@
             <PrefTerrain>layer00</PrefTerrain>
         </CoralData>
         <CoralData name="columnar">
-            <GrowTime>20</GrowTime>
+            <GrowTime>18</GrowTime>
             <Survivability>2</Survivability>
             <Propagatability>4</Propagatability>
             <CFProduction>0.5</CFProduction>
@@ -20,7 +20,7 @@
             <PrefTerrain>layer00</PrefTerrain>
         </CoralData>
         <CoralData name="encrusting">
-            <GrowTime>45</GrowTime>
+            <GrowTime>42</GrowTime>
             <Survivability>4</Survivability>
             <Propagatability>2</Propagatability>
             <CFProduction>0.3</CFProduction>
@@ -29,7 +29,7 @@
             <PrefTerrain>layer01</PrefTerrain>
         </CoralData>
         <CoralData name="foliaceous">
-            <GrowTime>25</GrowTime>
+            <GrowTime>22</GrowTime>
             <Survivability>2</Survivability>
             <Propagatability>5</Propagatability>
             <CFProduction>0.55</CFProduction>
@@ -38,7 +38,7 @@
             <PrefTerrain>layer01</PrefTerrain>
         </CoralData>
         <CoralData name="laminar">
-            <GrowTime>55</GrowTime>
+            <GrowTime>52</GrowTime>
             <Survivability>5</Survivability>
             <Propagatability>2</Propagatability>
             <CFProduction>0.3</CFProduction>
