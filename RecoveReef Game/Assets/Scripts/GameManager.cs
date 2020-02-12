@@ -236,7 +236,7 @@ public class GameManager : MonoBehaviour
         initializeTiles();
         print("initialization done");
         tempTimer = new CountdownTimer(globalVarContainer.globalVariables.maxGameTime);
-        disasterTimer = new CountdownTimer(60f); // make into first 5 mins immunity
+        disasterTimer = new CountdownTimer(30f); // make into first 5 mins immunity
         climateChangeTimer = new CountdownTimer(globalVarContainer.globalVariables.timeUntilClimateChange);
         climateChangeHasWarned = false;
         climateChangeHasHappened = false;
@@ -463,7 +463,7 @@ public class GameManager : MonoBehaviour
         }
 
         if (!showNursery) {
-            moveCameraWASD(40f);
+            moveCameraWASD(100f);
             if (edgeScrollingEnabled) moveCameraMouseEdge(20f,10f);
             zoomKeys(5f);
             clampCamera();
@@ -505,7 +505,7 @@ public class GameManager : MonoBehaviour
             endTheGame("The reef could not recover...");
         }
 
-        if (fishIncome >= 150f) {
+        if (fishIncome >= 350.0f) {
             timeUntilEnd.updateTime();
         } else {
             timeUntilEnd.reset();
@@ -595,7 +595,7 @@ public class GameManager : MonoBehaviour
                     weightedCoralMaturity += coralCells[pos].maturity;
                 }
             }
-            if (!economyMachine.algaeWillSurvive(algaeCells[key], substrataCells[key], -4*weightedCoralMaturity/3+coralSurvivabilityDebuff)) {
+            if (!economyMachine.algaeWillSurvive(algaeCells[key], substrataCells[key], -17*weightedCoralMaturity/12+coralSurvivabilityDebuff)) {
                 algaeTileMap.SetTile(key, null);
                 algaeCells.Remove(key);
             }
@@ -857,7 +857,7 @@ public class GameManager : MonoBehaviour
         economyMachine.updateHFCF(hfTotalProduction, cfTotalProduction);
         float hf = economyMachine.getActualHF();
         float cf = economyMachine.getActualCF();
-        fishIncome = (int)Math.Round(economyMachine.getTotalFish());
+        fishIncome = (int)Math.Round(economyMachine.getTotalFish())-totalPlasticSpawned/3;
     }
     #endregion
 
