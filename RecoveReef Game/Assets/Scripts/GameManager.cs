@@ -60,9 +60,10 @@ public class GameManager : MonoBehaviour
     CoralDataContainer coralBaseData;
     SubstrataDataContainer substrataDataContainer;
     AlgaeDataContainer algaeDataContainer;
-    Color progressNotDone = new Color(43f/255f,90f/255f,147f/255f,1f);
-    Color progressIsDone = new Color(0f,1f,176f/255f,1f);
-    Color progressDefinitelyDone = new Color(1f, 200f/255f, 102f/255f, 1f);
+    Color progressNone = new Color(43f/255f,90f/255f,147f/255f,1f);
+    Color progressZero = new Color(247f/255f,104f/255f,9f/255f,1f); // new Color(69f/255f,129f/255f,201f/255f,1f);
+    Color progressIsDone = new Color(249f/255f, 237f/255f, 6f/255f, 1f); // new Color(0f,1f,17f/255f,1f); // new Color(0f,1f,176f/255f,1f);
+    Color progressDefinitelyDone = new Color(0f,1f,17f/255f,1f); // new Color(1f, 200f/255f, 102f/255f, 1f);
     #endregion
     #region Global Changing Values
     private float zoom;
@@ -398,7 +399,7 @@ public class GameManager : MonoBehaviour
         // test script for popup messages
         if (Input.GetKeyDown(KeyCode.Slash)) {
             // makePopup("Title", "Hello!", false);
-            randomDisaster(1);
+            randomDisaster(2);
         }
         #endregion
 
@@ -417,17 +418,17 @@ public class GameManager : MonoBehaviour
             tryGrowCoral(5);
         } 
 
-        if (Input.GetKeyDown(KeyCode.Z)) {
+        if (Input.GetKeyDown(KeyCode.F1)) {
             change_coral(0);
-        } else if (Input.GetKeyDown(KeyCode.X)) {
+        } else if (Input.GetKeyDown(KeyCode.F2)) {
             change_coral(1);
-        } else if (Input.GetKeyDown(KeyCode.C)) {
+        } else if (Input.GetKeyDown(KeyCode.F3)) {
             change_coral(2);
-        } else if (Input.GetKeyDown(KeyCode.V)) {
+        } else if (Input.GetKeyDown(KeyCode.F4)) {
             change_coral(3);
-        } else if (Input.GetKeyDown(KeyCode.B)) {
+        } else if (Input.GetKeyDown(KeyCode.F5)) {
             change_coral(4);
-        } else if (Input.GetKeyDown(KeyCode.N)) {
+        } else if (Input.GetKeyDown(KeyCode.F6)) {
             change_coral(5);
         }
 
@@ -458,13 +459,13 @@ public class GameManager : MonoBehaviour
         }
         
         // transporting to some far off place for the nursery
-        if (Input.GetKeyDown(KeyCode.DownArrow)) {
+        if (Input.GetKeyDown(KeyCode.K)) {
             operateNursery();
         }
 
         if (!showNursery) {
             moveCameraWASD(100f);
-            if (edgeScrollingEnabled) moveCameraMouseEdge(20f,10f);
+            if (edgeScrollingEnabled) moveCameraMouseEdge(100f,10f);
             zoomKeys(5f);
             clampCamera();
         }
@@ -479,7 +480,7 @@ public class GameManager : MonoBehaviour
             for (int j = 0; j < globalVarContainer.globalVariables.maxSpacePerCoral; j++) {
                 Sprite currentPositionSprite = rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().sprite;
                 if (growingCorals[i][j] == null) {
-                    thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = progressNotDone;
+                    thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = progressNone;
                     if (currentPositionSprite.name != emptyRack.name)
                         rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().sprite = emptyRack;
                     continue;
@@ -487,7 +488,7 @@ public class GameManager : MonoBehaviour
                 growingCorals[i][j].timer.updateTime();
                 bool currentCoralDone = growingCorals[i][j].timer.isDone();
                 if (!currentCoralDone)
-                    thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.Lerp(progressNotDone, progressIsDone, growingCorals[i][j].timer.percentComplete);
+                    thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.Lerp(progressZero, progressIsDone, growingCorals[i][j].timer.percentComplete);
                 else if (currentCoralDone && thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color != progressDefinitelyDone)
                     thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = progressDefinitelyDone;
                 if (currentCoralDone && currentPositionSprite.name != bigRack[i].name) 
@@ -809,7 +810,7 @@ public class GameManager : MonoBehaviour
         // chance: 1/100
         // random: random area selection
         // toxic: center must be a coral
-        int t = UnityEngine.Random.Range(0,101);
+        int t = UnityEngine.Random.Range(1,76);
         if (t == 69 || forceEvent == 1) {
             if (coralCells.Count > 15) {
                 Vector3Int pos = coralCells.ElementAt(UnityEngine.Random.Range(0,coralCells.Count)).Key;
