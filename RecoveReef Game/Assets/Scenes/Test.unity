@@ -148022,6 +148022,11 @@ PrefabInstance:
       propertyPath: ccOverlay
       value: 
       objectReference: {fileID: 1519821154}
+    - target: {fileID: 3847284264381601591, guid: a42c425e58ec2bc4b9b466b78437a1df,
+        type: 3}
+      propertyPath: fishImage
+      value: 
+      objectReference: {fileID: 216187591}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a42c425e58ec2bc4b9b466b78437a1df, type: 3}
 --- !u!1 &993739988

@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TileBase[] substrataTileBases;
     [SerializeField] private TileBase[] toxicTileBases;
     [SerializeField] private GameObject fishDisplay;
+    [SerializeField] private GameObject fishImage;
     [SerializeField] private GameObject timeLeft;
     [SerializeField] private GameObject feedbackText;
     [SerializeField] private GameObject CNC;
@@ -330,6 +331,11 @@ public class GameManager : MonoBehaviour
 
     private void initializeGame() {
         fishDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = "Fish Income: 0";
+        if (hfTotalProduction >= cfTotalProduction) {
+            fishImage.GetComponent<UnityEngine.UI.Image>().color = new Color(73f/255f,196f/255f,114f/255f,1f);
+        } else {
+            fishImage.GetComponent<UnityEngine.UI.Image>().color = new Color(209f/255f,44f/255f,44f/255f,1f);
+        }
         timeLeft.GetComponent<TMPro.TextMeshProUGUI>().text = convertTimetoMS(tempTimer.currentTime);
     }
 
@@ -403,6 +409,10 @@ public class GameManager : MonoBehaviour
         }
         #endregion
 
+        if (Input.GetKeyDown(KeyCode.Backslash)) {
+            hfTotalProduction += 10000;
+        }
+
         #region Keyboard Shortcuts
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
             tryGrowCoral(0);
@@ -418,17 +428,17 @@ public class GameManager : MonoBehaviour
             tryGrowCoral(5);
         } 
 
-        if (Input.GetKeyDown(KeyCode.F1)) {
+        if (Input.GetKeyDown(KeyCode.F1) || Input.GetKeyDown(KeyCode.Z)) {
             change_coral(0);
-        } else if (Input.GetKeyDown(KeyCode.F2)) {
+        } else if (Input.GetKeyDown(KeyCode.F2) || Input.GetKeyDown(KeyCode.X)) {
             change_coral(1);
-        } else if (Input.GetKeyDown(KeyCode.F3)) {
+        } else if (Input.GetKeyDown(KeyCode.F3) || Input.GetKeyDown(KeyCode.C)) {
             change_coral(2);
-        } else if (Input.GetKeyDown(KeyCode.F4)) {
+        } else if (Input.GetKeyDown(KeyCode.F4) || Input.GetKeyDown(KeyCode.V)) {
             change_coral(3);
-        } else if (Input.GetKeyDown(KeyCode.F5)) {
+        } else if (Input.GetKeyDown(KeyCode.F5) || Input.GetKeyDown(KeyCode.B)) {
             change_coral(4);
-        } else if (Input.GetKeyDown(KeyCode.F6)) {
+        } else if (Input.GetKeyDown(KeyCode.F6) || Input.GetKeyDown(KeyCode.N)) {
             change_coral(5);
         }
 
@@ -573,6 +583,11 @@ public class GameManager : MonoBehaviour
         updateFishOutput();
 
         fishDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = "Fish Income: " + fishIncome;
+        if (hfTotalProduction >= cfTotalProduction) {
+            fishImage.GetComponent<UnityEngine.UI.Image>().color = new Color(73f/255f,196f/255f,114f/255f,1f);
+        } else {
+            fishImage.GetComponent<UnityEngine.UI.Image>().color = new Color(209f/255f,44f/255f,44f/255f,1f);
+        }
     }
 
     // __ECONOMY__
