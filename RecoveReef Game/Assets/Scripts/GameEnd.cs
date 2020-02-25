@@ -24,4 +24,10 @@ public class GameEnd : MonoBehaviour
     public void endMessage(string s) {
         gameEndCanvas.transform.Find("Panel/ScreenOrganizer/Texts/FlavorText").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = s;
     }
+
+    public void resetEndScreen() {
+        gameHasEnded = false;
+        gameEndCanvas.SetActive(false);
+        Time.timeScale = 1f;
+    }
 }

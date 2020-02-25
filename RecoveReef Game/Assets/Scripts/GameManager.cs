@@ -572,8 +572,7 @@ public class GameManager : MonoBehaviour
     private void updateFishData() {        
         updateFishOutput();
 
-        fishDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = "Fish Income: " + fishIncome
-                                                            + (hfTotalProduction >= cfTotalProduction ? "\nFlourishing!" : "\nUnbalanced...");
+        fishDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = "Fish Income: " + fishIncome;
     }
 
     // __ECONOMY__
