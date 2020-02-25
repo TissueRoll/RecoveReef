@@ -11,6 +11,10 @@ public class MainMenuManager : MonoBehaviour
         SceneManager.LoadScene("Test");
     }
 
+    public void getTrained() {
+        SceneManager.LoadScene("TestCopy");
+    }
+
     public void getExit() {
         print("Game has been quit.");
         Application.Quit();
