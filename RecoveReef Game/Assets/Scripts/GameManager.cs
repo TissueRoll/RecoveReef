@@ -334,7 +334,7 @@ public class GameManager : MonoBehaviour
         if (hfTotalProduction >= cfTotalProduction) {
             fishImage.GetComponent<UnityEngine.UI.Image>().color = new Color(73f/255f,196f/255f,114f/255f,1f);
         } else {
-            fishImage.GetComponent<UnityEngine.UI.Image>().color = new Color(209f/255f,44f/255f,44f/255f,1f);
+            fishImage.GetComponent<UnityEngine.UI.Image>().color = new Color(255f/255f,69f/255f,69f/255f,1f);
         }
         timeLeft.GetComponent<TMPro.TextMeshProUGUI>().text = convertTimetoMS(tempTimer.currentTime);
     }
@@ -586,7 +586,7 @@ public class GameManager : MonoBehaviour
         if (hfTotalProduction >= cfTotalProduction) {
             fishImage.GetComponent<UnityEngine.UI.Image>().color = new Color(73f/255f,196f/255f,114f/255f,1f);
         } else {
-            fishImage.GetComponent<UnityEngine.UI.Image>().color = new Color(209f/255f,44f/255f,44f/255f,1f);
+            fishImage.GetComponent<UnityEngine.UI.Image>().color = new Color(255f/255f,69f/255f,69f/255f,1f);
         }
     }
 
