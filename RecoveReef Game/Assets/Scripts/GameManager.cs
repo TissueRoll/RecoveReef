@@ -48,6 +48,34 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int level;
     #pragma warning restore 0649
     #endregion
+    #region Components of GameObjects
+    Grid grid;
+    TMPro.TextMeshProUGUI fishDisplayText;
+    UnityEngine.UI.Image fishImageImage;
+    TMPro.TextMeshProUGUI timeLeftText;
+    TMPro.TextMeshProUGUI ccTimerText;
+    ClimateChangeTimer ccTimer;
+
+    TMPro.TextMeshProUGUI cncText;
+    GameEnd endGameScript;
+    PopupScript popupScript;
+    TMPro.TextMeshProUGUI feedbackTextText;
+    MenuAnimator hudOpenSidebar;
+    private void initializeComponents() {
+        grid = GameObject.Find("Grid").GetComponent<Grid>();
+        fishDisplayText = fishDisplay.GetComponent<TMPro.TextMeshProUGUI>();
+        fishImageImage = fishImage.GetComponent<UnityEngine.UI.Image>();
+        timeLeftText = timeLeft.GetComponent<TMPro.TextMeshProUGUI>();
+        ccTimerText = ccTimerImage.transform.Find("CCTimeLeft").gameObject.GetComponent<TMPro.TextMeshProUGUI>();
+        ccTimer = ccTimerImage.GetComponent<ClimateChangeTimer>();
+        
+        cncText = CNC.GetComponent<TMPro.TextMeshProUGUI>();
+        endGameScript = endGameScreen.GetComponent<GameEnd>();
+        popupScript = popupCanvas.GetComponent<PopupScript>();
+        feedbackTextText = feedbackText.GetComponent<TMPro.TextMeshProUGUI>();
+        hudOpenSidebar = cameraFollow.GetComponent<MenuAnimator>();
+    }
+    #endregion
     #region Data Structures for the Game
     private Dictionary<Vector3Int,CoralCellData> coralCells;
     private Dictionary<Vector3Int,int> substrataCells;
@@ -96,7 +124,6 @@ public class GameManager : MonoBehaviour
 
     #region Generic Helper Functions
     private Vector3Int getMouseGridPosition() {
-        Grid grid = GameObject.Find("Grid").GetComponent<Grid>();
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Vector3 worldPoint = ray.GetPoint(-ray.origin.z/ray.direction.z);
         Vector3Int position = grid.WorldToCell(worldPoint);
@@ -228,6 +255,7 @@ public class GameManager : MonoBehaviour
         } else if (instance != this) {
             Destroy(gameObject);
         }
+        initializeComponents();
         print("loading XML data...");
         globalVarContainer = GlobalContainer.Load("GlobalsXML");
         substrataDataContainer = SubstrataDataContainer.Load("SubstrataXML");
@@ -332,13 +360,13 @@ public class GameManager : MonoBehaviour
     }
 
     private void initializeGame() {
-        fishDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = "Fish Income: 0";
+        fishDisplayText.text = "Fish Income: 0";
         if (hfTotalProduction >= cfTotalProduction) {
-            fishImage.GetComponent<UnityEngine.UI.Image>().color = new Color(73f/255f,196f/255f,114f/255f,1f);
+            fishImageImage.color = new Color(73f/255f,196f/255f,114f/255f,1f);
         } else {
-            fishImage.GetComponent<UnityEngine.UI.Image>().color = new Color(255f/255f,69f/255f,69f/255f,1f);
+            fishImageImage.color = new Color(255f/255f,69f/255f,69f/255f,1f);
         }
-        timeLeft.GetComponent<TMPro.TextMeshProUGUI>().text = convertTimetoMS(tempTimer.currentTime);
+        timeLeftText.text = convertTimetoMS(tempTimer.currentTime);
     }
 
     private void Start() {
@@ -388,17 +416,17 @@ public class GameManager : MonoBehaviour
         
         if (!climateChangeTimer.isDone()) {
             climateChangeTimer.updateTime();
-            ccTimerImage.transform.Find("CCTimeLeft").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = convertTimetoMS(climateChangeTimer.currentTime);
+            ccTimerText.text = convertTimetoMS(climateChangeTimer.currentTime);
         }
         if (!climateChangeHasWarned && climateChangeTimer.currentTime <= climateChangeTimer.timeDuration*(2.0/3.0)) {
             climateChangeHasWarned = true;
             ccTimerImage.transform.Find("CCTimeLeft").gameObject.SetActive(true);
-            ccTimerImage.GetComponent<ClimateChangeTimer>().climateChangeIsHappen();
+            ccTimer.climateChangeIsHappen();
             makePopup("Climate Change is coming...", "Scientists have predicted that our carbon emmisions will lead to devastating damages to sea life in a few years! This could slow down the growth of coral reefs soon...");
         } else if (climateChangeHasWarned && !climateChangeHasHappened && climateChangeTimer.isDone()) {
             climateChangeHasHappened = true;
             // ccTimerImage.transform.Find("CCTimeLeft").gameObject.SetActive(false);
-            // ccTimerImage.GetComponent<ClimateChangeTimer>().climateChangeIsHappen();
+            // ccTimer.climateChangeIsHappen();
             ccOverlay.SetActive(true);
             makePopup("Climate Change has come...", "Scientists have determined that the increased temperature and ocean acidity has slowed down coral growth! We have to make a greater effort to coral conservation and rehabilitation!");
             applyClimateChange();
@@ -483,6 +511,7 @@ public class GameManager : MonoBehaviour
         }
         #endregion
         
+        // __INEFFICIENT__
         for (int i = 0; i < 6; i++) {
             GameObject thing = CoralOptions[i].transform.Find("CoralIndicator").gameObject;
             GameObject rack = nurseryCamera.transform.Find("NurseryCanvas/Racks")
@@ -510,10 +539,10 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        CNC.GetComponent<TMPro.TextMeshProUGUI>().text = getCoralsInNursery() + "/" + globalVarContainer.globals[level].maxSpaceInNursery + " SLOTS LEFT";
+        cncText.text = getCoralsInNursery() + "/" + globalVarContainer.globals[level].maxSpaceInNursery + " SLOTS LEFT";
 
         tempTimer.updateTime();
-        timeLeft.GetComponent<TMPro.TextMeshProUGUI>().text = convertTimetoMS(tempTimer.currentTime);
+        timeLeftText.text = convertTimetoMS(tempTimer.currentTime);
         if (tempTimer.isDone()) {
             endTheGame("The reef could not recover...");
         }
@@ -533,10 +562,10 @@ public class GameManager : MonoBehaviour
         totalPlasticSpawned += x;
     }
     private void endTheGame(string s) {
-        endGameScreen.GetComponent<GameEnd>().finalStatistics(fishIncome, convertTimetoMS(tempTimer.currentTime));
-        endGameScreen.GetComponent<GameEnd>().setCongrats((gameIsWon ? gameWinWordArt : gameLoseWordArt));
-        endGameScreen.GetComponent<GameEnd>().endMessage(s);
-        endGameScreen.GetComponent<GameEnd>().gameEndReached();
+        endGameScript.finalStatistics(fishIncome, convertTimetoMS(tempTimer.currentTime));
+        endGameScript.setCongrats((gameIsWon ? gameWinWordArt : gameLoseWordArt));
+        endGameScript.endMessage(s);
+        endGameScript.gameEndReached();
     }
     
     public void operateNursery() {
@@ -557,13 +586,13 @@ public class GameManager : MonoBehaviour
 
     private void makePopup(string title, string message, bool anthro = false) {
         if (anthro) {
-            popupCanvas.GetComponent<PopupScript>().SetPopupSprite(popupBoom);
+            popupScript.SetPopupSprite(popupBoom);
         } else {
-            popupCanvas.GetComponent<PopupScript>().SetPopupSprite(popupSad);
+            popupScript.SetPopupSprite(popupSad);
         }
-        popupCanvas.GetComponent<PopupScript>().SetPopupTitle(title);
-        popupCanvas.GetComponent<PopupScript>().SetPopupMessage(message);
-        popupCanvas.GetComponent<PopupScript>().OpenPopup();
+        popupScript.SetPopupTitle(title);
+        popupScript.SetPopupMessage(message);
+        popupScript.OpenPopup();
     }
 
     private void feedbackDialogue(string text, float time) {
@@ -571,24 +600,24 @@ public class GameManager : MonoBehaviour
     }
 
     IEnumerator ShowMessage(string text, float time) {
-        feedbackText.GetComponent<TMPro.TextMeshProUGUI>().text = text;
-        feedbackText.GetComponent<TMPro.TextMeshProUGUI>().enabled = true;
+        feedbackTextText.text = text;
+        feedbackTextText.enabled = true;
         yield return new WaitForSeconds(time);
-        feedbackText.GetComponent<TMPro.TextMeshProUGUI>().enabled = false;
+        feedbackTextText.enabled = false;
     }
 
     public void openThing() {
-        cameraFollow.GetComponent<MenuAnimator>().OpenThing();
+        hudOpenSidebar.OpenThing();
     }
 
     private void updateFishData() {        
         updateFishOutput();
 
-        fishDisplay.GetComponent<TMPro.TextMeshProUGUI>().text = "Fish Income: " + fishIncome;
+        fishDisplayText.text = "Fish Income: " + fishIncome;
         if (hfTotalProduction >= cfTotalProduction) {
-            fishImage.GetComponent<UnityEngine.UI.Image>().color = new Color(73f/255f,196f/255f,114f/255f,1f);
+            fishImageImage.color = new Color(73f/255f,196f/255f,114f/255f,1f);
         } else {
-            fishImage.GetComponent<UnityEngine.UI.Image>().color = new Color(255f/255f,69f/255f,69f/255f,1f);
+            fishImageImage.color = new Color(255f/255f,69f/255f,69f/255f,1f);
         }
     }
 
