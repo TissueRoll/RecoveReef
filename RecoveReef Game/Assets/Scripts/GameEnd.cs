@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameEnd : MonoBehaviour
 {
@@ -29,5 +30,21 @@ public class GameEnd : MonoBehaviour
         gameHasEnded = false;
         gameEndCanvas.SetActive(false);
         Time.timeScale = 1f;
+    }
+
+    public void goToMainMenu() {
+        resetEndScreen();
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    public void restartGame() {
+        resetEndScreen();
+        Scene scene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(scene.name);
+    }
+
+    public void quitGame() {
+        print("game has been quit");
+        Application.Quit();
     }
 }
