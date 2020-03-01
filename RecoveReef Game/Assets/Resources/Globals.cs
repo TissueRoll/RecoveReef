@@ -4,6 +4,8 @@ using System.Xml.Serialization;
 
 public class Globals
 {
+    [XmlAttribute("level")]
+    public int level;
     [XmlElement("Zoom")]
     public float zoom;
 
@@ -25,6 +27,7 @@ public class Globals
 
     public string what_are() {
         string output = "---";
+        output += "\nlevel: " + level;
         output += "\nzoom: " + zoom;
         output += "\nupdateDelay: " + updateDelay;
         output += "\nmaxSpaceInNursery: " + maxSpaceInNursery;

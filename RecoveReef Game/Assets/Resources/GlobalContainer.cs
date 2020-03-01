@@ -9,8 +9,9 @@ using System.IO;
 public class GlobalContainer
 {
 
-    [XmlElement("Globals")]
-    public Globals globalVariables;
+    [XmlArray("Globals")]
+    [XmlArrayItem("Global")]
+    public List<Globals> globals = new List<Globals>();
 
     public static GlobalContainer Load(string path) {
         TextAsset ta = Resources.Load<TextAsset>(path);

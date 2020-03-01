@@ -8,6 +8,7 @@ public class PlasticBag : MonoBehaviour
     void Start() {
         Vector2 randomPositionOnScreen = Camera.main.ViewportToWorldPoint(new Vector2(UnityEngine.Random.value, UnityEngine.Random.value));
         Vector3 pos = new Vector3(randomPositionOnScreen.x, randomPositionOnScreen.y+10, 0);
+        print(pos);
         this.gameObject.transform.position = pos;
         LTSeq seq = LeanTween.sequence();
         for (int i = 0; i < 10; i++) {

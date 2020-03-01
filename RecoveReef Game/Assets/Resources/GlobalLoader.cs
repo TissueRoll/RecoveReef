@@ -7,6 +7,6 @@ public class GlobalLoader : MonoBehaviour
 
     void Start() {
         GlobalContainer g = GlobalContainer.Load(path);
-        print(g.globalVariables.what_are());
+        // print(g.globalVariables.what_are());
     }
 }

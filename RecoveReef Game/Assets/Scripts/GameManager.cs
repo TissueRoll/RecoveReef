@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Sprite popupBoom;
     [SerializeField] private GameObject ccTimerImage;
     [SerializeField] private GameObject ccOverlay;
+    [SerializeField] private int level;
     #pragma warning restore 0649
     #endregion
     #region Data Structures for the Game
@@ -184,7 +185,7 @@ public class GameManager : MonoBehaviour
     }
     private int getCoralsPerType(int type) {
         int result = 0;
-        for (int i = 0; i < globalVarContainer.globalVariables.maxSpacePerCoral; i++) {
+        for (int i = 0; i < globalVarContainer.globals[level].maxSpacePerCoral; i++) {
             if (growingCorals[type][i] == null)
                 continue;
             result += 1;
@@ -200,7 +201,7 @@ public class GameManager : MonoBehaviour
     }
     private int getReadyCoralsPerType(int type) {
         int ready = 0;
-        for (int i = 0; i < globalVarContainer.globalVariables.maxSpacePerCoral; i++) {
+        for (int i = 0; i < globalVarContainer.globals[level].maxSpacePerCoral; i++) {
             if (growingCorals[type][i] == null)
                 continue;
             if (growingCorals[type][i].timer.isDone())
@@ -210,7 +211,7 @@ public class GameManager : MonoBehaviour
     }
     private int getIndexOfReadyCoral(int type) {
         int index = -1;
-        for (int i = 0; i < globalVarContainer.globalVariables.maxSpacePerCoral; i++) {
+        for (int i = 0; i < globalVarContainer.globals[level].maxSpacePerCoral; i++) {
             if (growingCorals[type][i] == null)
                 continue;
             if (index == -1 && growingCorals[type][i].timer.isDone())
@@ -232,14 +233,14 @@ public class GameManager : MonoBehaviour
         substrataDataContainer = SubstrataDataContainer.Load("SubstrataXML");
         coralBaseData = CoralDataContainer.Load("CoralDataXML");
         algaeDataContainer = AlgaeDataContainer.Load("AlgaeDataXML");
-        zoom = globalVarContainer.globalVariables.zoom;
+        zoom = globalVarContainer.globals[level].zoom;
         print("XML data loaded");
         print("initializing tiles...");
         initializeTiles();
         print("initialization done");
-        tempTimer = new CountdownTimer(globalVarContainer.globalVariables.maxGameTime);
+        tempTimer = new CountdownTimer(globalVarContainer.globals[level].maxGameTime);
         disasterTimer = new CountdownTimer(30f); // make into first 5 mins immunity
-        climateChangeTimer = new CountdownTimer(globalVarContainer.globalVariables.timeUntilClimateChange);
+        climateChangeTimer = new CountdownTimer(globalVarContainer.globals[level].timeUntilClimateChange);
         climateChangeHasWarned = false;
         climateChangeHasHappened = false;
         economyMachine = new EconomyMachine(10f,0f,5f);
@@ -250,6 +251,7 @@ public class GameManager : MonoBehaviour
         timeToKillCorals = false;
         ccTimerImage.transform.Find("CCTimeLeft").gameObject.SetActive(false);
         ccOverlay.SetActive(false);
+        print("level is " + globalVarContainer.globals[level].level);
         initializeGame();
     }
 
@@ -487,7 +489,7 @@ public class GameManager : MonoBehaviour
                             .gameObject.transform.GetChild(i/3)
                             .gameObject.transform.GetChild(i%3)
                             .gameObject.transform.Find("Selection/RackPlacements").gameObject;
-            for (int j = 0; j < globalVarContainer.globalVariables.maxSpacePerCoral; j++) {
+            for (int j = 0; j < globalVarContainer.globals[level].maxSpacePerCoral; j++) {
                 Sprite currentPositionSprite = rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().sprite;
                 if (growingCorals[i][j] == null) {
                     thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = progressNone;
@@ -508,7 +510,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        CNC.GetComponent<TMPro.TextMeshProUGUI>().text = getCoralsInNursery() + "/" + globalVarContainer.globalVariables.maxSpaceInNursery + " SLOTS LEFT";
+        CNC.GetComponent<TMPro.TextMeshProUGUI>().text = getCoralsInNursery() + "/" + globalVarContainer.globals[level].maxSpaceInNursery + " SLOTS LEFT";
 
         tempTimer.updateTime();
         timeLeft.GetComponent<TMPro.TextMeshProUGUI>().text = convertTimetoMS(tempTimer.currentTime);
@@ -685,11 +687,11 @@ public class GameManager : MonoBehaviour
     }
 
     private void growCoral(int type) {
-        bool spaceInNursery = getCoralsInNursery() < globalVarContainer.globalVariables.maxSpaceInNursery;
-        bool underMaxGrow = getCoralsPerType(type) < globalVarContainer.globalVariables.maxSpacePerCoral;
+        bool spaceInNursery = getCoralsInNursery() < globalVarContainer.globals[level].maxSpaceInNursery;
+        bool underMaxGrow = getCoralsPerType(type) < globalVarContainer.globals[level].maxSpacePerCoral;
         if (spaceInNursery && underMaxGrow) {
             int nullIdx = -1;
-            for (int i = 0; i < globalVarContainer.globalVariables.maxSpacePerCoral; i++) {
+            for (int i = 0; i < globalVarContainer.globals[level].maxSpacePerCoral; i++) {
                 if (growingCorals[type][i] == null)
                     nullIdx = i;
             }
@@ -699,9 +701,9 @@ public class GameManager : MonoBehaviour
                 growingCorals[type][nullIdx] = new NursingCoral(coralBaseData.corals[type].name, new CountdownTimer(coralBaseData.corals[type].growTime));
             }
         } else if (!underMaxGrow) {
-            feedbackDialogue("Can only grow 4 corals per type.", globalVarContainer.globalVariables.feedbackDelayTime);
+            feedbackDialogue("Can only grow 4 corals per type.", globalVarContainer.globals[level].feedbackDelayTime);
         } else if (!spaceInNursery) {
-            feedbackDialogue("Nursery is at maximum capacity.", globalVarContainer.globalVariables.feedbackDelayTime);
+            feedbackDialogue("Nursery is at maximum capacity.", globalVarContainer.globals[level].feedbackDelayTime);
         }
     }
 
@@ -715,13 +717,13 @@ public class GameManager : MonoBehaviour
         int readyNum = getReadyCoralsPerType(type);
         int loadedNum = getCoralsPerType(type);
         if (!withinBoardBounds(position, 30)) {
-            feedbackDialogue("Bawal dito", globalVarContainer.globalVariables.feedbackDelayTime);
+            feedbackDialogue("Bawal dito", globalVarContainer.globals[level].feedbackDelayTime);
         } else if (coralTileMap.HasTile(position)) {
-            feedbackDialogue("Can't put corals on top of other corals!.", globalVarContainer.globalVariables.feedbackDelayTime);
+            feedbackDialogue("Can't put corals on top of other corals!.", globalVarContainer.globals[level].feedbackDelayTime);
         } else if (algaeTileMap.HasTile(position)) {
-            feedbackDialogue("Can't put corals on top of algae! The coral will die!", globalVarContainer.globalVariables.feedbackDelayTime);
+            feedbackDialogue("Can't put corals on top of algae! The coral will die!", globalVarContainer.globals[level].feedbackDelayTime);
         } else if (substrataOverlayTileMap.HasTile(position)) {
-            feedbackDialogue("This is a toxic tile! Corals won't survive here.", globalVarContainer.globalVariables.feedbackDelayTime);
+            feedbackDialogue("This is a toxic tile! Corals won't survive here.", globalVarContainer.globals[level].feedbackDelayTime);
         } else if ((substrataTileMap.HasTile(position) || substrataCells.ContainsKey(position)) && readyNum > 0) { 
             successful = true;
             int tempIdx = getIndexOfReadyCoral(type);
@@ -743,13 +745,13 @@ public class GameManager : MonoBehaviour
             coralTileMap.SetTile(position, coralTileBases[type]);
         } else if (readyNum == 0 && loadedNum-readyNum > 0) {
             float minTime = 3600f;
-            for (int i = 0; i < globalVarContainer.globalVariables.maxSpacePerCoral; i++) {
+            for (int i = 0; i < globalVarContainer.globals[level].maxSpacePerCoral; i++) {
                 if (growingCorals[type][i] == null)
                     continue;
                 minTime = Math.Min(minTime, growingCorals[type][i].timer.currentTime);
             }
             string t = "Soonest to mature coral of this type has " + convertTimetoMS(minTime) + " time left.";
-            feedbackDialogue(t, globalVarContainer.globalVariables.feedbackDelayTime);
+            feedbackDialogue(t, globalVarContainer.globals[level].feedbackDelayTime);
         }
 
         return successful;
