@@ -58,13 +58,13 @@ public class EconomyMachine
 
     public void updateHFCF(float hf, float cf) {
         float diff = (Mathf.Max(cf,hf)-Mathf.Min(cf,hf));
-        if (Mathf.Abs(diff) <= tolerance) {
+        if (Mathf.Abs(diff) <= tolerance) { // within threshold
             actualHF = hf;
-            actualCF = (cf > hf ? cf-tolerance : cf);
-        } else if (cf > hf) {
+            actualCF = (cf > hf ? cf-diff : cf);
+        } else if (cf > hf) { // more carnivorous
             actualCF = hf - diff;
             actualHF = actualCF + tolerance;
-        } else {
+        } else { // more herbivorous
             actualCF = Mathf.Max(hf-tolerance, cf);
             actualHF = hf - 0.5f*tolerance;
         }
