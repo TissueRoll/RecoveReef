@@ -55,7 +55,8 @@ public class GameManager : MonoBehaviour
     TMPro.TextMeshProUGUI timeLeftText;
     TMPro.TextMeshProUGUI ccTimerText;
     ClimateChangeTimer ccTimer;
-
+    UnityEngine.UI.Image[,] coralIndicators;
+    UnityEngine.UI.Image[,] coralRackIndicators;
     TMPro.TextMeshProUGUI cncText;
     GameEnd endGameScript;
     PopupScript popupScript;
@@ -68,7 +69,19 @@ public class GameManager : MonoBehaviour
         timeLeftText = timeLeft.GetComponent<TMPro.TextMeshProUGUI>();
         ccTimerText = ccTimerImage.transform.Find("CCTimeLeft").gameObject.GetComponent<TMPro.TextMeshProUGUI>();
         ccTimer = ccTimerImage.GetComponent<ClimateChangeTimer>();
-        
+        coralIndicators = new UnityEngine.UI.Image[6,4];
+        coralRackIndicators = new UnityEngine.UI.Image[6,4];
+        for (int i = 0; i < 6; i++) {
+            GameObject thing = CoralOptions[i].transform.Find("CoralIndicator").gameObject;
+            GameObject rack = nurseryCamera.transform.Find("NurseryCanvas/Racks")
+                    .gameObject.transform.GetChild(i/3)
+                    .gameObject.transform.GetChild(i%3)
+                    .gameObject.transform.Find("Selection/RackPlacements").gameObject;
+            for (int j = 0; j < 4; j++) {
+                coralIndicators[i,j] = thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>();
+                coralRackIndicators[i,j] = rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>();
+            }
+        }
         cncText = CNC.GetComponent<TMPro.TextMeshProUGUI>();
         endGameScript = endGameScreen.GetComponent<GameEnd>();
         popupScript = popupCanvas.GetComponent<PopupScript>();
@@ -513,29 +526,24 @@ public class GameManager : MonoBehaviour
         
         // __INEFFICIENT__
         for (int i = 0; i < 6; i++) {
-            GameObject thing = CoralOptions[i].transform.Find("CoralIndicator").gameObject;
-            GameObject rack = nurseryCamera.transform.Find("NurseryCanvas/Racks")
-                            .gameObject.transform.GetChild(i/3)
-                            .gameObject.transform.GetChild(i%3)
-                            .gameObject.transform.Find("Selection/RackPlacements").gameObject;
             for (int j = 0; j < globalVarContainer.globals[level].maxSpacePerCoral; j++) {
-                Sprite currentPositionSprite = rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().sprite;
+                Sprite currentPositionSprite = coralRackIndicators[i,j].sprite;
                 if (growingCorals[i][j] == null) {
-                    thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = progressNone;
+                    coralIndicators[i,j].color = progressNone;
                     if (currentPositionSprite.name != emptyRack.name)
-                        rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().sprite = emptyRack;
+                        coralRackIndicators[i,j].sprite = emptyRack;
                     continue;
                 }
                 growingCorals[i][j].timer.updateTime();
                 bool currentCoralDone = growingCorals[i][j].timer.isDone();
                 if (!currentCoralDone)
-                    thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.Lerp(progressZero, progressIsDone, growingCorals[i][j].timer.percentComplete);
-                else if (currentCoralDone && thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color != progressDefinitelyDone)
-                    thing.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().color = progressDefinitelyDone;
+                    coralIndicators[i,j].color = Color.Lerp(progressZero, progressIsDone, growingCorals[i][j].timer.percentComplete);
+                else if (currentCoralDone && coralIndicators[i,j].color != progressDefinitelyDone)
+                    coralIndicators[i,j].color = progressDefinitelyDone;
                 if (currentCoralDone && currentPositionSprite.name != bigRack[i].name) 
-                    rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().sprite = bigRack[i];
+                    coralRackIndicators[i,j].sprite = bigRack[i];
                 else if (!currentCoralDone && currentPositionSprite.name != smallRack[i].name)
-                    rack.transform.GetChild(j).gameObject.GetComponent<UnityEngine.UI.Image>().sprite = smallRack[i];
+                    coralRackIndicators[i,j].sprite = smallRack[i];
             }
         }
 
