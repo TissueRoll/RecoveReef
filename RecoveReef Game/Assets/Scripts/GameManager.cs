@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Tilemaps;
+using UnityEngine.EventSystems;
 using System.Linq;
 
 public class GameManager : MonoBehaviour
@@ -496,9 +497,13 @@ public class GameManager : MonoBehaviour
 
         // testing for hex tile coords
         if (Input.GetMouseButtonDown(0)) {
-            Vector3Int position = getMouseGridPosition();
-            print("L:: " + position);
-            // print(":: " + substrataOverlayTileMap.GetTile(position).name); // temp disabled cuz it can error
+            if (EventSystem.current.IsPointerOverGameObject()) {
+                // print(EventSystem.current.currentSelectedGameObject.name);
+            } else {
+                Vector3Int position = getMouseGridPosition();
+                print("L:: " + position);
+                // print(":: " + substrataOverlayTileMap.GetTile(position).name); // temp disabled cuz it can error
+            }
         }
 
         bool rb = Input.GetMouseButtonDown(1);
