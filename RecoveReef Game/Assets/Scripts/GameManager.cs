@@ -41,8 +41,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject[] plasticBags;
     [SerializeField] private Sprite gameWinWordArt;
     [SerializeField] private Sprite gameLoseWordArt;
-    [SerializeField] private Sprite popupSad;
-    [SerializeField] private Sprite popupBoom;
     [SerializeField] private GameObject ccTimerImage;
     [SerializeField] private GameObject ccOverlay;
     [SerializeField] private int level;
@@ -145,9 +143,9 @@ public class GameManager : MonoBehaviour
         return position;
     }
     private string convertTimetoMS(float rawTime) {
-        string minutes = Mathf.Floor(rawTime/60).ToString("00");
-        string seconds = Mathf.RoundToInt(rawTime%60).ToString("00");
-        return string.Format("{0}:{1}", minutes, seconds);
+        int minutes = Mathf.FloorToInt(rawTime / 60f);
+        int seconds = Mathf.FloorToInt(rawTime - minutes * 60);
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
     private HashSet<Vector3Int> spread (Vector3Int position, int level) {
         HashSet<Vector3Int> result = new HashSet<Vector3Int>();
@@ -438,13 +436,15 @@ public class GameManager : MonoBehaviour
             climateChangeHasWarned = true;
             ccTimerImage.transform.Find("CCTimeLeft").gameObject.SetActive(true);
             ccTimer.climateChangeIsHappen();
-            makePopup("Climate Change is coming...", "Scientists have predicted that our carbon emmisions will lead to devastating damages to sea life in a few years! This could slow down the growth of coral reefs soon...");
+            // makePopup("Climate Change is coming...", "Scientists have predicted that our carbon emmisions will lead to devastating damages to sea life in a few years! This could slow down the growth of coral reefs soon...");
+            popupScript.makeEvent(0, "Climate Change is coming! Scientists have predicted that our carbon emmisions will lead to devastating damages to sea life in a few years! This could slow down the growth of coral reefs soon...");
         } else if (climateChangeHasWarned && !climateChangeHasHappened && climateChangeTimer.isDone()) {
             climateChangeHasHappened = true;
             // ccTimerImage.transform.Find("CCTimeLeft").gameObject.SetActive(false);
             // ccTimer.climateChangeIsHappen();
             ccOverlay.SetActive(true);
-            makePopup("Climate Change has come...", "Scientists have determined that the increased temperature and ocean acidity has slowed down coral growth! We have to make a greater effort to coral conservation and rehabilitation!");
+            // makePopup("Climate Change has come...", "Scientists have determined that the increased temperature and ocean acidity has slowed down coral growth! We have to make a greater effort to coral conservation and rehabilitation!");
+            popupScript.makeEvent(0, "Climate Change has come! Scientists have determined that the increased temperature and ocean acidity has slowed down coral growth! We have to make a greater effort to coral conservation and rehabilitation!");
             applyClimateChange();
         }
 
@@ -452,7 +452,7 @@ public class GameManager : MonoBehaviour
         // test script for popup messages
         if (Input.GetKeyDown(KeyCode.Slash)) {
             // makePopup("Title", "Hello!", false);
-            randomDisaster(2);
+            randomDisaster(UnityEngine.Random.Range(1,3));
         }
         #endregion
 
@@ -593,17 +593,6 @@ public class GameManager : MonoBehaviour
             cameraFollowPosition = savedCameraPosition;
             cameraFollow.Setup(() => cameraFollowPosition, () => zoom);
         }
-    }
-
-    private void makePopup(string title, string message, bool anthro = false) {
-        if (anthro) {
-            popupScript.SetPopupSprite(popupBoom);
-        } else {
-            popupScript.SetPopupSprite(popupSad);
-        }
-        popupScript.SetPopupTitle(title);
-        popupScript.SetPopupMessage(message);
-        popupScript.OpenPopup();
     }
 
     private void feedbackDialogue(string text, float time) {
@@ -863,7 +852,7 @@ public class GameManager : MonoBehaviour
     #endregion
     #region Disasters
     private void randomDisaster(int forceEvent = 0) {
-        // chance: 1/100
+        // chance: 1/50
         // random: random area selection
         // toxic: center must be a coral
         int t = UnityEngine.Random.Range(1,51);
@@ -877,7 +866,7 @@ public class GameManager : MonoBehaviour
                         coralTileMap.SetTile(removePos, coralDeadTileBases[findIndexOfEntityFromName(coralCells[removePos].TileBase.name)]);
                     }
                 }
-                makePopup("Random Event:\nIrresponsible Tourists", "Oh no! A group of tourists took coral parts as a souvenir! A coral group has died due to this!");
+                popupScript.makeEvent(UnityEngine.Random.Range(2,4));
             }
         } else if (t == 42 || forceEvent == 2) {
             Vector3Int pos = new Vector3Int(UnityEngine.Random.Range(-30,31), UnityEngine.Random.Range(-30,31), 0);
@@ -896,7 +885,7 @@ public class GameManager : MonoBehaviour
                 }
                 substrataOverlayTileMap.SetTile(toxicPos,toxicOverlay);
             }
-            makePopup("Random Event:\nToxic Waste", "Oh no! Toxic waste has been dumped in the ocean again! Seaweed and coral alike have died around the fallen toxic waste.", true);
+            popupScript.makeEvent(1);
         }
     }
     // __ECONOMY__
