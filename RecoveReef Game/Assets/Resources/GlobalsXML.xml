@@ -9,6 +9,7 @@
             <FeedbackDelayTime>2.5</FeedbackDelayTime>
             <MaxGameTime>900</MaxGameTime>
             <TimeUntilClimateChange>720</TimeUntilClimateChange>
+            <Goal>250</Goal>
         </Global>
         <Global level="1">
             <Zoom>20</Zoom>
@@ -18,6 +19,7 @@
             <FeedbackDelayTime>2.5</FeedbackDelayTime>
             <MaxGameTime>300</MaxGameTime>
             <TimeUntilClimateChange>200</TimeUntilClimateChange>
+            <Goal>300</Goal>
         </Global>
     </Globals>
 </GlobalCollection>

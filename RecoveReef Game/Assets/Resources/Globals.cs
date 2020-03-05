@@ -24,6 +24,8 @@ public class Globals
     public float maxGameTime;
     [XmlElement("TimeUntilClimateChange")]
     public float timeUntilClimateChange;
+    [XmlElement("Goal")]
+    public float goal;
 
     public string what_are() {
         string output = "---";
@@ -35,6 +37,7 @@ public class Globals
         output += "\nfeedbackDelayTime: " + feedbackDelayTime;
         output += "\nmaxGameTime: " + maxGameTime;
         output += "\ntimeUntilClimateChange: " + timeUntilClimateChange;
+        output += "\ngoal: " + goal;
         return output;
     }
 }

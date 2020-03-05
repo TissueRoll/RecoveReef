@@ -62,6 +62,7 @@ public class GameManager : MonoBehaviour
     PopupScript popupScript;
     TMPro.TextMeshProUGUI feedbackTextText;
     MenuAnimator hudOpenSidebar;
+    GameObject nurseryScreen;
     private void initializeComponents() {
         grid = GameObject.Find("Grid").GetComponent<Grid>();
         fishDisplayText = fishDisplay.GetComponent<TMPro.TextMeshProUGUI>();
@@ -87,6 +88,7 @@ public class GameManager : MonoBehaviour
         popupScript = popupCanvas.GetComponent<PopupScript>();
         feedbackTextText = feedbackText.GetComponent<TMPro.TextMeshProUGUI>();
         hudOpenSidebar = cameraFollow.GetComponent<MenuAnimator>();
+        nurseryScreen = nurseryCamera.transform.Find("NurseryCanvas").gameObject;
     }
     #endregion
     #region Data Structures for the Game
@@ -402,6 +404,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        // __REMOVE__
         if (Input.GetKeyDown(KeyCode.Backspace)) {
             gameIsWon = false;
             endTheGame("force end");
@@ -445,6 +448,7 @@ public class GameManager : MonoBehaviour
             applyClimateChange();
         }
 
+        // __REMOVE__
         // test script for popup messages
         if (Input.GetKeyDown(KeyCode.Slash)) {
             // makePopup("Title", "Hello!", false);
@@ -524,7 +528,6 @@ public class GameManager : MonoBehaviour
         }
         #endregion
         
-        // __INEFFICIENT__
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < globalVarContainer.globals[level].maxSpacePerCoral; j++) {
                 Sprite currentPositionSprite = coralRackIndicators[i,j].sprite;
@@ -555,7 +558,7 @@ public class GameManager : MonoBehaviour
             endTheGame("The reef could not recover...");
         }
 
-        if (fishIncome >= 350.0f) {
+        if (fishIncome >= globalVarContainer.globals[level].goal) {
             timeUntilEnd.updateTime();
         } else {
             timeUntilEnd.reset();
@@ -582,10 +585,10 @@ public class GameManager : MonoBehaviour
             savedCameraPosition = cameraFollow.transform.position;
             cameraFollow.enabled = false;
             nurseryCamera.enabled = true;
-            nurseryCamera.transform.Find("NurseryCanvas").gameObject.SetActive(true); // BAND AID
+            nurseryScreen.SetActive(true);
         } else {
             cameraFollow.enabled = true;
-            nurseryCamera.transform.Find("NurseryCanvas").gameObject.SetActive(false); // BAND AID
+            nurseryScreen.SetActive(false);
             nurseryCamera.enabled = false;
             cameraFollowPosition = savedCameraPosition;
             cameraFollow.Setup(() => cameraFollowPosition, () => zoom);
@@ -754,7 +757,7 @@ public class GameManager : MonoBehaviour
         int readyNum = getReadyCoralsPerType(type);
         int loadedNum = getCoralsPerType(type);
         if (!withinBoardBounds(position, 30)) {
-            feedbackDialogue("Bawal dito", globalVarContainer.globals[level].feedbackDelayTime);
+            feedbackDialogue("Can't put corals out of bounds!", globalVarContainer.globals[level].feedbackDelayTime);
         } else if (coralTileMap.HasTile(position)) {
             feedbackDialogue("Can't put corals on top of other corals!.", globalVarContainer.globals[level].feedbackDelayTime);
         } else if (algaeTileMap.HasTile(position)) {
@@ -863,8 +866,8 @@ public class GameManager : MonoBehaviour
         // chance: 1/100
         // random: random area selection
         // toxic: center must be a coral
-        int t = UnityEngine.Random.Range(1,76);
-        if (t == 69 || forceEvent == 1) {
+        int t = UnityEngine.Random.Range(1,51);
+        if (t == 21 || forceEvent == 1) {
             if (coralCells.Count > 15) {
                 Vector3Int pos = coralCells.ElementAt(UnityEngine.Random.Range(0,coralCells.Count)).Key;
                 HashSet<Vector3Int> removeSpread = spread(pos, 2);
