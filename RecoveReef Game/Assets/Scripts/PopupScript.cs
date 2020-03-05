@@ -31,7 +31,7 @@ public class PopupScript : MonoBehaviour
     public void makeEvent(int type, string forced = "") {
         if (forced.Length > 0) {
             SetPopupSprite(defaultSprite);
-            SetPopupMessage("An event has happened.");
+            SetPopupMessage(forced);
         } else if (type == 1) { // toxic waste
             SetPopupSprite(toxicWaste);
             SetPopupMessage("An irresponsible company just dumped a barrel of toxic waste into your coral reef! Part of your reef has now become permanently affected.");
