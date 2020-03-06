@@ -19,7 +19,7 @@
             <FeedbackDelayTime>2.5</FeedbackDelayTime>
             <MaxGameTime>300</MaxGameTime>
             <TimeUntilClimateChange>200</TimeUntilClimateChange>
-            <Goal>300</Goal>
+            <Goal>125</Goal>
         </Global>
     </Globals>
 </GlobalCollection>
