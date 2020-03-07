@@ -134,6 +134,7 @@ public class GameManager : MonoBehaviour
     private bool gameIsWon;
     private List<Vector3Int> markedToDieCoral;
     private bool timeToKillCorals;
+    private List<int> coralTypeNumbers;
     #endregion
 
     #region Generic Helper Functions
@@ -270,6 +271,7 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
         initializeComponents();
+        endGameScript.resetEndScreen();
         print("loading XML data...");
         globalVarContainer = GlobalContainer.Load("GlobalsXML");
         substrataDataContainer = SubstrataDataContainer.Load("SubstrataXML");
@@ -278,6 +280,7 @@ public class GameManager : MonoBehaviour
         zoom = globalVarContainer.globals[level].zoom;
         print("XML data loaded");
         print("initializing tiles...");
+        coralTypeNumbers = new List<int>() {0, 0, 0, 0, 0, 0};
         initializeTiles();
         print("initialization done");
         tempTimer = new CountdownTimer(globalVarContainer.globals[level].maxGameTime);
@@ -285,7 +288,7 @@ public class GameManager : MonoBehaviour
         climateChangeTimer = new CountdownTimer(globalVarContainer.globals[level].timeUntilClimateChange);
         climateChangeHasWarned = false;
         climateChangeHasHappened = false;
-        economyMachine = new EconomyMachine(10f,0f,5f);
+        economyMachine = new EconomyMachine(10f,0f,5f,20);
         timeUntilEnd = new CountdownTimer(60f);
         plasticSpawner = new CountdownTimer(15f);
         totalPlasticSpawned = 0;
@@ -349,6 +352,7 @@ public class GameManager : MonoBehaviour
             );
             cfTotalProduction += cell.coralData.cfProduction;
             hfTotalProduction += cell.coralData.hfProduction;
+            coralTypeNumbers[findIndexOfEntityFromName(currentTB.name)]++;
             coralCells.Add(cell.LocalPlace, cell);
         }
         
@@ -620,6 +624,11 @@ public class GameManager : MonoBehaviour
 
         fishDisplayText.text = "Fish Income: " + fishIncome;
         if (hfTotalProduction >= cfTotalProduction) {
+            // if (economyMachine.isDiverse(coralTypeNumbers)) {
+            //     fishImageImage.color = new Color(255f/255f, 198f/255f, 39f/255f, 1f);
+            // } else {
+            //     fishImageImage.color = new Color(73f/255f,196f/255f,114f/255f,1f);
+            // }
             fishImageImage.color = new Color(73f/255f,196f/255f,114f/255f,1f);
         } else {
             fishImageImage.color = new Color(255f/255f,69f/255f,69f/255f,1f);
@@ -699,6 +708,7 @@ public class GameManager : MonoBehaviour
                             coralTileMap.SetTile(localPlace, null);
                             hfTotalProduction -= coralCells[localPlace].coralData.hfProduction;
                             cfTotalProduction -= coralCells[localPlace].coralData.cfProduction;
+                            coralTypeNumbers[findIndexOfEntityFromName(coralCells[localPlace].TileBase.name)]--;
                             coralCells.Remove(localPlace);
                         }
                     }
@@ -776,6 +786,7 @@ public class GameManager : MonoBehaviour
             coralCells.Add(position, cell);
             cfTotalProduction += coralCells[position].coralData.cfProduction;
             hfTotalProduction += coralCells[position].coralData.hfProduction;
+            coralTypeNumbers[type]++;
             coralTileMap.SetTile(position, coralTileBases[type]);
         } else if (readyNum == 0 && loadedNum-readyNum > 0) {
             float minTime = 3600f;
@@ -822,6 +833,7 @@ public class GameManager : MonoBehaviour
             coralTileMap.SetTile(key, null);
             hfTotalProduction -= coralCells[key].coralData.hfProduction;
             cfTotalProduction -= coralCells[key].coralData.cfProduction;
+            coralTypeNumbers[findIndexOfEntityFromName(coralCells[key].TileBase.name)]--;
             coralCells.Remove(key);
         }
         markedToDieCoral.Clear();
@@ -847,6 +859,7 @@ public class GameManager : MonoBehaviour
                         );
                         cfTotalProduction += cell.coralData.cfProduction;
                         hfTotalProduction += cell.coralData.hfProduction;
+                        coralTypeNumbers[findIndexOfEntityFromName(coralCells[key].TileBase.name)]++;
                         coralCells.Add(cell.LocalPlace,cell);
                         coralTileMap.SetTile(cell.LocalPlace, cell.TileBase);
                     }
@@ -905,9 +918,11 @@ public class GameManager : MonoBehaviour
     // __ECONOMY__
     #region Misc Updates
     private void updateFishOutput() {
+        print("HF: " + hfTotalProduction + " CF: " + cfTotalProduction);
         economyMachine.updateHFCF(hfTotalProduction, cfTotalProduction);
-        float hf = economyMachine.getActualHF();
-        float cf = economyMachine.getActualCF();
+        // idk why this is here
+        // float hf = economyMachine.getActualHF();
+        // float cf = economyMachine.getActualCF();
         fishIncome = (int)Math.Round(economyMachine.getTotalFish())-totalPlasticSpawned/3;
     }
     #endregion

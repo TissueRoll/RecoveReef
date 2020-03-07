@@ -4,6 +4,64 @@
         <CoralData name="branching">
             <GrowTime>10</GrowTime>
             <Survivability>1</Survivability>
+            <Propagatability>10</Propagatability>
+            <CFProduction>0.15</CFProduction>
+            <HFProduction>0.45</HFProduction>
+            <CoralType>fast</CoralType>
+            <PrefTerrain>layer00</PrefTerrain>
+        </CoralData>
+        <CoralData name="columnar">
+            <GrowTime>15</GrowTime>
+            <Survivability>1</Survivability>
+            <Propagatability>8</Propagatability>
+            <CFProduction>0.35</CFProduction>
+            <HFProduction>0.65</HFProduction>
+            <CoralType>normal</CoralType>
+            <PrefTerrain>layer00</PrefTerrain>
+        </CoralData>
+        <CoralData name="encrusting">
+            <GrowTime>35</GrowTime>
+            <Survivability>6</Survivability>
+            <Propagatability>2</Propagatability>
+            <CFProduction>1.0</CFProduction>
+            <HFProduction>0.5</HFProduction>
+            <CoralType>slow</CoralType>
+            <PrefTerrain>layer01</PrefTerrain>
+        </CoralData>
+        <CoralData name="foliaceous">
+            <GrowTime>20</GrowTime>
+            <Survivability>3</Survivability>
+            <Propagatability>6</Propagatability>
+            <CFProduction>0.55</CFProduction>
+            <HFProduction>0.85</HFProduction>
+            <CoralType>normal</CoralType>
+            <PrefTerrain>layer01</PrefTerrain>
+        </CoralData>
+        <CoralData name="laminar">
+            <GrowTime>45</GrowTime>
+            <Survivability>8</Survivability>
+            <Propagatability>2</Propagatability>
+            <CFProduction>1.2</CFProduction>
+            <HFProduction>0.6</HFProduction>
+            <CoralType>normal</CoralType>
+            <PrefTerrain>layer02</PrefTerrain>
+        </CoralData>
+        <CoralData name="massive">
+            <GrowTime>70</GrowTime>
+            <Survivability>10</Survivability>
+            <Propagatability>1</Propagatability>
+            <CFProduction>1.4</CFProduction>
+            <HFProduction>0.7</HFProduction>
+            <CoralType>slow</CoralType>
+            <PrefTerrain>layer02</PrefTerrain>
+        </CoralData>
+    </CoralDatas>
+</CoralDataCollection>
+
+    <!-- <CoralDatas>
+        <CoralData name="branching">
+            <GrowTime>10</GrowTime>
+            <Survivability>1</Survivability>
             <Propagatability>6</Propagatability>
             <CFProduction>1.0</CFProduction>
             <HFProduction>0.1</HFProduction>
@@ -55,5 +113,4 @@
             <CoralType>slow</CoralType>
             <PrefTerrain>layer02</PrefTerrain>
         </CoralData>
-    </CoralDatas>
-</CoralDataCollection>
+    </CoralDatas> -->
