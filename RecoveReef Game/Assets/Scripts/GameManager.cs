@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TileBase[] algaeTileBases;
     [SerializeField] private TileBase[] substrataTileBases;
     [SerializeField] private TileBase[] toxicTileBases;
+    [SerializeField] private TileBase algaeEdgeTileBase;
     [SerializeField] private GameObject fishDisplay;
     [SerializeField] private GameObject fishImage;
     [SerializeField] private GameObject timeLeft;
@@ -330,6 +331,15 @@ public class GameManager : MonoBehaviour
                 }
             } else {
                 substrataCells.Add(localPlace, substrataDataContainer.substrata[idx].groundViability);
+            }
+        }
+
+        for (int i = 31; i <= 35; i++) {
+            for (int j = -35; j <= 35; j++) {
+                substrataOverlayTileMap.SetTile(new Vector3Int(j, i, 0), algaeEdgeTileBase);
+                substrataOverlayTileMap.SetTile(new Vector3Int(j, -i, 0), algaeEdgeTileBase);
+                substrataOverlayTileMap.SetTile(new Vector3Int(i, j, 0), algaeEdgeTileBase);
+                substrataOverlayTileMap.SetTile(new Vector3Int(-i, j, 0), algaeEdgeTileBase);
             }
         }
         
