@@ -18,4 +18,9 @@ public class MenuAnimator : MonoBehaviour
         }
         isOpen = !isOpen;
     }
+
+    public void ResetPosition() {
+        isOpen = false;
+        
+    }
 }

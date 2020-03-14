@@ -1,0 +1,5 @@
+climate change header: 48pt, TITAN ONE
+
+body text: 24pt, OPEN SANS SEMIBOLD
+
+ok button text: 36pt, TITAN ONE

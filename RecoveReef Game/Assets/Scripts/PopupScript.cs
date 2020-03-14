@@ -9,10 +9,15 @@ public class PopupScript : MonoBehaviour
     public GameObject popupCanvas;
     public GameObject outText;
     public UnityEngine.UI.Image popupSprite;
+    public UnityEngine.UI.Button popupButton;
     [SerializeField] private Sprite defaultSprite;
     [SerializeField] private Sprite toxicWaste;
     [SerializeField] private Sprite tourists;
     [SerializeField] private Sprite bombing;
+    [SerializeField] private Sprite climateChange;
+    [SerializeField] private Sprite normalButton;
+    [SerializeField] private Sprite climateButton;
+    
 
     void Update() {
         if (!GameEnd.gameHasEnded && !PauseScript.GamePaused && Input.GetKeyDown(KeyCode.Return)) {
@@ -29,9 +34,11 @@ public class PopupScript : MonoBehaviour
     }
 
     public void makeEvent(int type, string forced = "") {
+        popupButton.GetComponent<UnityEngine.UI.Image>().sprite = normalButton;
         if (forced.Length > 0) {
-            SetPopupSprite(defaultSprite);
+            SetPopupSprite(climateChange);
             SetPopupMessage(forced);
+            popupButton.GetComponent<UnityEngine.UI.Image>().sprite = climateButton;
         } else if (type == 1) { // toxic waste
             SetPopupSprite(toxicWaste);
             SetPopupMessage("An irresponsible company just dumped a barrel of toxic waste into your coral reef! Part of your reef has now become permanently affected.");

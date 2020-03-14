@@ -136,6 +136,7 @@ public class GameManager : MonoBehaviour
     private List<Vector3Int> markedToDieCoral;
     private bool timeToKillCorals;
     private List<int> coralTypeNumbers;
+    private Vector2 resolution;
     #endregion
 
     #region Generic Helper Functions
@@ -271,6 +272,7 @@ public class GameManager : MonoBehaviour
         } else if (instance != this) {
             Destroy(gameObject);
         }
+        resolution = new Vector2(Screen.width, Screen.height);
         initializeComponents();
         endGameScript.resetEndScreen();
         print("loading XML data...");
@@ -422,6 +424,12 @@ public class GameManager : MonoBehaviour
         }
 
         // updateFishData();
+
+        // if (resolution.x != Screen.width || resolution.y != Screen.height) {
+            
+        //     resolution.x = Screen.width;
+        //     resolution.y = Screen.height;
+        // }
 
         plasticSpawner.updateTime();
         if (plasticSpawner.isDone()) {
