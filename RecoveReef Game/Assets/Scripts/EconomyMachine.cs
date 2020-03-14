@@ -10,12 +10,24 @@ public class EconomyMachine
     private float actualCF;
     private float tolerance;
     private int coralNumberTolerance;
+    private int cycle;
+    private int cycleMax;
+    private List<float> vals;
+    private bool initialCycleComplete;
+    private List<float> desired;
+    float tolerancePercentage;
 
     public EconomyMachine (float aHF, float aCF, float tol, int cNT) {
         actualHF = aHF;
         actualCF = aCF;
         tolerance = tol;
         coralNumberTolerance = cNT;
+        cycle = 0;
+        cycleMax = 5;
+        vals = new List<float>() {1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+        initialCycleComplete = false;
+        desired = new List<float>() {0.25f, 0.21f, 0.15f, 0.17f, 0.12f, 0.10f};
+        tolerancePercentage = 0.05f;
     }
 
     public bool algaeWillSurvive (AlgaeCellData algaeCellData, int groundViability, int additiveFactors) {
@@ -59,60 +71,39 @@ public class EconomyMachine
     }
 
     public float diversityMultiplier (List<int> coralNumbers) {
-        Debug.Log("___");
-        foreach (int num in coralNumbers) {
-            Debug.Log(num);
-        }
-        Debug.Log("***");
         float multiplier = 1.0f;
         int[] fast = new int[3]{0,1,3};
         int[] slow = new int[3]{2,4,5};
-        float fMax = 0;
-        int fMaxIdx = 0;
-        float fDist = 0.0f;
-        float sMax = 0;
-        int sMaxIdx = 2;
-        float sDist = 0.0f;
-        for (int i = 0; i < 3; i++) {
-            fDist += coralNumbers[fast[i]];
-            sDist += coralNumbers[slow[i]];
-            if (coralNumbers[fast[i]] > fMax) {
-                fMax = coralNumbers[fast[i]];
-                fMaxIdx = fast[i];
-            }
-            if (coralNumbers[slow[i]] > sMax) {
-                sMax = coralNumbers[slow[i]];
-                sMaxIdx = slow[i];
-            }
+        float sum = 0;
+        foreach (int x in coralNumbers) {
+            sum += x;
         }
-        fDist -= fMax;
-        fDist /= 2.0f;
-        sDist -= sMax;
-        sDist /= 2.0f;
 
-        float interLimit = coralNumberTolerance/2.0f;
-        float cNTtemp = coralNumberTolerance;
-        if (fMax >= sMax) {
-            if (fMax*3/5 - cNTtemp <= sMax && sMax <= fMax) { // within s/f threshold
-                float fastDev = fDist-(fMax-cNTtemp-interLimit);
-                float slowDev = sDist-(sMax-cNTtemp-interLimit);
-                float worstDev = Mathf.Max(0.0f, Mathf.Min(fastDev,slowDev));
-                multiplier = 1.0f + 0.5f*Mathf.Lerp(0.0f, interLimit, Mathf.Min(interLimit, worstDev));
-            } else {
-                multiplier = 1.0f;
-            }
-        } else {
-            if ((sMax - fMax) <= cNTtemp) { // within s/f threshold
-                float fastDev = fDist-(fMax-cNTtemp-interLimit);
-                float slowDev = sDist-(sMax-cNTtemp-interLimit);
-                float worstDev = Mathf.Max(0.0f, Mathf.Min(fastDev,slowDev));
-                multiplier = 1.0f + 0.5f*Mathf.Lerp(0.0f, interLimit, Mathf.Min(interLimit, worstDev));
-            } else {
-                multiplier = 1.0f;
+        for (int i = 0; i < coralNumbers.Count; i++) {
+            float computedPercentage = ((float)coralNumbers[i])/sum;
+            if (desired[i]-tolerancePercentage <= computedPercentage && computedPercentage <= desired[i]+tolerancePercentage) {
+                multiplier += 0.5f/((float)coralNumbers.Count);
             }
         }
 
-        return multiplier;
+        vals[cycle] = multiplier;
+        if (cycle == 4 && !initialCycleComplete) {
+            initialCycleComplete = true;
+        }
+        cycle = (cycle+1)%cycleMax;
+
+        float averageMultiplier = 0.0f;
+        foreach (float x in vals) {
+            averageMultiplier += x;
+        }
+        averageMultiplier /= ((float)cycleMax);
+
+        // Debug.Log("---");
+        // foreach(float x in vals)
+        //     Debug.Log(x);
+        // Debug.Log("---");
+
+        return averageMultiplier;
     }
 
     public void updateHFCF(float hf, float cf) {
@@ -139,12 +130,17 @@ public class EconomyMachine
         return actualCF;
     }
 
-    public float getTotalFish() {
-        return (0.2f*actualHF+0.3f*actualCF);
+    public float getTotalFish(List<int> coralNumbers) {
+        return (0.2f*actualHF+0.3f*actualCF)*diversityMultiplier(coralNumbers);
     }
 
-    // public bool isDiverse(List<int> coralNumbers) {
-    //     return (diversityMultiplier(coralNumbers) < 1.5f ? false : true);
-    // }
+    public bool isAverageGood() {
+        float averageMultiplier = 0.0f;
+        foreach (float x in vals) {
+            averageMultiplier += x;
+        }
+        averageMultiplier /= ((float)cycleMax);
+        return (averageMultiplier >= 1.35f);
+    }
 
 }

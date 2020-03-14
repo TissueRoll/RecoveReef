@@ -395,7 +395,7 @@ public class GameManager : MonoBehaviour
         // nurseryCamera.Setup(() => new Vector3(500,500,-10), () => zoom);
         nurseryCamera.enabled = false;
         // __FIX__ MAKE INTO GLOBALS?
-        // InvokeRepeating("updateFishData", 0f, 1.0f);
+        InvokeRepeating("updateFishData", 0f, 1.0f);
         InvokeRepeating("updateAllAlgae", 1.0f, 1.0f); 
         InvokeRepeating("updateAllCoral", 2.0f, 2.0f); 
         InvokeRepeating("killCorals", 1.0f, 3.0f);
@@ -407,17 +407,11 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // __REMOVE__
-        if (Input.GetKeyDown(KeyCode.Backspace)) {
-            gameIsWon = false;
-            endTheGame("force end");
-        }
-
         if (PauseScript.GamePaused) {
             return;
         }
 
-        updateFishData();
+        // updateFishData();
 
         plasticSpawner.updateTime();
         if (plasticSpawner.isDone()) {
@@ -461,9 +455,9 @@ public class GameManager : MonoBehaviour
         }
         #endregion
 
-        if (Input.GetKeyDown(KeyCode.Backslash)) {
-            hfTotalProduction += 10000;
-        }
+        // if (Input.GetKeyDown(KeyCode.Backslash)) {
+        //     hfTotalProduction += 10000;
+        // }
 
         #region Keyboard Shortcuts
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
@@ -619,17 +613,19 @@ public class GameManager : MonoBehaviour
         hudOpenSidebar.OpenThing();
     }
 
-    private void updateFishData() {        
+    private void updateFishData() {
+        if (GameEnd.gameHasEnded || PauseScript.GamePaused)
+            return;        
         updateFishOutput();
 
         fishDisplayText.text = "Fish Income: " + fishIncome;
         if (hfTotalProduction >= cfTotalProduction) {
-            // if (economyMachine.isDiverse(coralTypeNumbers)) {
-            //     fishImageImage.color = new Color(255f/255f, 198f/255f, 39f/255f, 1f);
-            // } else {
-            //     fishImageImage.color = new Color(73f/255f,196f/255f,114f/255f,1f);
-            // }
-            fishImageImage.color = new Color(73f/255f,196f/255f,114f/255f,1f);
+            if (economyMachine.isAverageGood()) {
+                fishImageImage.color = new Color(255f/255f, 198f/255f, 39f/255f, 1f);
+            } else {
+                fishImageImage.color = new Color(73f/255f,196f/255f,114f/255f,1f);
+            }
+            // fishImageImage.color = new Color(73f/255f,196f/255f,114f/255f,1f);
         } else {
             fishImageImage.color = new Color(255f/255f,69f/255f,69f/255f,1f);
         }
@@ -918,12 +914,11 @@ public class GameManager : MonoBehaviour
     // __ECONOMY__
     #region Misc Updates
     private void updateFishOutput() {
-        print("HF: " + hfTotalProduction + " CF: " + cfTotalProduction);
         economyMachine.updateHFCF(hfTotalProduction, cfTotalProduction);
         // idk why this is here
         // float hf = economyMachine.getActualHF();
         // float cf = economyMachine.getActualCF();
-        fishIncome = (int)Math.Round(economyMachine.getTotalFish())-totalPlasticSpawned/3;
+        fishIncome = (int)Math.Round(economyMachine.getTotalFish(coralTypeNumbers))-totalPlasticSpawned/3;
     }
     #endregion
 
