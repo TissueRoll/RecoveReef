@@ -467,10 +467,10 @@ public class GameManager : MonoBehaviour
 
         // __REMOVE__
         // test script for popup messages
-        if (Input.GetKeyDown(KeyCode.Slash)) {
-            // makePopup("Title", "Hello!", false);
-            randomDisaster(UnityEngine.Random.Range(1,3));
-        }
+        // if (Input.GetKeyDown(KeyCode.Slash)) {
+        //     // makePopup("Title", "Hello!", false);
+        //     randomDisaster(UnityEngine.Random.Range(1,3));
+        // }
         #endregion
 
         // if (Input.GetKeyDown(KeyCode.Backslash)) {
@@ -544,7 +544,7 @@ public class GameManager : MonoBehaviour
         if (!showNursery) {
             moveCameraWASD(100f);
             if (edgeScrollingEnabled) moveCameraMouseEdge(100f,10f);
-            zoomKeys(5f);
+            zoomKeys(20.0f);
             clampCamera();
         }
         #endregion
