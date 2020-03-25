@@ -291,7 +291,7 @@ public class GameManager : MonoBehaviour
         climateChangeTimer = new CountdownTimer(globalVarContainer.globals[level].timeUntilClimateChange);
         climateChangeHasWarned = false;
         climateChangeHasHappened = false;
-        economyMachine = new EconomyMachine(10f,0f,5f,20);
+        economyMachine = new EconomyMachine(10f,0f,5f,15);
         timeUntilEnd = new CountdownTimer(60f);
         plasticSpawner = new CountdownTimer(15f);
         totalPlasticSpawned = 0;
@@ -453,29 +453,14 @@ public class GameManager : MonoBehaviour
             climateChangeHasWarned = true;
             ccTimerImage.transform.Find("CCTimeLeft").gameObject.SetActive(true);
             ccTimer.climateChangeIsHappen();
-            // makePopup("Climate Change is coming...", "Scientists have predicted that our carbon emmisions will lead to devastating damages to sea life in a few years! This could slow down the growth of coral reefs soon...");
             popupScript.makeEvent(0, "Climate Change is coming! Scientists have predicted that our carbon emmisions will lead to devastating damages to sea life in a few years! This could slow down the growth of coral reefs soon...");
         } else if (climateChangeHasWarned && !climateChangeHasHappened && climateChangeTimer.isDone()) {
             climateChangeHasHappened = true;
-            // ccTimerImage.transform.Find("CCTimeLeft").gameObject.SetActive(false);
-            // ccTimer.climateChangeIsHappen();
             ccOverlay.SetActive(true);
-            // makePopup("Climate Change has come...", "Scientists have determined that the increased temperature and ocean acidity has slowed down coral growth! We have to make a greater effort to coral conservation and rehabilitation!");
             popupScript.makeEvent(0, "Climate Change has come! Scientists have determined that the increased temperature and ocean acidity has slowed down coral growth! We have to make a greater effort to coral conservation and rehabilitation!");
             applyClimateChange();
         }
-
-        // __REMOVE__
-        // test script for popup messages
-        // if (Input.GetKeyDown(KeyCode.Slash)) {
-        //     // makePopup("Title", "Hello!", false);
-        //     randomDisaster(UnityEngine.Random.Range(1,3));
-        // }
         #endregion
-
-        // if (Input.GetKeyDown(KeyCode.Backslash)) {
-        //     hfTotalProduction += 10000;
-        // }
 
         #region Keyboard Shortcuts
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
@@ -511,17 +496,6 @@ public class GameManager : MonoBehaviour
         }
         #endregion
 
-        // testing for hex tile coords
-        if (Input.GetMouseButtonDown(0)) {
-            if (EventSystem.current.IsPointerOverGameObject()) {
-                // print(EventSystem.current.currentSelectedGameObject.name);
-            } else {
-                Vector3Int position = getMouseGridPosition();
-                print("L:: " + position);
-                // print(":: " + substrataOverlayTileMap.GetTile(position).name); // temp disabled cuz it can error
-            }
-        }
-
         bool rb = Input.GetMouseButtonDown(1);
         if (rb) {
             if(!plantCoral(selectedCoral)) {
@@ -533,7 +507,7 @@ public class GameManager : MonoBehaviour
         // movement of screen
         if (Input.GetKeyDown(KeyCode.Space)) {
             edgeScrollingEnabled = !edgeScrollingEnabled;
-            print("edgeScrolling = " + edgeScrollingEnabled);
+            feedbackDialogue("Edge scrolling is " + (edgeScrollingEnabled ? "enabled!" : "disabled!"), globalVarContainer.globals[level].feedbackDelayTime);
         }
         
         // transporting to some far off place for the nursery
@@ -767,11 +741,7 @@ public class GameManager : MonoBehaviour
 
     private bool plantCoral(int type) {
         bool successful = false;
-        // should be unable to replace a tile
-        // need to add more useful stuff like notifying why you can place a tile here
-        print("right mouse button has been pressed");
         Vector3Int position = getMouseGridPosition();
-        print("position: " + position);
         int readyNum = getReadyCoralsPerType(type);
         int loadedNum = getCoralsPerType(type);
         if (!withinBoardBounds(position, 30)) {

@@ -19,15 +19,6 @@
             <CoralType>normal</CoralType>
             <PrefTerrain>layer00</PrefTerrain>
         </CoralData>
-        <CoralData name="encrusting">
-            <GrowTime>35</GrowTime>
-            <Survivability>6</Survivability>
-            <Propagatability>2</Propagatability>
-            <CFProduction>1.0</CFProduction>
-            <HFProduction>0.5</HFProduction>
-            <CoralType>slow</CoralType>
-            <PrefTerrain>layer01</PrefTerrain>
-        </CoralData>
         <CoralData name="foliaceous">
             <GrowTime>20</GrowTime>
             <Survivability>3</Survivability>
@@ -35,6 +26,15 @@
             <CFProduction>0.55</CFProduction>
             <HFProduction>0.85</HFProduction>
             <CoralType>normal</CoralType>
+            <PrefTerrain>layer01</PrefTerrain>
+        </CoralData>
+        <CoralData name="encrusting">
+            <GrowTime>35</GrowTime>
+            <Survivability>6</Survivability>
+            <Propagatability>2</Propagatability>
+            <CFProduction>1.0</CFProduction>
+            <HFProduction>0.5</HFProduction>
+            <CoralType>slow</CoralType>
             <PrefTerrain>layer01</PrefTerrain>
         </CoralData>
         <CoralData name="laminar">
